@@ -3,6 +3,8 @@
 const header = document.querySelector("header")
 
 // = = = = = FUNCIONES = = = = =
+// JavaScript
+
 
 // = = = = = EVENTOS = = = = =
 window.addEventListener("scroll", () => {
