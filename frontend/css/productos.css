@@ -1,0 +1,27 @@
+:root{
+    --principal-fondo: #FEF3C7;
+    --secundario-fondo: #FFFFFF;
+    --elem-importantes: #155E75;
+    --elem-secun:#0EA5A4;
+    --detalles: #84CC16;
+    --texto: #263238;
+}
+/* #75949d */
+
+@font-face {
+    font-family: 'titulo';
+    src: url('../assets/fonts/DancingScript-VariableFont_wght.ttf');
+}
+@font-face {
+    font-family: 'texto';
+    src: url('../assets/fonts/JosefinSans-Light.ttf');
+}
+
+
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+/* = = = = SECCION HERO = = = = */
