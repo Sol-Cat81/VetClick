@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VetClick - login</title>
+    <link rel="stylesheet" href="css/login.css">
+</head>
+<body>
+    <main class="login-container">
+        <section class="panel-bienvenida">
+            <div class="logo-container">
+                <img src="assets/icons/LogoPrincipal.jpeg" alt="" class="logo">
+            </div>
+            <h1>Bienvenido</h1>
+            <p class="descripcion">
+                VetClick
+                <br>
+                clinica veterinaria
+            </p>
+
+            <div class="mascotas-container">
+
+            </div>
+        </section>
+
+        <section class="panel-login">
+            <div class="icono-login">
+                <span>🐾</span>
+            </div>
+            <h2>Iniciar sesion</h2>
+            <p class="subtitulo">
+                Ingrece tus datos para seguir 
+            </p>
+
+            <form id="fromLogin">
+                <div class="campo">
+                    <label for="correo">
+                        Correo electronico
+                    </label>
+                    <div class="input-container">
+
+                        <input type="email" name="correo" id="correo-session" placeholder="ejemplo@veterinaria.com" required>
+                    </div>
+                </div>
+
+                <div class="campo">
+                    <label for="password">
+                        Contraseña
+                    </label>
+
+                    <div class="input-container">
+
+                        <input type="password" name="password" id="password-session" placeholder="*********" required>
+                        <button type="button" id="mostrarPassword" class="btn-password">👁</button>
+                    </div>
+                </div>
+
+                <div class="opciones">
+                    <label class="politica-privacidad"> <input type="checkbox" name="politica-privacidad" id="politica-privacidad"> <span>Acepto politicas de seguridad</span></label>
+                </div>
+
+                <button type="submit" class="btn-session">Iniciar sesion</button>
+            </form>
+        </section>
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="js/login.js"></script>
+</body>
+</html>
