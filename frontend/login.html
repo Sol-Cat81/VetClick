@@ -1,69 +1,137 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VetClick - login</title>
+    <title>VetClick · Iniciar sesión</title>
+    <link rel="shortcut icon" href="assets/icons/ChatGPT-Image-Logo.png" type="image/x-icon">
     <link rel="stylesheet" href="css/login.css">
 </head>
 <body>
     <main class="login-container">
+
+        <!-- Panel de bienvenida -->
         <section class="panel-bienvenida">
             <div class="logo-container">
-                <img src="assets/icons/LogoPrincipal.jpeg" alt="" class="logo">
+                <img src="assets/icons/LogoPrincipal.jpeg" alt="Logo VetClick" class="logo">
             </div>
             <h1>Bienvenido</h1>
             <p class="descripcion">
-                VetClick
-                <br>
-                clinica veterinaria
+                VetClick<br>
+                Clínica veterinaria
             </p>
 
-            <div class="mascotas-container">
-
+            <!-- Reservado para ilustración / animación de mascotas -->
+            <div class="mascotas-container" aria-hidden="true">
+                <img src="assets/img/imagen-ilustrada-login.svg" alt="imagen de veterinario" class="imagen-ilustrada-login">
             </div>
         </section>
 
-        <section class="panel-login">
+        <!-- Panel de inicio de sesión -->
+        <section class="panel-login" id="panelLogin">
             <div class="icono-login">
                 <span>🐾</span>
             </div>
-            <h2>Iniciar sesion</h2>
-            <p class="subtitulo">
-                Ingrece tus datos para seguir 
-            </p>
+            <h2>Iniciar sesión</h2>
+            <p class="subtitulo">Ingresa tus datos para continuar</p>
 
-            <form id="fromLogin">
+            <p class="mensaje-error" id="loginError" role="alert" hidden></p>
+
+            <form id="formLogin" novalidate>
                 <div class="campo">
-                    <label for="correo">
-                        Correo electronico
-                    </label>
+                    <label for="correo-session">Correo electrónico</label>
                     <div class="input-container">
-
-                        <input type="email" name="correo" id="correo-session" placeholder="ejemplo@veterinaria.com" required>
+                        <input type="email" name="correo" id="correo-session" placeholder="ejemplo@veterinaria.com" autocomplete="email" required>
                     </div>
                 </div>
 
                 <div class="campo">
-                    <label for="password">
-                        Contraseña
-                    </label>
-
+                    <label for="password-session">Contraseña</label>
                     <div class="input-container">
-
-                        <input type="password" name="password" id="password-session" placeholder="*********" required>
-                        <button type="button" id="mostrarPassword" class="btn-password">👁</button>
+                        <input type="password" name="password" id="password-session" placeholder="********" autocomplete="current-password" minlength="6" required>
+                        <button type="button" class="btn-password" data-target="password-session" aria-label="Mostrar contraseña">
+                            <svg class="icono-ojo" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
                     </div>
                 </div>
 
                 <div class="opciones">
-                    <label class="politica-privacidad"> <input type="checkbox" name="politica-privacidad" id="politica-privacidad"> <span>Acepto politicas de seguridad</span></label>
+                    <label class="politica-privacidad">
+                        <input type="checkbox" name="politica-privacidad" id="politica-privacidad-login" required>
+                        <span>Acepto las políticas de seguridad</span>
+                    </label>
                 </div>
 
-                <button type="submit" class="btn-session">Iniciar sesion</button>
+                <button type="submit" class="btn-session">
+                    <span class="btn-texto">Iniciar sesión</span>
+                </button>
             </form>
+
+            <p class="separador"><span>o</span></p>
+
+            <button type="button" class="btn-secundario" id="irARegistro">Crear una cuenta</button>
+        </section>
+
+        <!-- Panel de registro -->
+        <section class="panel-registro" id="panelRegistro" hidden>
+            <div class="icono-login">
+                <span>🐾</span>
+            </div>
+            <h2>Crear una cuenta</h2>
+            <p class="subtitulo">Completa los campos con tus datos</p>
+
+            <p class="mensaje-error" id="registroError" role="alert" hidden></p>
+
+            <form id="formRegistro" novalidate>
+                <div class="campo">
+                    <label for="nombre-usuario">Nombre completo</label>
+                    <div class="input-container">
+                        <input type="text" name="nombre-usuario" id="nombre-usuario" autocomplete="name" required>
+                    </div>
+                </div>
+
+                <div class="campo">
+                    <label for="correo-registro">Correo electrónico</label>
+                    <div class="input-container">
+                        <input type="email" name="correo-registro" id="correo-registro" autocomplete="email" required>
+                    </div>
+                </div>
+
+                <div class="campo">
+                    <label for="password-registro">Contraseña</label>
+                    <div class="input-container">
+                        <input type="password" name="password-registro" id="password-registro" autocomplete="new-password" minlength="6" required>
+                        <button type="button" class="btn-password" data-target="password-registro" aria-label="Mostrar contraseña">
+                            <svg class="icono-ojo" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="campo">
+                    <label for="telefono-registro">Teléfono</label>
+                    <div class="input-container">
+                        <input type="tel" name="telefono-registro" id="telefono-registro" autocomplete="tel" required>
+                    </div>
+                </div>
+
+                <div class="opciones">
+                    <label class="politica-privacidad">
+                        <input type="checkbox" name="politica-privacidad" id="politica-privacidad-registro" required>
+                        <span>Acepto las políticas de seguridad</span>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn-session">
+                    <span class="btn-texto">Crear una cuenta</span>
+                </button>
+            </form>
+
+            <p class="separador"><span>o</span></p>
+
+            <button type="button" class="btn-secundario" id="irALogin">Iniciar sesión</button>
         </section>
     </main>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
     <script src="js/login.js"></script>
 </body>
