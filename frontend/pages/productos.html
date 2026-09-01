@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,12 +11,17 @@
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <!-- Phosphor icons -->
     <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2"></script>
+    <!-- swiper -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.css" />
     <!-- CSS -->
     <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="">
+    <link rel="stylesheet" href="../css/productos.css">
     <title>VetClick - Shop</title>
 </head>
+
 <body>
+    <lottie-player class="loader" src="../assets/img/animal.json" background="transparent" speed="1"
+        style="width: 300px; height: 300px;" loop autoplay></lottie-player>
     <!-- BARRA DE NAVEGACION -->
     <header>
         <!-- Logo -->
@@ -39,25 +45,55 @@
     <main>
         <!-- SECCION HERO (CARRUSEL) -->
         <section id="hero-productos">
-            <div id="carouselExampleRide" class="carousel slide" data-bs-ride="true">
-                <div class="carousel-inner">
-                    <div class="carousel-item active">
+            <div class="swiper">
+                <!-- Additional required wrapper -->
+                <div class="swiper-wrapper">
+                    <!-- Slides -->
+                    <div class="swiper-slide">
+                        <img src="../assets/img/carrusel1.png" alt="">
                     </div>
-                    <div class="carousel-item">
+                    <div class="swiper-slide">
+                        <img src="../assets/img/carrusel2.png" alt="">
                     </div>
-                    <div class="carousel-item">
+                    <div class="swiper-slide">
+                        <img src="../assets/img/carrusel2.png" alt="">
                     </div>
+                    ...
                 </div>
-                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleRide" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Previous</span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleRide" data-bs-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Next</span>
-                </button>
+                <!-- If we need pagination -->
+                <div class="swiper-pagination"></div>
+
+                <!-- If we need navigation buttons -->
+                <div class="swiper-button-prev"></div>
+                <div class="swiper-button-next"></div>
+
+                <!-- If we need scrollbar -->
+                <div class="swiper-scrollbar"></div>
             </div>
         </section>
+
+        <div class="container-fluid">
+            <div class="row">
+                <!-- BARRA LATERAL -->
+                <div class="col col-2">
+                    <aside>
+                        <h3>Productos</h3>
+                        <ul class="sidevar">
+                            <li></li>
+                            <li></li>
+                            <li></li>
+                            <li></li>
+                            <li></li>
+                        </ul>
+                    </aside>
+                </div>
+                <div class="col col-10">
+                    <section id="productos">
+                        sds
+                    </section>
+                </div>
+            </div>
+        </div>
     </main>
 
     <!-- PIE DE PAGINA -->
@@ -94,10 +130,16 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
         crossorigin="anonymous"></script>
-
+    <!-- swiper -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.js"></script>
     <!-- Anime js -->
     <script src="https://cdn.jsdelivr.net/npm/animejs/dist/bundles/anime.umd.min.js"></script>
 
-    <script src="js/main.js"></script>
+    <!-- Pre-loader -->
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+
+    <script src="../js/main.js"></script>
+    <script src="../js/productos.js"></script>
 </body>
+
 </html>

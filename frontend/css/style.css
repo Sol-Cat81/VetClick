@@ -25,9 +25,24 @@
 }
 
 body{
-    background-color: --principal-fondo;
+    background-color: var(--secundario-fondo);
     font-family: 'texto';
 }
+
+/* Loader */
+.loader{
+    position: fixed;
+    top: calc(50vh - 150px);
+    left: calc(50vw - 150px);
+    z-index: 400;
+    align-self: center;
+    justify-self: center;
+    margin: auto;
+}
+  @keyframes movie {
+    0% {opacity: 1;}
+    100% {opacity: 0;}
+ }
 
 /* = = = = Clases reutilizables = = = = */
 h2{
@@ -52,6 +67,8 @@ header{
     justify-content: space-between;
     align-items: center;
     position: fixed;
+    z-index: 200;
+    transition: all 0.5s;
 }
 .scroll{
     background-color: var(--elem-importantes);
@@ -73,11 +90,20 @@ header{
     font-size: 1.5rem;
     order: 1;
 }
-.usuario i{
+header i{
     transition: 0.5s;
     padding: 5px;
 }
-.usuario i:hover{
+header i:hover{
+    color: var(--elem-secun);
+}
+.canva{
+    transition: 0.5s;
+    padding: 5px;
+    color: var(--secundario-fondo);
+    font-size: 1.5rem;
+}
+.canva:hover{
     color: var(--elem-secun);
 }
 
@@ -104,18 +130,19 @@ nav ul li a:hover{
 #hero{
     background-color: #9ac0ca;
     width: 100%;
-    height: 80vh;
+    height: auto;
     align-content: center;
     justify-content: space-between;
     color: var(--elem-importantes);
     text-align: center;
+    padding: 50px 0px;
 }
-#hero .row .col:nth-child(2){
+#hero .row .col-md-5{
     margin-left: auto;
 }
-#hero .row .col:nth-child(1){
+#hero .row .col-md-7{
     align-self: center;
-    margin: 0 auto;
+    margin: auto;
     font-size: 1.5rem;
 }
 .img-hero img{
@@ -145,7 +172,7 @@ h1{
 #nosotros{
     border-bottom: 2px solid var(--elem-secun);
 }
-#nosotros .col:nth-child(1){
+#nosotros .col-8-lg{
     align-self: center;
     height: 100%;
     padding: 20px;
@@ -165,7 +192,7 @@ h1{
     cursor: pointer;
     margin: 0px auto;
 }
-#servicios .col:nth-child(2){
+#servicios .col-sm-4:nth-child(2){
     border-left: 3px solid var(--elem-secun);
     border-right: 3px solid var(--elem-secun);
 }
@@ -191,6 +218,7 @@ h1{
 .contacto{
     width: 90%;
     margin: 0px auto;
+    align-content: center;
 }
 .contacto input,textarea{
     width: 80%;
@@ -208,11 +236,13 @@ h1{
     border: 1px solid var(--elem-importantes);
     border-radius: 5px;
 }
-.contacto .row .col img{
+.contacto .row .col-lg-6 img{
     width: auto;
 }
 #contacto img{
     width: 100%;
+    align-self: center;
+    justify-self: center;
 }
 
 /* = = = = PIE DE PAGINA = = = = */
@@ -239,4 +269,60 @@ footer .list-group li{
     flex-wrap: nowrap;
     gap: 15px;
     font-size: 2rem;
+}
+
+@media (max-width: 992px){
+    .contacto input,textarea{
+    width: 100%;
+}
+}
+
+@media (max-width: 800px){
+    header{
+        padding: 10px 20px;
+    }
+
+    /* hero */
+    h1{
+        font-size: 3rem;
+    }
+    .centrado{
+    width: 100%;
+    padding: 30px;
+    .contacto{
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px){
+    .img-hero img{
+        width: 400px;
+        margin-top: 30px;
+    }
+    footer .col-md-4:nth-child(1){
+        text-align: center;
+    }
+    footer .col-md-4:nth-child(1)img{
+        width: 60%;
+    }
+}
+    .card-serv{
+        width: 100%;
+}
+}
+
+@media (max-width: 700px){
+    header{
+        padding: 10px 30px;
+    }
+    .usuario{
+        order: 0;
+    }
+}
+
+@media (max-width: 576px){
+     #servicios .col-sm-4:nth-child(2){
+    border-left: 0px;
+    border-right: 0px;
+}
 }

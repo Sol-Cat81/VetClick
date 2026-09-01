@@ -25,3 +25,22 @@
 }
 
 /* = = = = SECCION HERO = = = = */
+.swiper{
+    width: 100%;
+    height: auto;
+}
+.swiper-slide img{
+    width: 100%;
+}
+.swiper-button-next, .swiper-button-prev{
+    padding: 10px;
+    border-radius: 50px;
+    background-color: var(--elem-importantes);
+    color: var(--secundario-fondo);
+}
+.swiper-pagination-bullet{
+    background-color: var(--elem-secun);
+}
+#productos{
+    height:500px ;
+}
