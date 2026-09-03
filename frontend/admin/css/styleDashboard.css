@@ -1,0 +1,631 @@
+/* =========================================
+   DASHBOARD
+========================================= */
+
+.dashboard {
+    width: 100%;
+    padding: 25px;
+    box-sizing: border-box;
+}
+
+
+/* =========================================
+   CABECERA
+========================================= */
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 20px;
+}
+
+.dashboard-header h2 {
+    margin: 0;
+
+    font-size: 24px;
+    font-weight: 700;
+
+    color: #263238;
+}
+
+.dashboard-header p {
+    margin: 5px 0 0;
+
+    color: #78909c;
+    font-size: 14px;
+}
+
+.dashboard-fecha {
+    font-size: 13px;
+    color: #78909c;
+}
+
+
+
+/* =========================================
+   GRID PRINCIPAL
+========================================= */
+
+.hero {
+    display: grid;
+
+    grid-template-columns:
+        minmax(280px, 1.1fr)
+        minmax(260px, 0.9fr)
+        minmax(300px, 1.3fr);
+
+    grid-template-areas:
+
+        "calendario empleados inventario"
+
+        "calendario empleados cita"
+
+        "calendario empleados actividades";
+
+    gap: 18px;
+
+    align-items: stretch;
+}
+
+
+/* =========================================
+   TARJETAS
+========================================= */
+
+.card {
+    background: #ffffff;
+
+    border: 1px solid #e6ebee;
+
+    border-radius: 10px;
+
+    box-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.04);
+
+    box-sizing: border-box;
+
+    overflow: hidden;
+}
+
+
+.card-header {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 16px 18px;
+
+    border-bottom: 1px solid #edf1f3;
+}
+
+.card-header h3 {
+    margin: 0;
+
+    color: #263238;
+
+    font-size: 16px;
+}
+
+.card-header span {
+    display: block;
+
+    margin-top: 4px;
+
+    font-size: 12px;
+
+    color: #90a4ae;
+}
+
+
+.btn-menu {
+    border: none;
+
+    background: transparent;
+
+    color: #78909c;
+
+    cursor: pointer;
+
+    font-size: 16px;
+
+    letter-spacing: 2px;
+}
+
+
+/* =========================================
+   CALENDARIO
+========================================= */
+
+.calendario-cita-dashboard {
+    grid-area: calendario;
+
+    min-height: 560px;
+}
+
+#calendario-dashboard {
+    padding: 10px;
+}
+
+
+/* Personalización FullCalendar */
+
+.fc {
+    font-family: inherit;
+
+    font-size: 12px;
+}
+
+.fc .fc-toolbar-title {
+    font-size: 16px;
+    color: #263238;
+}
+
+.fc .fc-button {
+    background: #1976d2;
+    border: none;
+
+    font-size: 11px;
+}
+
+.fc .fc-button:hover {
+    background: #1565c0;
+}
+
+.fc .fc-daygrid-day-number {
+    color: #455a64;
+}
+
+.fc .fc-day-today {
+    background: #e3f2fd !important;
+}
+
+.fc .fc-event {
+    border: none;
+    border-radius: 4px;
+
+    padding: 2px 4px;
+
+    font-size: 10px;
+}
+
+
+
+/* =========================================
+   EMPLEADOS
+========================================= */
+
+.empleados-dashboard {
+    grid-area: empleados;
+
+    display: flex;
+
+    flex-direction: column;
+}
+
+.cantidad-empleados {
+    background: #e3f2fd;
+
+    color: #1976d2 !important;
+
+    padding: 5px 9px;
+
+    border-radius: 20px;
+
+    font-weight: 600;
+}
+
+
+.lista-empleados {
+    padding: 5px 18px;
+
+    flex: 1;
+}
+
+
+.empleado {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 11px 0;
+
+    border-bottom: 1px solid #edf1f3;
+}
+
+
+.avatar {
+    width: 32px;
+    height: 32px;
+
+    border-radius: 50%;
+
+    background: #e3f2fd;
+
+    color: #1976d2;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 11px;
+
+    font-weight: bold;
+}
+
+
+.empleado-info {
+    flex: 1;
+}
+
+.empleado-info strong {
+    display: block;
+
+    color: #37474f;
+
+    font-size: 13px;
+}
+
+.empleado-info span {
+    display: block;
+
+    color: #90a4ae;
+
+    font-size: 11px;
+
+    margin-top: 2px;
+}
+
+
+.estado {
+    width: 8px;
+    height: 8px;
+
+    border-radius: 50%;
+}
+
+.estado.activo {
+    background: #43a047;
+}
+
+
+.btn-secundario {
+    margin: 10px 18px 16px;
+
+    padding: 9px;
+
+    background: white;
+
+    border: 1px solid #90a4ae;
+
+    border-radius: 5px;
+
+    color: #546e7a;
+
+    cursor: pointer;
+}
+
+
+
+/* =========================================
+   INVENTARIO
+========================================= */
+
+.inventario-alert-dashboard {
+    grid-area: inventario;
+}
+
+
+.alertas-inventario {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 10px;
+
+    padding: 15px;
+}
+
+
+.alerta {
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    padding: 12px;
+
+    border-radius: 7px;
+}
+
+
+.alerta strong {
+    display: block;
+
+    font-size: 12px;
+
+    color: #37474f;
+}
+
+.alerta span {
+    display: block;
+
+    font-size: 11px;
+
+    margin-top: 3px;
+
+    color: #607d8b;
+}
+
+
+.alerta-icono {
+    width: 25px;
+    height: 25px;
+
+    min-width: 25px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 5px;
+
+    font-weight: bold;
+}
+
+
+.alerta-critica {
+    background: #ffebee;
+}
+
+.alerta-critica .alerta-icono {
+    background: #ef5350;
+    color: white;
+}
+
+
+.alerta-peligro {
+    background: #fff3e0;
+}
+
+.alerta-peligro .alerta-icono {
+    background: #ff9800;
+    color: white;
+}
+
+
+.alerta-ok {
+    background: #e8f5e9;
+}
+
+.alerta-ok .alerta-icono {
+    background: #43a047;
+    color: white;
+}
+
+
+
+/* =========================================
+   AGREGAR CITA
+========================================= */
+
+.agregar-cita-dashboard {
+    grid-area: cita;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+    align-items: center;
+
+    padding: 20px;
+
+    text-align: center;
+}
+
+
+.agregar-cita-icono {
+    width: 45px;
+    height: 45px;
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    border-radius: 10px;
+
+    background: #e3f2fd;
+
+    color: #1976d2;
+
+    font-size: 28px;
+}
+
+
+.agregar-cita-dashboard h3 {
+    margin: 10px 0 4px;
+
+    color: #37474f;
+
+    font-size: 15px;
+}
+
+
+.agregar-cita-dashboard p {
+    margin: 0 0 15px;
+
+    color: #90a4ae;
+
+    font-size: 12px;
+}
+
+
+.btn-principal {
+    width: 100%;
+
+    padding: 9px;
+
+    border: none;
+
+    border-radius: 5px;
+
+    background: #1976d2;
+
+    color: white;
+
+    cursor: pointer;
+
+    font-size: 13px;
+}
+
+.btn-principal:hover {
+    background: #1565c0;
+}
+
+
+
+/* =========================================
+   ACTIVIDADES
+========================================= */
+
+.actividades-diarias-dashboard {
+    grid-area: actividades;
+}
+
+
+.lista-actividades {
+    padding: 5px 18px;
+}
+
+
+.actividad {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 12px 0;
+
+    border-bottom: 1px solid #edf1f3;
+}
+
+
+.actividad-icono {
+    width: 28px;
+    height: 28px;
+
+    min-width: 28px;
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    border-radius: 50%;
+
+    background: #e3f2fd;
+
+    color: #1976d2;
+
+    font-weight: bold;
+}
+
+
+.actividad div:nth-child(2) {
+    flex: 1;
+}
+
+
+.actividad strong {
+    display: block;
+
+    color: #455a64;
+
+    font-size: 12px;
+}
+
+
+.actividad span {
+    display: block;
+
+    color: #90a4ae;
+
+    font-size: 10px;
+
+    margin-top: 3px;
+}
+
+
+.actividad time {
+    color: #90a4ae;
+
+    font-size: 10px;
+}
+
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 1100px) {
+
+    .hero {
+        grid-template-columns:
+            1fr 1fr;
+
+        grid-template-areas:
+
+            "calendario empleados"
+
+            "inventario inventario"
+
+            "cita actividades";
+    }
+
+}
+
+
+@media (max-width: 750px) {
+
+    .hero {
+        grid-template-columns: 1fr;
+
+        grid-template-areas:
+
+            "calendario"
+
+            "empleados"
+
+            "inventario"
+
+            "cita"
+
+            "actividades";
+    }
+
+    .alertas-inventario {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-header {
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 10px;
+    }
+
+}

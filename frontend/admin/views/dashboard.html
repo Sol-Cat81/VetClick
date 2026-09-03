@@ -1,0 +1,294 @@
+<section class="dashboard">
+
+    <!-- TÍTULO -->
+    <div class="dashboard-header">
+        <div>
+            <h2>Panel administrativo</h2>
+            <p>Resumen general de Vet Click</p>
+        </div>
+
+        <span class="dashboard-fecha">
+            Hoy, 18 de octubre de 2023
+        </span>
+    </div>
+
+
+    <section class="hero">
+
+
+        <!-- ========================= -->
+        <!-- CALENDARIO -->
+        <!-- ========================= -->
+
+        <section class="card calendario-cita-dashboard">
+
+            <div class="card-header">
+                <div>
+                    <h3>Estado de Turnos</h3>
+                    <span>Turnos programados</span>
+                </div>
+
+                <button class="btn-menu">•••</button>
+            </div>
+
+            <div id="calendario-dashboard"></div>
+
+        </section>
+
+
+
+        <!-- ========================= -->
+        <!-- EMPLEADOS -->
+        <!-- ========================= -->
+
+        <section class="card empleados-dashboard">
+
+            <div class="card-header">
+
+                <div>
+                    <h3>Empleados en turno</h3>
+                    <span>Personal activo actualmente</span>
+                </div>
+
+                <span class="cantidad-empleados">5</span>
+
+            </div>
+
+
+            <div class="lista-empleados">
+
+                <div class="empleado">
+                    <div class="avatar">JM</div>
+
+                    <div class="empleado-info">
+                        <strong>Dr. Juan Martínez</strong>
+                        <span>Veterinario</span>
+                    </div>
+
+                    <span class="estado activo"></span>
+                </div>
+
+
+                <div class="empleado">
+                    <div class="avatar">AL</div>
+
+                    <div class="empleado-info">
+                        <strong>Dra. Ana López</strong>
+                        <span>Veterinaria</span>
+                    </div>
+
+                    <span class="estado activo"></span>
+                </div>
+
+
+                <div class="empleado">
+                    <div class="avatar">CR</div>
+
+                    <div class="empleado-info">
+                        <strong>Carlos Ruiz</strong>
+                        <span>Recepción</span>
+                    </div>
+
+                    <span class="estado activo"></span>
+                </div>
+
+
+                <div class="empleado">
+                    <div class="avatar">LG</div>
+
+                    <div class="empleado-info">
+                        <strong>Laura García</strong>
+                        <span>Asistente</span>
+                    </div>
+
+                    <span class="estado activo"></span>
+                </div>
+
+
+                <div class="empleado">
+                    <div class="avatar">PS</div>
+
+                    <div class="empleado-info">
+                        <strong>Pedro Sánchez</strong>
+                        <span>Recepción</span>
+                    </div>
+
+                    <span class="estado activo"></span>
+                </div>
+
+            </div>
+
+
+            <button class="btn-secundario">
+                Gestionar personal
+            </button>
+
+        </section>
+
+
+
+        <!-- ========================= -->
+        <!-- ALERTAS INVENTARIO -->
+        <!-- ========================= -->
+
+        <section class="card inventario-alert-dashboard">
+
+            <div class="card-header">
+
+                <div>
+                    <h3>Alertas de inventario</h3>
+                    <span>Productos que requieren atención</span>
+                </div>
+
+                <button class="btn-menu">•••</button>
+
+            </div>
+
+
+            <div class="alertas-inventario">
+
+                <div class="alerta alerta-critica">
+
+                    <div class="alerta-icono">
+                        !
+                    </div>
+
+                    <div>
+                        <strong>Alimento RC Adulto</strong>
+                        <span>Stock bajo: 3/20</span>
+                    </div>
+
+                </div>
+
+
+                <div class="alerta alerta-peligro">
+
+                    <div class="alerta-icono">
+                        !
+                    </div>
+
+                    <div>
+                        <strong>Vacuna Antirrábica</strong>
+                        <span>Crítico: 1/50</span>
+                    </div>
+
+                </div>
+
+
+                <div class="alerta alerta-ok">
+
+                    <div class="alerta-icono">
+                        ✓
+                    </div>
+
+                    <div>
+                        <strong>Antiparasitario</strong>
+                        <span>Óptimo: 45/60</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ========================= -->
+        <!-- AGREGAR CITA -->
+        <!-- ========================= -->
+
+        <section class="card agregar-cita-dashboard">
+
+            <div class="agregar-cita-icono">
+                +
+            </div>
+
+            <h3>Añadir cita</h3>
+
+            <p>
+                Registrar un nuevo turno para un paciente
+            </p>
+
+            <button class="btn-principal">
+                Añadir cita
+            </button>
+
+        </section>
+
+
+
+        <!-- ========================= -->
+        <!-- ACTIVIDADES -->
+        <!-- ========================= -->
+
+        <section class="card actividades-diarias-dashboard">
+
+            <div class="card-header">
+
+                <div>
+                    <h3>Últimas actividades</h3>
+                    <span>Actividad reciente</span>
+                </div>
+
+                <button class="btn-menu">•••</button>
+
+            </div>
+
+
+            <div class="lista-actividades">
+
+                <div class="actividad">
+
+                    <div class="actividad-icono">
+                        +
+                    </div>
+
+                    <div>
+                        <strong>Stock actualizado</strong>
+                        <span>Se modificó el stock de vacunas</span>
+                    </div>
+
+                    <time>10m</time>
+
+                </div>
+
+
+                <div class="actividad">
+
+                    <div class="actividad-icono">
+                        ✓
+                    </div>
+
+                    <div>
+                        <strong>Cita registrada "Toby"</strong>
+                        <span>Turno para consulta general</span>
+                    </div>
+
+                    <time>25m</time>
+
+                </div>
+
+
+                <div class="actividad">
+
+                    <div class="actividad-icono">
+                        +
+                    </div>
+
+                    <div>
+                        <strong>Alta paciente "Max"</strong>
+                        <span>Nuevo paciente registrado</span>
+                    </div>
+
+                    <time>1h</time>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </section>
+
+</section>
