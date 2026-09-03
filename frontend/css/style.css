@@ -1,5 +1,5 @@
 :root{
-    --principal-fondo: #FEF3C7;
+    --principal-fondo: #F8FAF5;
     --secundario-fondo: #FFFFFF;
     --elem-importantes: #155E75;
     --elem-secun:#0EA5A4;
@@ -25,7 +25,7 @@
 }
 
 body{
-    background-color: var(--secundario-fondo);
+    background-color: var(--principal-fondo);
     font-family: 'texto';
 }
 
@@ -69,10 +69,7 @@ header{
     position: fixed;
     z-index: 200;
     transition: all 0.5s;
-}
-.scroll{
     background-color: var(--elem-importantes);
-    box-shadow: 0px 0px 20px 0px rgb(97, 97, 97);
 }
 
 /* Logo */

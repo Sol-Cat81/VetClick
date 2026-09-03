@@ -12,15 +12,9 @@ function cerrarLoader(){
 
 
 // = = = = = EVENTOS = = = = =
-window.addEventListener('load', cerrarLoader);
-
-window.addEventListener("scroll", () => {
-    if(window.scrollY > 100){
-        header.classList.add("scroll");
-    }else{
-        header.classList.remove("scroll");
-    }
-});
+window.addEventListener('load', () => {
+    cerrarLoader()
+})
 
 window.addEventListener('resize', () => {
     if(window.innerWidth < 700){
