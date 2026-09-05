@@ -24,7 +24,6 @@
       href="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.css"
     />
     <!-- CSS -->
-    <link rel="stylesheet" href="../css/style.css" />
     <link rel="stylesheet" href="../css/productos.css" />
     <title>VetClick - Shop</title>
   </head>
@@ -41,22 +40,144 @@
     ></lottie-player>
     <!-- BARRA DE NAVEGACION -->
     <header>
-      <!-- Logo -->
-      <div class="logo">
-        <a href="../index.html">VetClick</a>
+      <div class="contenedor">
+        <div class="menu">
+          <i
+            class="ph-thin ph-list"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#offcanvasWithBothOptions"
+            aria-controls="offcanvasWithBothOptions"
+          ></i>
+          <a href="../index.html" class="logo">VetClick</a>
+        </div>
+        <form class="search-bar">
+          <input type="text" placeholder="Buscar..." name="search" />
+          <button type="submit">
+            <i class="ph-bold ph-magnifying-glass"></i>
+          </button>
+        </form>
+        <div class="header-icons">
+          <i class="ph-thin ph-shopping-cart"></i>
+          <i class="ph-thin ph-heart"></i>
+          <i class="ph-thin ph-user"></i>
+        </div>
       </div>
-      <div class="usuario">
-        <i class="ph-thin ph-user"></i>
-        <i class="ph-thin ph-shopping-cart-simple"></i>
+      <div
+        class="offcanvas offcanvas-start"
+        data-bs-scroll="true"
+        tabindex="-1"
+        id="offcanvasWithBothOptions"
+        aria-labelledby="offcanvasWithBothOptionsLabel"
+      >
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title" id="offcanvasWithBothOptionsLabel">
+            Menu
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="offcanvas"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="offcanvas-body">
+          <ul>
+            <li><a href="../index.html" class="ofcanvas-nav">Inicio</a></li>
+            <li><a href="servicios.html" class="ofcanvas-nav">Servicios</a></li>
+            <li><a href="turnos.html" class="ofcanvas-nav">Turnos</a></li>
+          </ul>
+          <details class="desplegar-categoria">
+            <summary>
+              Categorias
+              <span class="flecha"><i class="ph-thin ph-caret-down"></i></span>
+            </summary>
+            <ul>
+              <li>
+                <details class="categoria-offcanvas">
+                  <summary>
+                    Perros
+                    <span class="sub-flecha"
+                      ><i class="ph-thin ph-caret-down"></i
+                    ></span>
+                  </summary>
+                  <ul>
+                    <li>Alimentos secos</li>
+                    <li>Alimentos humedos</li>
+                    <li>Comederos</li>
+                  </ul>
+                </details>
+              </li>
+              <li>
+                <details class="categoria-offcanvas">
+                  <summary>
+                    Gatos
+                    <span class="sub-flecha"
+                      ><i class="ph-thin ph-caret-down"></i
+                    ></span>
+                  </summary>
+                  <ul>
+                    <li>Alimentos secos</li>
+                    <li>Alimentos humedos</li>
+                    <li>Comederos</li>
+                  </ul>
+                </details>
+              </li>
+              <li>
+                <details class="categoria-offcanvas">
+                  <summary>
+                    Aves
+                    <span class="sub-flecha"
+                      ><i class="ph-thin ph-caret-down"></i
+                    ></span>
+                  </summary>
+                  <ul>
+                    <li>Alimentos secos</li>
+                    <li>Alimentos humedos</li>
+                    <li>Comederos</li>
+                  </ul>
+                </details>
+              </li>
+              <li>
+                <details class="categoria-offcanvas">
+                  <summary>
+                    Roedores
+                    <span class="sub-flecha"
+                      ><i class="ph-thin ph-caret-down"></i
+                    ></span>
+                  </summary>
+                  <ul>
+                    <li>Alimentos secos</li>
+                    <li>Alimentos humedos</li>
+                    <li>Comederos</li>
+                  </ul>
+                </details>
+              </li>
+              <li>
+                <details class="categoria-offcanvas">
+                  <summary>
+                    Otros
+                    <span class="sub-flecha"
+                      ><i class="ph-thin ph-caret-down"></i
+                    ></span>
+                  </summary>
+                  <ul>
+                    <li>Alimentos secos</li>
+                    <li>Alimentos humedos</li>
+                    <li>Comederos</li>
+                  </ul>
+                </details>
+              </li>
+            </ul>
+          </details>
+        </div>
+        <div class="offcanvas-footer">
+          <div class="logo-offcanvas">
+            <img src="../assets/icons/ChatGPT-Image-Logo.png" alt="" />
+            <span>VetClick</span>
+          </div>
+          <div class="offcanvas-correo">vetclick2026@gmail.com</div>
+        </div>
       </div>
-      <nav>
-        <ul>
-          <li><a href="#hero">Inicio</a></li>
-          <li><a href="pages/servicios.html">Servicios</a></li>
-          <li><a href="pages/politicas.html">Productos</a></li>
-          <li><a href="pages/turnos.html">Turnos</a></li>
-        </ul>
-      </nav>
     </header>
 
     <main>
@@ -349,44 +470,69 @@
           </div>
         </div>
       </section>
+
       <section id="marcas" class="container">
         <h2>Marcas</h2>
-        <div class="row row-cols-2 row-cols-xl-6 row-cols-lg-5 row-cols-md-3 g-4">
+        <div
+          class="row row-cols-2 row-cols-xl-6 row-cols-lg-5 row-cols-md-3 g-4"
+        >
           <div class="col">
             <div class="card-marcas mx-auto">
-              <img src="https://i.pinimg.com/736x/09/37/49/093749af19dcfcce270eeba5f4f174b0.jpg" alt="..." />
+              <img
+                src="https://i.pinimg.com/736x/09/37/49/093749af19dcfcce270eeba5f4f174b0.jpg"
+                alt="..."
+              />
             </div>
           </div>
           <div class="col">
             <div class="card-marcas mx-auto">
-              <img src="https://mundoanimalsantafe.com.ar/wp-content/uploads/2020/04/Sabrositos.png" alt="..." />
+              <img
+                src="https://mundoanimalsantafe.com.ar/wp-content/uploads/2020/04/Sabrositos.png"
+                alt="..."
+              />
             </div>
           </div>
           <div class="col">
             <div class="card-marcas mx-auto">
-              <img src="https://i.pinimg.com/736x/09/37/49/093749af19dcfcce270eeba5f4f174b0.jpg" alt="..." />
+              <img
+                src="https://i.pinimg.com/736x/09/37/49/093749af19dcfcce270eeba5f4f174b0.jpg"
+                alt="..."
+              />
             </div>
           </div>
           <div class="col">
             <div class="card-marcas mx-auto">
-              <img src="https://mundoanimalsantafe.com.ar/wp-content/uploads/2020/04/Sabrositos.png" alt="..." />
+              <img
+                src="https://mundoanimalsantafe.com.ar/wp-content/uploads/2020/04/Sabrositos.png"
+                alt="..."
+              />
             </div>
           </div>
           <div class="col">
             <div class="card-marcas mx-auto">
-              <img src="https://i.pinimg.com/736x/09/37/49/093749af19dcfcce270eeba5f4f174b0.jpg" alt="..." />
+              <img
+                src="https://i.pinimg.com/736x/09/37/49/093749af19dcfcce270eeba5f4f174b0.jpg"
+                alt="..."
+              />
             </div>
           </div>
           <div class="col">
             <div class="card-marcas mx-auto">
-              <img src="https://i.pinimg.com/736x/09/37/49/093749af19dcfcce270eeba5f4f174b0.jpg" alt="..." />
+              <img
+                src="https://i.pinimg.com/736x/09/37/49/093749af19dcfcce270eeba5f4f174b0.jpg"
+                alt="..."
+              />
             </div>
           </div>
           <div class="col">
             <div class="card-marcas mx-auto">
-              <img src="https://mundoanimalsantafe.com.ar/wp-content/uploads/2020/04/Sabrositos.png" alt="..." />
+              <img
+                src="https://mundoanimalsantafe.com.ar/wp-content/uploads/2020/04/Sabrositos.png"
+                alt="..."
+              />
             </div>
           </div>
+        </div>
       </section>
     </main>
 
@@ -433,7 +579,6 @@
     <!-- Pre-loader -->
     <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 
-    <script src="../js/main.js"></script>
     <script src="../js/productos.js"></script>
   </body>
 </html>
