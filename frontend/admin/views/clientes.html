@@ -1,6 +1,321 @@
-
 <section class="clientes">
-    <h1>Estás en el cliente</h1>
 
-    <p>Bienvenido al panel de administración de Vet Click.</p>
+    <!-- =====================================
+         CABECERA
+    ====================================== -->
+
+    <div class="clientes-header">
+
+        <div>
+            <h2>Panel de Administración - Clientes</h2>
+
+            <p>
+                Gestión de propietarios y sus mascotas
+            </p>
+        </div>
+
+        <span class="fecha-clientes">
+            Septiembre 2026
+        </span>
+
+    </div>
+
+
+    <!-- =====================================
+         BARRA DE HERRAMIENTAS
+    ====================================== -->
+
+    <div class="clientes-toolbar">
+
+        <button class="btn-agregar-cliente" id="btnAgregarCliente">
+
+            <span>+</span>
+
+            Añadir Cliente
+
+        </button>
+
+
+        <div class="buscador-clientes">
+
+            <span class="icono-busqueda">⌕</span>
+
+            <input type="text" id="buscarCliente" placeholder="Filtrar por nombre o email...">
+
+        </div>
+
+
+        <div class="paginacion">
+
+            <span>
+                1 - 25 de
+                <strong id="totalClientes">
+                    150
+                </strong>
+                Clientes
+            </span>
+
+            <button class="btn-paginacion" id="paginaAnterior">
+                ‹
+            </button>
+
+            <button class="btn-paginacion" id="paginaSiguiente">
+                ›
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================
+         TABLA CLIENTES
+    ====================================== -->
+
+    <div class="tabla-clientes-container">
+
+        <table class="tabla-clientes">
+
+            <thead>
+
+                <tr>
+
+                    <th>ID</th>
+
+                    <th>Nombre</th>
+
+                    <th>Apellido</th>
+
+                    <th>Email</th>
+
+                    <th>Teléfono</th>
+
+                    <th>Estado</th>
+
+                    <th>Acciones</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody id="tablaClientes">
+
+                <!--
+                    Estos datos son solamente de ejemplo.
+                    Posteriormente serán generados
+                    desde Node.js + MySQL.
+                -->
+
+
+                <tr>
+
+                    <td>1</td>
+
+                    <td>Luna</td>
+
+                    <td>López</td>
+
+                    <td>lunas.lopez@gmail.com</td>
+
+                    <td>3815551234</td>
+
+                    <td>
+                        <span class="estado activo">
+                            Activo
+                        </span>
+                    </td>
+
+                    <td class="acciones">
+
+                        <button class="btn-editar" title="Editar cliente">
+                            ✎
+                        </button>
+
+
+                        <button class="btn-eliminar" title="Eliminar cliente">
+                            🗑
+                        </button>
+
+
+                        <button class="btn-mascotas" title="Ver mascotas">
+
+                            🐾 Mascotas
+
+                        </button>
+
+                    </td>
+
+                </tr>
+
+
+                <tr>
+
+                    <td>2</td>
+
+                    <td>Martínez</td>
+
+                    <td>Apoito</td>
+
+                    <td>martinez@gmail.com</td>
+
+                    <td>3815554567</td>
+
+                    <td>
+                        <span class="estado activo">
+                            Activo
+                        </span>
+                    </td>
+
+                    <td class="acciones">
+
+                        <button class="btn-editar">
+                            ✎
+                        </button>
+
+                        <button class="btn-eliminar">
+                            🗑
+                        </button>
+
+                        <button class="btn-mascotas">
+                            🐾 Mascotas
+                        </button>
+
+                    </td>
+
+                </tr>
+
+
+                <tr>
+
+                    <td>3</td>
+
+                    <td>María</td>
+
+                    <td>Forberto</td>
+
+                    <td>maria.lopez@gmail.com</td>
+
+                    <td>3815557890</td>
+
+                    <td>
+                        <span class="estado inactivo">
+                            Inactivo
+                        </span>
+                    </td>
+
+                    <td class="acciones">
+
+                        <button class="btn-editar">
+                            ✎
+                        </button>
+
+                        <button class="btn-eliminar">
+                            🗑
+                        </button>
+
+                        <button class="btn-mascotas">
+                            🐾 Mascotas
+                        </button>
+
+                    </td>
+
+                </tr>
+
+
+                <tr>
+
+                    <td>4</td>
+
+                    <td>Carlos</td>
+
+                    <td>Ruiz</td>
+
+                    <td>carlosruiz@gmail.com</td>
+
+                    <td>3815552222</td>
+
+                    <td>
+                        <span class="estado activo">
+                            Activo
+                        </span>
+                    </td>
+
+                    <td class="acciones">
+
+                        <button class="btn-editar">
+                            ✎
+                        </button>
+
+                        <button class="btn-eliminar">
+                            🗑
+                        </button>
+
+                        <button class="btn-mascotas">
+                            🐾 Mascotas
+                        </button>
+
+                    </td>
+
+                </tr>
+
+
+                <tr>
+
+                    <td>5</td>
+
+                    <td>Luna</td>
+
+                    <td>Bajalo</td>
+
+                    <td>carloszapen@gmail.com</td>
+
+                    <td>3815553333</td>
+
+                    <td>
+                        <span class="estado activo">
+                            Activo
+                        </span>
+                    </td>
+
+                    <td class="acciones">
+
+                        <button class="btn-editar">
+                            ✎
+                        </button>
+
+                        <button class="btn-eliminar">
+                            🗑
+                        </button>
+
+                        <button class="btn-mascotas">
+                            🐾 Mascotas
+                        </button>
+
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <!-- =====================================
+         PIE DE TABLA
+    ====================================== -->
+
+    <div class="clientes-footer">
+
+        <span>
+            <strong id="clientesRegistrados">
+                150
+            </strong>
+            Clientes Registrados
+        </span>
+
+    </div>
+
 </section>

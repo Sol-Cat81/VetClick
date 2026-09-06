@@ -1,0 +1,208 @@
+<section class="direcciones">
+    <!--cabezera-->
+    <div class="direcciones-header">
+        <div>
+            <h2>Panel de Administración - Direcciones</h2>
+            <p>
+                Gestión de domicilios de los clientes
+            </p>
+        </div>
+        <span class="fecha-direcciones">
+            Septiembre 2026
+        </span>
+    </div>
+    <!-- barra de heramientas-->
+    <div class="direcciones-toolbar">
+        <button class="btn-agregar-direccion" id="btnAgregarDireccion">
+            <span>+</span>
+            Añadir Dirección
+        </button>
+        <!-- buscador -->
+        <div class="buscador-direcciones">
+            <span class="icono-busqueda-direccion">
+                ⌕
+            </span>
+            <input type="text" id="buscarDireccion" placeholder="Filtrar por cliente, calle o localidad...">
+        </div>
+        <!-- filtro de provincia -->
+        <div class="filtro-provincia">
+            <select id="filtroProvincia">
+                <option value="">
+                    Todas las provincias
+                </option>
+                <option value="Tucumán">
+                    Tucumán
+                </option>
+                <option value="Salta">
+                    Salta
+                </option>
+            </select>
+        </div>
+        <!-- paginacion -->
+        <div class="paginacion-direcciones">
+            <span>1 - 25 de<strong id="totalDirecciones">150</strong>
+                Direcciones
+            </span>
+            <button class="btn-paginacion-direccion" id="paginaAnteriorDireccion">‹</button>
+
+            <button class="btn-paginacion-direccion" id="paginaSiguienteDireccion">›</button>
+        </div>
+    </div>
+    <!--tabla-->
+    <div class="tabla-direcciones-container">
+        <table class="tabla-direcciones">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Cliente</th>
+                    <th>Dirección</th>
+                    <th>Localidad</th>
+                    <th>Provincia</th>
+                    <th>Código Postal</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="tablaDirecciones">
+                <tr>
+                    <td>1</td>
+                    <td>
+                        <div class="cliente-direccion">
+                            <div class="avatar-cliente-direccion">
+                                CR
+                            </div>
+                            <div>
+                                <strong>
+                                    Carlos Ruiz
+                                </strong>
+                                <span>
+                                    ID Cliente: 5
+                                </span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="direccion-principal">
+                            <strong>
+                                Av. Belgrano 1250
+                            </strong>
+                            <span>
+                                Piso 2 - Depto. B
+                            </span>
+                        </div>
+                    </td>
+                    <td>
+                        San Miguel de Tucumán
+                    </td>
+                    <td>
+                        Tucumán
+                    </td>
+                    <td>
+                        4000
+                    </td>
+                    <td class="acciones-direccion">
+                        <button class="btn-ver-direccion" title="Ver dirección">👁</button>
+
+                        <button class="btn-editar-direccion" title="Editar dirección">✎</button>
+
+                        <button class="btn-eliminar-direccion" title="Eliminar dirección">🗑</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>
+                        <div class="cliente-direccion">
+                            <div class="avatar-cliente-direccion">
+                                ML
+                            </div>
+                            <div>
+                                <strong>
+                                    María López
+                                </strong>
+                                <span>
+                                    ID Cliente: 8
+                                </span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="direccion-principal">
+                            <strong>
+                                Calle Laprida 850
+                            </strong>
+                            <span>
+                                Casa
+                            </span>
+                        </div>
+                    </td>
+                    <td>
+                        San Miguel de Tucumán
+                    </td>
+                    <td>
+                        Tucumán
+                    </td>
+                    <td>
+                        4000
+                    </td>
+                    <td class="acciones-direccion">
+                        <button class="btn-ver-direccion" title="Ver dirección">👁</button>
+
+                        <button class="btn-editar-direccion" title="Editar dirección">✎</button>
+
+                        <button class="btn-eliminar-direccion" title="Eliminar dirección">🗑</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>
+                        <div class="cliente-direccion">
+                            <div class="avatar-cliente-direccion">
+                                JM
+                            </div>
+                            <div>
+                                <strong>
+                                    Juan Martínez
+                                </strong>
+                                <span>
+                                    ID Cliente: 12
+                                </span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="direccion-principal">
+                            <strong>
+                                San Martín 455
+                            </strong>
+                            <span>
+                                Piso 1 - Depto. A
+                            </span>
+                        </div>
+                    </td>
+                    <td>
+                        Yerba Buena
+                    </td>
+                    <td>
+                        Tucumán
+                    </td>
+                    <td>
+                        4107
+                    </td>
+                    <td class="acciones-direccion">
+                        <button class="btn-ver-direccion" title="Ver dirección">👁</button>
+
+                        <button class="btn-editar-direccion" title="Editar dirección">✎</button>
+
+                        <button class="btn-eliminar-direccion" title="Eliminar dirección">🗑</button>
+                    </td>
+                </tr>    
+            </tbody>
+        </table>
+    </div>
+    <!--foteer-->
+    <div class="direcciones-footer">
+        <span>
+            <strong id="direccionesRegistradas">150</strong>
+            Direcciones Registradas
+        </span>
+    </div>
+</section>
