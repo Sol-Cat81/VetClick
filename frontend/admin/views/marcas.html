@@ -1,0 +1,93 @@
+<section class="marcas">
+  <div class="marcas-header">
+    <div>
+      <h2>Panel de Administración - Marcas</h2>
+      <p>Gestión de marcas de productos</p>
+    </div>
+    <span class="fecha-marcas">Septiembre 2026</span>
+  </div>
+  <div class="marcas-toolbar">
+    <button class="btn-agregar-marca" id="btnAgregarMarca">
+      <span>+</span> Añadir Marca
+    </button>
+    <div class="buscador-marcas">
+      <span class="icono-busqueda-marca">⌕</span
+      ><input
+        type="text"
+        id="buscarMarca"
+        placeholder="Filtrar por nombre o contacto..."
+      />
+    </div>
+    <div class="paginacion-marcas">
+      <span>1 - 25 de <strong id="totalMarcas">24</strong> Marcas</span
+      ><button class="btn-paginacion-marca" id="paginaAnteriorMarca">‹</button
+      ><button class="btn-paginacion-marca" id="paginaSiguienteMarca">›</button>
+    </div>
+  </div>
+  <div class="tabla-marcas-container">
+    <table class="tabla-marcas">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Dirección de la imagen</th>
+          <th>Nombre de la marca</th>
+          <th>Contacto</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tablaMarcas">
+        <tr>
+          <td>1</td>
+          <td>assets/img/marcas/royal-canin.png</td>
+          <td><strong>Royal Canin</strong></td>
+          <td>contacto@royalcanin.com</td>
+          <td class="acciones-marca">
+            <button class="btn-editar-marca" title="Editar marca">✎</button
+            ><button class="btn-eliminar-marca" title="Eliminar marca">
+              🗑
+            </button>
+          </td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>assets/img/marcas/pro-plan.png</td>
+          <td><strong>Pro Plan</strong></td>
+          <td>info@purina.com</td>
+          <td class="acciones-marca">
+            <button class="btn-editar-marca" title="Editar marca">✎</button
+            ><button class="btn-eliminar-marca" title="Eliminar marca">
+              🗑
+            </button>
+          </td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>assets/img/marcas/bayer.png</td>
+          <td><strong>Bayer</strong></td>
+          <td>consultas@bayer.com</td>
+          <td class="acciones-marca">
+            <button class="btn-editar-marca" title="Editar marca">✎</button
+            ><button class="btn-eliminar-marca" title="Eliminar marca">
+              🗑
+            </button>
+          </td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>assets/img/marcas/kong.png</td>
+          <td><strong>Kong</strong></td>
+          <td>soporte@kongcompany.com</td>
+          <td class="acciones-marca">
+            <button class="btn-editar-marca" title="Editar marca">✎</button
+            ><button class="btn-eliminar-marca" title="Eliminar marca">
+              🗑
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="marcas-footer">
+    <strong id="marcasRegistradas">24</strong> Marcas Registradas
+  </div>
+</section>
