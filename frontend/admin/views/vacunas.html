@@ -1,0 +1,213 @@
+<section class="vacunas">
+
+    <div class="vacunas-header">
+        <div>
+            <h2>Panel de Administración - Vacunas</h2>
+            <p>Gestión de vacunas aplicadas y próximas aplicaciones</p>
+        </div>
+
+        <button class="btn-agregar">
+            + Añadir Vacuna
+        </button>
+    </div>
+
+    <div class="vacunas-filtros">
+
+        <div class="buscador">
+            <input type="text" placeholder="Buscar por mascota o vacuna...">
+        </div>
+
+        <div class="filtro">
+            <input type="date" title="Filtrar por fecha de aplicación">
+        </div>
+
+        <div class="filtro">
+            <select>
+                <option value="">Todas las vacunas</option>
+                <option value="proxima">Próximas aplicaciones</option>
+                <option value="aplicada">Aplicadas</option>
+            </select>
+        </div>
+
+    </div>
+
+    <div class="tabla-vacunas">
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Mascota</th>
+                    <th>Vacuna</th>
+                    <th>Fecha aplicación</th>
+                    <th>Próxima aplicación</th>
+                    <th>Veterinario</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                <tr>
+                    <td>#001</td>
+
+                    <td>
+                        <div class="mascota-info">
+                            <span class="mascota-avatar">R</span>
+
+                            <div>
+                                <strong>Rocky</strong>
+                                <small>ID: 12</small>
+                            </div>
+                        </div>
+                    </td>
+
+                    <td>
+                        <strong>Antirrábica</strong>
+                    </td>
+
+                    <td>15/03/2026</td>
+
+                    <td>
+                        <span class="fecha-proxima">
+                            15/03/2027
+                        </span>
+                    </td>
+
+                    <td>
+                        Dra. Laura Gómez
+                    </td>
+
+                    <td>
+                        <div class="acciones">
+                            <button class="btn-ver" title="Ver">
+                                👁
+                            </button>
+
+                            <button class="btn-editar" title="Editar">
+                                ✎
+                            </button>
+
+                            <button class="btn-eliminar" title="Eliminar">
+                                🗑
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td>#002</td>
+
+                    <td>
+                        <div class="mascota-info">
+                            <span class="mascota-avatar">L</span>
+
+                            <div>
+                                <strong>Luna</strong>
+                                <small>ID: 18</small>
+                            </div>
+                        </div>
+                    </td>
+
+                    <td>
+                        <strong>Quíntuple felina</strong>
+                    </td>
+
+                    <td>22/04/2026</td>
+
+                    <td>
+                        <span class="fecha-proxima">
+                            22/04/2027
+                        </span>
+                    </td>
+
+                    <td>
+                        Dr. Martín López
+                    </td>
+
+                    <td>
+                        <div class="acciones">
+                            <button class="btn-ver" title="Ver">
+                                👁
+                            </button>
+
+                            <button class="btn-editar" title="Editar">
+                                ✎
+                            </button>
+
+                            <button class="btn-eliminar" title="Eliminar">
+                                🗑
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td>#003</td>
+
+                    <td>
+                        <div class="mascota-info">
+                            <span class="mascota-avatar">T</span>
+
+                            <div>
+                                <strong>Toby</strong>
+                                <small>ID: 24</small>
+                            </div>
+                        </div>
+                    </td>
+
+                    <td>
+                        <strong>Polivalente</strong>
+                    </td>
+
+                    <td>03/05/2026</td>
+
+                    <td>
+                        <span class="fecha-proxima">
+                            03/05/2027
+                        </span>
+                    </td>
+
+                    <td>
+                        Dra. Laura Gómez
+                    </td>
+
+                    <td>
+                        <div class="acciones">
+                            <button class="btn-ver" title="Ver">
+                                👁
+                            </button>
+
+                            <button class="btn-editar" title="Editar">
+                                ✎
+                            </button>
+
+                            <button class="btn-eliminar" title="Eliminar">
+                                🗑
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <div class="paginacion">
+
+        <button>‹</button>
+
+        <button class="pagina-activa">1</button>
+        <button>2</button>
+        <button>3</button>
+
+        <button>›</button>
+
+    </div>
+
+</section>
