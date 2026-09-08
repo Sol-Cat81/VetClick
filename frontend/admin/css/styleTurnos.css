@@ -1,0 +1,776 @@
+/* =========================================
+   TURNOS
+========================================= */
+
+.turnos {
+
+    width: 100%;
+
+    padding: 25px;
+
+    box-sizing: border-box;
+
+    color: #37474f;
+}
+
+
+
+/* =========================================
+   CABECERA
+========================================= */
+
+.turnos-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 20px;
+
+}
+
+
+.turnos-header h2 {
+
+    margin: 0;
+
+    font-size: 23px;
+
+    color: #263238;
+
+}
+
+
+.turnos-header p {
+
+    margin: 5px 0 0;
+
+    font-size: 13px;
+
+    color: #90a4ae;
+
+}
+
+
+.fecha-turnos {
+
+    font-size: 13px;
+
+    color: #78909c;
+
+}
+
+
+
+/* =========================================
+   TOOLBAR
+========================================= */
+
+.turnos-toolbar {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin-bottom: 10px;
+
+}
+
+
+
+/* =========================================
+   BOTÓN AGREGAR
+========================================= */
+
+.btn-agregar-turno {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 7px;
+
+    min-width: 135px;
+
+    height: 40px;
+
+    padding: 0 15px;
+
+    border: none;
+
+    border-radius: 6px;
+
+    background: #1976d2;
+
+    color: white;
+
+    font-size: 13px;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+
+}
+
+
+.btn-agregar-turno span {
+
+    font-size: 20px;
+
+    line-height: 1;
+
+}
+
+
+.btn-agregar-turno:hover {
+
+    background: #1565c0;
+
+}
+
+
+
+/* =========================================
+   BUSCADOR
+========================================= */
+
+.buscador-turnos {
+
+    display: flex;
+
+    align-items: center;
+
+    flex: 1;
+
+    max-width: 380px;
+
+    height: 40px;
+
+    padding: 0 12px;
+
+    box-sizing: border-box;
+
+    background: #f1f4f6;
+
+    border-radius: 6px;
+
+}
+
+
+.icono-busqueda-turno {
+
+    font-size: 21px;
+
+    color: #78909c;
+
+    margin-right: 8px;
+
+}
+
+
+.buscador-turnos input {
+
+    width: 100%;
+
+    height: 100%;
+
+    border: none;
+
+    outline: none;
+
+    background: transparent;
+
+    color: #455a64;
+
+    font-size: 13px;
+
+}
+
+
+.buscador-turnos input::placeholder {
+
+    color: #90a4ae;
+
+}
+
+
+
+/* =========================================
+   FILTROS
+========================================= */
+
+.filtro-estado-turno select,
+.filtro-fecha-turno input {
+
+    height: 40px;
+
+    padding: 0 10px;
+
+    border: 1px solid #dce2e5;
+
+    border-radius: 6px;
+
+    background: white;
+
+    color: #546e7a;
+
+    outline: none;
+
+    font-size: 12px;
+
+    cursor: pointer;
+
+    box-sizing: border-box;
+
+}
+
+
+.filtro-estado-turno select:focus,
+.filtro-fecha-turno input:focus {
+
+    border-color: #1976d2;
+
+}
+
+
+
+/* =========================================
+   PAGINACIÓN
+========================================= */
+
+.paginacion-turnos {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    margin-left: auto;
+
+    white-space: nowrap;
+
+}
+
+
+.paginacion-turnos span {
+
+    font-size: 12px;
+
+    color: #455a64;
+
+    margin-right: 5px;
+
+}
+
+
+.btn-paginacion-turno {
+
+    width: 30px;
+
+    height: 30px;
+
+    border: 1px solid #dce2e5;
+
+    background: white;
+
+    border-radius: 5px;
+
+    color: #546e7a;
+
+    font-size: 20px;
+
+    cursor: pointer;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+}
+
+
+.btn-paginacion-turno:hover {
+
+    background: #f1f5f7;
+
+}
+
+
+
+/* =========================================
+   TABLA
+========================================= */
+
+.tabla-turnos-container {
+
+    width: 100%;
+
+    overflow-x: auto;
+
+    background: white;
+
+    border: 1px solid #e1e7ea;
+
+    border-radius: 6px;
+
+}
+
+
+.tabla-turnos {
+
+    width: 100%;
+
+    border-collapse: collapse;
+
+}
+
+
+.tabla-turnos thead {
+
+    background: #f4f7f8;
+
+}
+
+
+.tabla-turnos th {
+
+    padding: 12px 13px;
+
+    text-align: left;
+
+    color: #37474f;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    border-bottom: 1px solid #dfe5e8;
+
+    white-space: nowrap;
+
+}
+
+
+.tabla-turnos td {
+
+    padding: 9px 13px;
+
+    font-size: 12px;
+
+    color: #455a64;
+
+    border-bottom: 1px solid #e6ebed;
+
+    white-space: nowrap;
+
+}
+
+
+.tabla-turnos tbody tr:hover {
+
+    background: #f8fafb;
+
+}
+
+
+.tabla-turnos tbody tr:last-child td {
+
+    border-bottom: none;
+
+}
+
+
+
+/* =========================================
+   FECHA Y HORA
+========================================= */
+
+.fecha-hora-turno strong {
+
+    display: block;
+
+    color: #37474f;
+
+    font-size: 12px;
+
+}
+
+
+.fecha-hora-turno span {
+
+    display: block;
+
+    margin-top: 3px;
+
+    color: #1976d2;
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+}
+
+
+
+/* =========================================
+   MASCOTA
+========================================= */
+
+.mascota-turno {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+}
+
+
+.avatar-turno {
+
+    width: 32px;
+
+    height: 32px;
+
+    min-width: 32px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #e3f2fd;
+
+    font-size: 17px;
+
+}
+
+
+.avatar-turno.gato {
+
+    background: #f3e5f5;
+
+}
+
+
+.mascota-turno strong {
+
+    color: #37474f;
+
+    font-size: 13px;
+
+}
+
+
+
+/* =========================================
+   CLIENTE
+========================================= */
+
+.cliente-turno {
+
+    color: #1976d2;
+
+    font-weight: 500;
+
+}
+
+
+
+/* =========================================
+   ESTADOS
+========================================= */
+
+.estado-turno {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 5px 9px;
+
+    border-radius: 12px;
+
+    font-size: 9px;
+
+    font-weight: 700;
+
+    letter-spacing: 0.2px;
+
+}
+
+
+.estado-turno.pendiente {
+
+    background: #fff3e0;
+
+    color: #ef6c00;
+
+}
+
+
+.estado-turno.confirmado {
+
+    background: #e8f5e9;
+
+    color: #2e7d32;
+
+}
+
+
+.estado-turno.cancelado {
+
+    background: #ffebee;
+
+    color: #c62828;
+
+}
+
+
+.estado-turno.finalizado {
+
+    background: #e3f2fd;
+
+    color: #1565c0;
+
+}
+
+
+
+/* =========================================
+   ACCIONES
+========================================= */
+
+.acciones-turno {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 5px;
+
+}
+
+
+.acciones-turno button {
+
+    width: 30px;
+
+    height: 30px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border: none;
+
+    border-radius: 5px;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+
+}
+
+
+
+/* VER */
+
+.btn-ver-turno {
+
+    background: #e8f5e9;
+
+    color: #2e7d32;
+
+}
+
+
+.btn-ver-turno:hover {
+
+    background: #c8e6c9;
+
+}
+
+
+
+/* EDITAR */
+
+.btn-editar-turno {
+
+    background: #e3f2fd;
+
+    color: #1976d2;
+
+}
+
+
+.btn-editar-turno:hover {
+
+    background: #bbdefb;
+
+}
+
+
+
+/* CANCELAR */
+
+.btn-cancelar-turno {
+
+    background: #ffebee;
+
+    color: #c62828;
+
+}
+
+
+.btn-cancelar-turno:hover {
+
+    background: #ffcdd2;
+
+}
+
+
+
+/* =========================================
+   FOOTER
+========================================= */
+
+.turnos-footer {
+
+    padding: 10px 5px;
+
+    font-size: 12px;
+
+    color: #546e7a;
+
+}
+
+
+.turnos-footer strong {
+
+    color: #263238;
+
+}
+
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 1250px) {
+
+    .turnos-toolbar {
+
+        flex-wrap: wrap;
+
+    }
+
+
+    .buscador-turnos {
+
+        order: 2;
+
+        max-width: none;
+
+        flex: 1;
+
+    }
+
+
+    .filtro-estado-turno {
+
+        order: 3;
+
+    }
+
+
+    .filtro-fecha-turno {
+
+        order: 4;
+
+    }
+
+
+    .paginacion-turnos {
+
+        order: 5;
+
+    }
+
+}
+
+
+
+@media (max-width: 700px) {
+
+    .turnos {
+
+        padding: 15px;
+
+    }
+
+
+    .turnos-header {
+
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 8px;
+
+    }
+
+
+    .turnos-toolbar {
+
+        flex-direction: column;
+
+        align-items: stretch;
+
+    }
+
+
+    .btn-agregar-turno,
+    .buscador-turnos,
+    .filtro-estado-turno,
+    .filtro-fecha-turno {
+
+        width: 100%;
+
+        max-width: none;
+
+    }
+
+
+    .filtro-estado-turno select,
+    .filtro-fecha-turno input {
+
+        width: 100%;
+
+    }
+
+
+    .paginacion-turnos {
+
+        margin-left: 0;
+
+    }
+
+}
