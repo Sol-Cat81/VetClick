@@ -1,0 +1,666 @@
+<section class="pagos">
+
+    <!-- =====================================
+         CABECERA
+    ====================================== -->
+
+    <div class="pagos-header">
+
+        <div>
+
+            <h2>
+                Panel de Administración - Pagos
+            </h2>
+
+            <p>
+                Gestión y seguimiento de los pagos de los pedidos
+            </p>
+
+        </div>
+
+        <span class="fecha-pagos">
+            Septiembre 2026
+        </span>
+
+    </div>
+
+
+
+    <!-- =====================================
+         BARRA DE HERRAMIENTAS
+    ====================================== -->
+
+    <div class="pagos-toolbar">
+
+
+        <button class="btn-agregar-pago" id="btnAgregarPago">
+
+            <span>+</span>
+
+            Registrar Pago
+
+        </button>
+
+
+
+        <div class="buscador-pagos">
+
+            <span class="icono-busqueda">
+                ⌕
+            </span>
+
+            <input type="text" id="buscarPago" placeholder="Filtrar por ID de pago o pedido...">
+
+        </div>
+
+
+
+        <select class="filtro-estado-pago" id="filtroEstadoPago">
+
+            <option value="">
+                Todos los estados
+            </option>
+
+            <option value="PENDIENTE">
+                Pendiente
+            </option>
+
+            <option value="REALIZADO">
+                Realizado
+            </option>
+
+        </select>
+
+
+
+        <div class="paginacion">
+
+            <span>
+
+                1 - 25 de
+
+                <strong id="totalPagos">
+                    150
+                </strong>
+
+                Pagos
+
+            </span>
+
+
+            <button class="btn-paginacion" id="paginaAnteriorPagos">
+                ‹
+            </button>
+
+
+            <button class="btn-paginacion" id="paginaSiguientePagos">
+                ›
+            </button>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================
+         TABLA PAGOS
+    ====================================== -->
+
+    <div class="tabla-pagos-container">
+
+        <table class="tabla-pagos">
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        ID
+                    </th>
+
+                    <th>
+                        Pedido
+                    </th>
+
+                    <th>
+                        Cliente
+                    </th>
+
+                    <th>
+                        Total Pedido
+                    </th>
+
+                    <th>
+                        Estado del Pago
+                    </th>
+
+                    <th>
+                        Acciones
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody id="tablaPagos">
+
+
+                <!-- =================================
+                     PAGO 1
+                ================================== -->
+
+                <tr>
+
+                    <td>
+                        1
+                    </td>
+
+
+                    <td>
+
+                        <span class="pedido-id">
+                            #0001
+                        </span>
+
+                    </td>
+
+
+                    <td>
+
+                        <div class="cliente-pago">
+
+                            <div class="avatar-pago">
+                                MR
+                            </div>
+
+                            <span>
+                                Martín Rodríguez
+                            </span>
+
+                        </div>
+
+                    </td>
+
+
+                    <td>
+                        <strong>
+                            $27.000
+                        </strong>
+                    </td>
+
+
+                    <td>
+
+                        <span class="estado realizado">
+                            Realizado
+                        </span>
+
+                    </td>
+
+
+                    <td class="acciones">
+
+                        <button class="btn-ver-pago" title="Ver pago" onclick="abrirModalPago(1)">
+                            👁
+                        </button>
+
+
+                        <button class="btn-editar-pago" title="Cambiar estado" onclick="editarPago(1)">
+                            ✎
+                        </button>
+
+                    </td>
+
+                </tr>
+
+
+
+                <!-- =================================
+                     PAGO 2
+                ================================== -->
+
+                <tr>
+
+                    <td>
+                        2
+                    </td>
+
+
+                    <td>
+
+                        <span class="pedido-id">
+                            #0002
+                        </span>
+
+                    </td>
+
+
+                    <td>
+
+                        <div class="cliente-pago">
+
+                            <div class="avatar-pago">
+                                LG
+                            </div>
+
+                            <span>
+                                Laura Gómez
+                            </span>
+
+                        </div>
+
+                    </td>
+
+
+                    <td>
+                        <strong>
+                            $18.500
+                        </strong>
+                    </td>
+
+
+                    <td>
+
+                        <span class="estado pendiente">
+                            Pendiente
+                        </span>
+
+                    </td>
+
+
+                    <td class="acciones">
+
+                        <button class="btn-ver-pago" title="Ver pago" onclick="abrirModalPago(2)">
+                            👁
+                        </button>
+
+
+                        <button class="btn-editar-pago" title="Cambiar estado" onclick="editarPago(2)">
+                            ✎
+                        </button>
+
+                    </td>
+
+                </tr>
+
+
+
+                <!-- =================================
+                     PAGO 3
+                ================================== -->
+
+                <tr>
+
+                    <td>
+                        3
+                    </td>
+
+
+                    <td>
+
+                        <span class="pedido-id">
+                            #0003
+                        </span>
+
+                    </td>
+
+
+                    <td>
+
+                        <div class="cliente-pago">
+
+                            <div class="avatar-pago">
+                                JP
+                            </div>
+
+                            <span>
+                                Juan Pérez
+                            </span>
+
+                        </div>
+
+                    </td>
+
+
+                    <td>
+                        <strong>
+                            $34.500
+                        </strong>
+                    </td>
+
+
+                    <td>
+
+                        <span class="estado realizado">
+                            Realizado
+                        </span>
+
+                    </td>
+
+
+                    <td class="acciones">
+
+                        <button class="btn-ver-pago" title="Ver pago" onclick="abrirModalPago(3)">
+                            👁
+                        </button>
+
+
+                        <button class="btn-editar-pago" title="Cambiar estado" onclick="editarPago(3)">
+                            ✎
+                        </button>
+
+                    </td>
+
+                </tr>
+
+
+
+                <!-- =================================
+                     PAGO 4
+                ================================== -->
+
+                <tr>
+
+                    <td>
+                        4
+                    </td>
+
+
+                    <td>
+
+                        <span class="pedido-id">
+                            #0004
+                        </span>
+
+                    </td>
+
+
+                    <td>
+
+                        <div class="cliente-pago">
+
+                            <div class="avatar-pago">
+                                CM
+                            </div>
+
+                            <span>
+                                Carlos Martínez
+                            </span>
+
+                        </div>
+
+                    </td>
+
+
+                    <td>
+                        <strong>
+                            $42.000
+                        </strong>
+                    </td>
+
+
+                    <td>
+
+                        <span class="estado pendiente">
+                            Pendiente
+                        </span>
+
+                    </td>
+
+
+                    <td class="acciones">
+
+                        <button class="btn-ver-pago" title="Ver pago" onclick="abrirModalPago(4)">
+                            👁
+                        </button>
+
+
+                        <button class="btn-editar-pago" title="Cambiar estado" onclick="editarPago(4)">
+                            ✎
+                        </button>
+
+                    </td>
+
+                </tr>
+
+
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+
+    <!-- =====================================
+         PIE DE TABLA
+    ====================================== -->
+
+    <div class="pagos-footer">
+
+        <span>
+
+            <strong id="pagosRegistrados">
+                150
+            </strong>
+
+            Pagos Registrados
+
+        </span>
+
+    </div>
+
+
+
+    <!-- =====================================
+         MODAL DETALLE DEL PAGO
+    ====================================== -->
+
+    <div class="modal-pago-overlay" id="modalPago">
+
+
+        <div class="modal-pago">
+
+
+            <!-- CABECERA DEL MODAL -->
+
+            <div class="modal-pago-header">
+
+
+                <div>
+
+                    <h3>
+
+                        Detalle del Pago
+
+                        <span id="modalIdPago">
+                            #0001
+                        </span>
+
+                    </h3>
+
+
+                    <p id="modalClientePago">
+                        Martín Rodríguez
+                    </p>
+
+                </div>
+
+
+                <button class="btn-cerrar-pago" id="btnCerrarPago" type="button">
+
+                    ×
+
+                </button>
+
+            </div>
+
+
+
+            <!-- INFORMACIÓN DEL PAGO -->
+
+            <div class="modal-pago-informacion">
+
+
+                <div class="info-pago">
+
+                    <span>
+                        ID del Pedido
+                    </span>
+
+                    <strong id="modalIdPedido">
+                        #0001
+                    </strong>
+
+                </div>
+
+
+                <div class="info-pago">
+
+                    <span>
+                        Fecha
+                    </span>
+
+                    <strong id="modalFecha">
+                        09/09/2026
+                    </strong>
+
+                </div>
+
+
+                <div class="info-pago">
+
+                    <span>
+                        Cliente
+                    </span>
+
+                    <strong id="modalCliente">
+                        Martín Rodríguez
+                    </strong>
+
+                </div>
+
+
+                <div class="info-pago">
+
+                    <span>
+                        Total del Pedido
+                    </span>
+
+                    <strong id="modalTotal">
+                        $27.000
+                    </strong>
+
+                </div>
+
+
+                <div class="info-pago">
+
+                    <span>
+                        Estado del Pago
+                    </span>
+
+
+                    <select id="modalEstadoPago">
+
+                        <option value="PENDIENTE">
+                            Pendiente
+                        </option>
+
+                        <option value="REALIZADO">
+                            Realizado
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- INFORMACIÓN DEL PEDIDO -->
+
+            <div class="detalle-pedido-pago">
+
+
+                <h4>
+                    Resumen del pedido
+                </h4>
+
+
+                <div class="linea-pago">
+
+                    <span>
+                        Subtotal
+                    </span>
+
+                    <strong>
+                        $25.000
+                    </strong>
+
+                </div>
+
+
+                <div class="linea-pago">
+
+                    <span>
+                        Costo de envío
+                    </span>
+
+                    <strong>
+                        $2.000
+                    </strong>
+
+                </div>
+
+
+                <div class="linea-pago total-pago">
+
+                    <span>
+                        Total
+                    </span>
+
+                    <strong>
+                        $27.000
+                    </strong>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- FOOTER MODAL -->
+
+            <div class="modal-pago-footer">
+
+
+                <button class="btn-cancelar-pago" id="btnCancelarPago" type="button">
+
+                    Cancelar
+
+                </button>
+
+
+                <button class="btn-guardar-pago" id="btnGuardarPago" type="button">
+
+                    Guardar estado
+
+                </button>
+
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+</section>

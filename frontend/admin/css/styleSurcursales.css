@@ -1,0 +1,509 @@
+/* ================================
+   CONTENEDOR PRINCIPAL
+================================ */
+
+.sucursales {
+
+    width: 100%;
+
+    padding: 25px;
+
+    box-sizing: border-box;
+
+    color: #37474f;
+
+}
+
+
+/* ================================
+   HEADER
+================================ */
+
+.sucursales-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 25px;
+
+}
+
+
+.sucursales-header h2 {
+
+    margin: 0 0 6px;
+
+    color: #263238;
+
+    font-size: 24px;
+
+}
+
+
+.sucursales-header p {
+
+    margin: 0;
+
+    color: #78909c;
+
+    font-size: 14px;
+
+}
+
+
+/* ================================
+   BOTÓN AGREGAR
+================================ */
+
+.btn-agregar {
+
+    border: none;
+
+    background: #1976d2;
+
+    color: white;
+
+    padding: 11px 18px;
+
+    border-radius: 6px;
+
+    cursor: pointer;
+
+    font-size: 14px;
+
+    font-weight: 500;
+
+}
+
+
+.btn-agregar:hover {
+
+    background: #1565c0;
+
+}
+
+
+/* ================================
+   FILTROS
+================================ */
+
+.sucursales-filtros {
+
+    display: flex;
+
+    gap: 12px;
+
+    margin-bottom: 20px;
+
+    align-items: center;
+
+}
+
+
+.buscador {
+
+    flex: 1;
+
+}
+
+
+.buscador input,
+.filtro select {
+
+    width: 100%;
+
+    height: 40px;
+
+    padding: 0 12px;
+
+    box-sizing: border-box;
+
+    border: 1px solid #dce2e5;
+
+    border-radius: 6px;
+
+    background: #f1f4f6;
+
+    color: #37474f;
+
+    outline: none;
+
+}
+
+
+.buscador input:focus,
+.filtro select:focus {
+
+    border-color: #1976d2;
+
+    background: white;
+
+}
+
+
+.filtro {
+
+    width: 220px;
+
+}
+
+
+/* ================================
+   TABLA
+================================ */
+
+.tabla-sucursales {
+
+    width: 100%;
+
+    overflow-x: auto;
+
+    background: white;
+
+    border: 1px solid #e1e7ea;
+
+    border-radius: 6px;
+
+}
+
+
+.tabla-sucursales table {
+
+    width: 100%;
+
+    min-width: 1050px;
+
+    border-collapse: collapse;
+
+}
+
+
+.tabla-sucursales th {
+
+    background: #f4f7f8;
+
+    color: #546e7a;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    text-align: left;
+
+    padding: 15px;
+
+    border-bottom: 1px solid #e1e7ea;
+
+}
+
+
+.tabla-sucursales td {
+
+    padding: 14px 15px;
+
+    border-bottom: 1px solid #e6ebed;
+
+    font-size: 14px;
+
+    color: #455a64;
+
+}
+
+
+.tabla-sucursales tbody tr:hover {
+
+    background: #f8fafb;
+
+}
+
+
+/* ================================
+   INFORMACIÓN DE SUCURSAL
+================================ */
+
+.sucursal-info {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+}
+
+
+.sucursal-avatar {
+
+    width: 36px;
+
+    height: 36px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #e3f2fd;
+
+    color: #1565c0;
+
+    font-weight: 600;
+
+}
+
+
+.sucursal-info strong {
+
+    display: block;
+
+    color: #37474f;
+
+}
+
+
+.sucursal-info small {
+
+    display: block;
+
+    margin-top: 2px;
+
+    color: #90a4ae;
+
+    font-size: 11px;
+
+}
+
+
+/* ================================
+   ESTADOS
+================================ */
+
+.estado {
+
+    display: inline-block;
+
+    padding: 5px 10px;
+
+    border-radius: 4px;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+}
+
+
+.estado.activo {
+
+    background: #e8f5e9;
+
+    color: #2e7d32;
+
+}
+
+
+.estado.inactivo {
+
+    background: #ffebee;
+
+    color: #c62828;
+
+}
+
+
+/* ================================
+   ACCIONES
+================================ */
+
+.acciones {
+
+    display: flex;
+
+    gap: 6px;
+
+}
+
+
+.acciones button {
+
+    width: 32px;
+
+    height: 32px;
+
+    border: 1px solid #dce2e5;
+
+    border-radius: 5px;
+
+    background: white;
+
+    cursor: pointer;
+
+}
+
+
+.btn-ver {
+
+    color: #1565c0;
+
+}
+
+
+.btn-editar {
+
+    color: #ef6c00;
+
+}
+
+
+.btn-eliminar {
+
+    color: #c62828;
+
+}
+
+
+.acciones button:hover {
+
+    background: #f1f4f6;
+
+}
+
+
+/* ================================
+   PAGINACIÓN
+================================ */
+
+.paginacion {
+
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 5px;
+
+    margin-top: 18px;
+
+}
+
+
+.paginacion button {
+
+    width: 34px;
+
+    height: 34px;
+
+    border: 1px solid #dce2e5;
+
+    background: white;
+
+    border-radius: 5px;
+
+    cursor: pointer;
+
+    color: #546e7a;
+
+}
+
+
+.paginacion button:hover {
+
+    background: #f1f4f6;
+
+}
+
+
+.paginacion .pagina-activa {
+
+    background: #1976d2;
+
+    color: white;
+
+    border-color: #1976d2;
+
+}
+
+
+/* ================================
+   RESPONSIVE
+================================ */
+
+@media (max-width: 1200px) {
+
+    .sucursales-filtros {
+
+        flex-wrap: wrap;
+
+    }
+
+    .buscador {
+
+        min-width: 250px;
+
+    }
+
+    .filtro {
+
+        width: 200px;
+
+    }
+
+}
+
+
+@media (max-width: 700px) {
+
+    .sucursales {
+
+        padding: 15px;
+
+    }
+
+
+    .sucursales-header {
+
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 15px;
+
+    }
+
+
+    .btn-agregar {
+
+        width: 100%;
+
+    }
+
+
+    .sucursales-filtros {
+
+        flex-direction: column;
+
+        align-items: stretch;
+
+    }
+
+
+    .buscador,
+    .filtro {
+
+        width: 100%;
+
+    }
+
+
+    .paginacion {
+
+        justify-content: center;
+
+    }
+
+}

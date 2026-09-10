@@ -1,0 +1,932 @@
+/* =========================================
+   GENERAL
+========================================= */
+
+.pagos,
+.pagos * {
+    box-sizing: border-box;
+}
+
+
+/* =========================================
+   CONTENEDOR
+========================================= */
+
+.pagos {
+
+    width: 100%;
+    padding: 30px;
+    color: #37474f;
+}
+
+
+/* =========================================
+   HEADER
+========================================= */
+
+.pagos-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 25px;
+
+}
+
+
+.pagos-header h2 {
+
+    margin: 0 0 6px;
+
+    font-size: 23px;
+
+    color: #263238;
+
+}
+
+
+.pagos-header p {
+
+    margin: 0;
+
+    color: #78909c;
+
+    font-size: 14px;
+
+}
+
+
+/* =========================================
+   BOTÓN AGREGAR
+========================================= */
+
+.pagos .btn-agregar-pago {
+
+    border: none;
+
+    background: #1976d2;
+
+    color: white;
+
+    padding: 11px 18px;
+
+    border-radius: 6px;
+
+    cursor: pointer;
+
+    font-size: 14px;
+
+}
+
+
+.pagos .btn-agregar-pago:hover {
+
+    background: #1565c0;
+
+}
+
+
+/* =========================================
+   RESUMEN
+========================================= */
+
+.resumen-pagos {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 15px;
+
+    margin-bottom: 25px;
+
+}
+
+
+.pagos .resumen-card {
+
+    background: white;
+
+    border: 1px solid #e1e7ea;
+
+    border-radius: 7px;
+
+    padding: 20px;
+
+}
+
+
+.pagos .resumen-titulo {
+
+    display: block;
+
+    color: #90a4ae;
+
+    font-size: 13px;
+
+    margin-bottom: 8px;
+
+}
+
+
+.pagos .resumen-card strong {
+
+    font-size: 23px;
+
+    color: #263238;
+
+}
+
+
+/* =========================================
+   FILTROS
+========================================= */
+
+.pagos-toolbar {
+
+    display: flex;
+
+    gap: 12px;
+
+    margin-bottom: 18px;
+
+}
+
+
+.buscador-pagos input,
+.filtro-estado-pago {
+
+    border: none;
+
+    background: #f1f4f6;
+
+    padding: 11px 13px;
+
+    border-radius: 6px;
+
+    color: #37474f;
+
+    outline: none;
+
+}
+
+
+.buscador-pagos {
+
+    width: 350px;
+}
+
+
+.filtro-estado-pago {
+
+    width: 200px;
+}
+
+
+/* =========================================
+   TABLA
+========================================= */
+
+.tabla-pagos-container {
+
+    background: white;
+
+    border: 1px solid #e1e7ea;
+
+    border-radius: 7px;
+
+    overflow-x: auto;
+
+}
+
+
+.tabla-pagos {
+
+    width: 100%;
+
+    border-collapse: collapse;
+
+}
+
+
+.tabla-pagos thead {
+
+    background: #f4f7f8;
+
+}
+
+
+.tabla-pagos th {
+
+    text-align: left;
+
+    padding: 14px;
+
+    color: #78909c;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+}
+
+
+.tabla-pagos td {
+
+    padding: 14px;
+
+    border-top: 1px solid #e6ebed;
+
+    font-size: 14px;
+
+}
+
+
+.tabla-pagos tbody tr:hover {
+
+    background: #f8fafb;
+
+}
+
+
+/* =========================================
+   CLIENTE
+========================================= */
+
+.pagos .cliente-pago {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+}
+
+
+.pagos .avatar-pago {
+
+    width: 35px;
+
+    height: 35px;
+
+    border-radius: 50%;
+
+    background: #e3f2fd;
+
+    color: #1565c0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+}
+
+
+/* =========================================
+   PEDIDO
+========================================= */
+
+.pagos .pedido-id {
+
+    display: inline-block;
+
+    padding: 5px 9px;
+
+    background: #f1f4f6;
+
+    border-radius: 5px;
+
+    color: #546e7a;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+}
+
+
+/* =========================================
+   ESTADOS
+========================================= */
+
+.tabla-pagos .estado {
+
+    display: inline-block;
+
+    padding: 6px 10px;
+
+    border-radius: 20px;
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+}
+
+
+.pagos .estado.pendiente {
+
+    background: #fff3e0;
+
+    color: #ef6c00;
+
+}
+
+
+.pagos .estado.realizado {
+
+    background: #e8f5e9;
+
+    color: #2e7d32;
+
+}
+
+
+/* =========================================
+   ACCIONES
+========================================= */
+
+.tabla-pagos .acciones {
+
+    display: flex;
+
+    gap: 6px;
+
+}
+
+
+.tabla-pagos .acciones button {
+
+    width: 32px;
+
+    height: 32px;
+
+    border: none;
+
+    border-radius: 5px;
+
+    cursor: pointer;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+}
+
+
+.pagos .btn-ver-pago {
+
+    background: #e3f2fd;
+
+    color: #1565c0;
+
+}
+
+
+.pagos .btn-editar-pago {
+
+    background: #f1f4f6;
+
+    color: #546e7a;
+
+}
+
+
+.pagos .btn-ver-pago:hover {
+
+    background: #bbdefb;
+
+}
+
+
+.pagos .btn-editar-pago:hover {
+
+    background: #e3e8eb;
+
+}
+
+
+/* =========================================
+   PAGINACIÓN
+========================================= */
+
+.pagos-toolbar .paginacion {
+
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 5px;
+
+    margin-top: 18px;
+
+}
+
+
+.pagos-toolbar .paginacion button {
+
+    width: 32px;
+
+    height: 32px;
+
+    border: 1px solid #dce2e5;
+
+    background: white;
+
+    border-radius: 5px;
+
+    cursor: pointer;
+
+    color: #546e7a;
+
+}
+
+
+.pagos-toolbar .paginacion button:hover {
+
+    background: #f1f4f6;
+
+}
+
+
+.pagos-toolbar .paginacion .pagina-activa {
+
+    background: #1976d2;
+
+    color: white;
+
+    border-color: #1976d2;
+
+}
+
+
+/* =========================================
+   MODAL
+========================================= */
+
+.modal-pago-overlay {
+
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(0, 0, 0, 0.45);
+
+    display: none;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 20px;
+
+    z-index: 1000;
+
+}
+
+
+.modal-pago-overlay.activo {
+
+    display: flex;
+
+}
+
+
+/* =========================================
+   CONTENEDOR MODAL
+========================================= */
+
+.modal-pago {
+
+    width: 650px;
+
+    max-width: 100%;
+
+    background: white;
+
+    border-radius: 9px;
+
+    box-shadow:
+        0 10px 40px rgba(0, 0, 0, 0.2);
+
+    animation: aparecerModalPago 0.2s ease;
+
+}
+
+
+@keyframes aparecerModalPago {
+
+    from {
+
+        opacity: 0;
+
+        transform: translateY(-20px);
+
+    }
+
+    to {
+
+        opacity: 1;
+
+        transform: translateY(0);
+
+    }
+
+}
+
+
+/* =========================================
+   HEADER MODAL
+========================================= */
+
+.modal-pago-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    padding: 22px 25px;
+
+    border-bottom: 1px solid #e1e7ea;
+
+}
+
+
+.modal-pago-header h3 {
+
+    margin: 0;
+
+    color: #263238;
+
+    font-size: 20px;
+
+}
+
+
+.modal-pago-header h3 span {
+
+    color: #1976d2;
+
+}
+
+
+.modal-pago-header p {
+
+    margin: 6px 0 0;
+
+    color: #78909c;
+
+    font-size: 14px;
+
+}
+
+
+/* =========================================
+   CERRAR
+========================================= */
+
+.pagos .btn-cerrar-pago {
+
+    width: 38px;
+
+    height: 38px;
+
+    border: none;
+
+    background: transparent;
+
+    border-radius: 50%;
+
+    font-size: 28px;
+
+    color: #78909c;
+
+    cursor: pointer;
+
+}
+
+
+.pagos .btn-cerrar-pago:hover {
+
+    background: #f1f4f6;
+
+    color: #263238;
+
+}
+
+
+/* =========================================
+   INFORMACIÓN
+========================================= */
+
+.modal-pago-informacion {
+
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 20px;
+
+    padding: 25px;
+
+    background: #f8fafb;
+
+}
+
+
+.info-pago {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 7px;
+
+}
+
+
+.info-pago span {
+
+    color: #90a4ae;
+
+    font-size: 12px;
+
+}
+
+
+.info-pago strong {
+
+    color: #37474f;
+
+    font-size: 14px;
+
+}
+
+
+/* =========================================
+   SELECT ESTADO
+========================================= */
+
+.info-pago select {
+
+    width: 100%;
+
+    padding: 9px 11px;
+
+    border: 1px solid #dce2e5;
+
+    border-radius: 6px;
+
+    background: white;
+
+    color: #37474f;
+
+    outline: none;
+
+    cursor: pointer;
+
+}
+
+
+.info-pago select:focus {
+
+    border-color: #1976d2;
+
+}
+
+
+/* =========================================
+   RESUMEN MODAL
+========================================= */
+
+.detalle-pedido-pago {
+
+    padding: 25px;
+
+}
+
+
+.detalle-pedido-pago h4 {
+
+    margin: 0 0 18px;
+
+    color: #37474f;
+
+    font-size: 16px;
+
+}
+
+
+.linea-pago {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    padding: 9px 0;
+
+    color: #78909c;
+
+    font-size: 14px;
+
+}
+
+
+.linea-pago strong {
+
+    color: #37474f;
+
+}
+
+
+.linea-pago.total-pago {
+
+    margin-top: 8px;
+
+    padding-top: 15px;
+
+    border-top: 1px solid #dce2e5;
+
+}
+
+
+.linea-pago.total-pago span {
+
+    color: #263238;
+
+    font-weight: 600;
+
+}
+
+
+.linea-pago.total-pago strong {
+
+    color: #1976d2;
+
+    font-size: 19px;
+
+}
+
+
+/* =========================================
+   FOOTER MODAL
+========================================= */
+
+.modal-pago-footer {
+
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 10px;
+
+    padding: 18px 25px;
+
+    border-top: 1px solid #e1e7ea;
+
+    background: #fafbfc;
+
+}
+
+
+.modal-pago-footer button {
+
+    border: none;
+
+    padding: 10px 18px;
+
+    border-radius: 6px;
+
+    cursor: pointer;
+
+    font-size: 14px;
+
+}
+
+
+.btn-cancelar-pago {
+
+    background: #f1f4f6;
+
+    color: #546e7a;
+
+}
+
+
+.btn-cancelar-pago:hover {
+
+    background: #e3e8eb;
+
+}
+
+
+.btn-guardar-pago {
+
+    background: #1976d2;
+
+    color: white;
+
+}
+
+
+.btn-guardar-pago:hover {
+
+    background: #1565c0;
+
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 900px) {
+
+    .pagos .resumen-pagos {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+
+    }
+
+}
+
+
+@media (max-width: 700px) {
+
+    .pagos {
+
+        padding: 15px;
+
+    }
+
+
+    .pagos .pagos-header {
+
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 15px;
+
+    }
+
+
+    .pagos .resumen-pagos {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+    .pagos .pagos-toolbar {
+
+        flex-direction: column;
+
+    }
+
+
+    .pagos .buscador-pagos,
+    .pagos .filtro-estado-pago {
+
+        width: 100%;
+
+    }
+
+
+    .pagos .modal-pago-informacion {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+    .pagos .modal-pago-footer {
+
+        flex-direction: column;
+
+    }
+
+
+    .pagos .modal-pago-footer button {
+
+        width: 100%;
+
+    }
+
+}
