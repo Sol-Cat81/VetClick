@@ -1,0 +1,556 @@
+/* =========================================
+   SECCIÓN VETERINARIOS
+========================================= */
+
+.veterinarios {
+    width: 100%;
+    box-sizing: border-box;
+
+    padding: 0 29px;
+
+    color: #243b53;
+}
+
+
+/* =========================================
+   CABECERA
+========================================= */
+
+.veterinarios-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 28px 0 24px;
+
+    border-top: 1px solid #dce3e8;
+}
+
+.veterinarios-header h2 {
+    margin: 0;
+
+    font-size: 29px;
+    font-weight: 700;
+
+    color: #243b53;
+}
+
+.veterinarios-header p {
+    margin: 5px 0 0;
+
+    font-size: 16px;
+
+    color: #7890a6;
+}
+
+.fecha-veterinarios {
+    font-size: 16px;
+
+    color: #7890a6;
+}
+
+
+/* =========================================
+   BARRA DE HERRAMIENTAS
+========================================= */
+
+.veterinarios-toolbar {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    margin-bottom: 13px;
+}
+
+
+/* =========================================
+   BOTÓN AGREGAR
+========================================= */
+
+.btn-agregar-veterinario {
+    height: 50px;
+
+    padding: 0 22px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 9px;
+
+    border: none;
+    border-radius: 7px;
+
+    background: #1976d2;
+    color: white;
+
+    font-size: 16px;
+
+    cursor: pointer;
+
+    transition: background 0.2s ease;
+}
+
+.btn-agregar-veterinario:hover {
+    background: #1565c0;
+}
+
+.btn-agregar-veterinario span {
+    font-size: 24px;
+
+    line-height: 1;
+}
+
+
+/* =========================================
+   BUSCADOR
+========================================= */
+
+.buscador-veterinarios {
+    height: 50px;
+
+    flex: 1;
+
+    display: flex;
+    align-items: center;
+
+    padding: 0 14px;
+
+    background: #f4f6f8;
+
+    border-radius: 7px;
+}
+
+.icono-busqueda-veterinarios {
+    margin-right: 10px;
+
+    font-size: 23px;
+
+    color: #6e8aa3;
+}
+
+.buscador-veterinarios input {
+    width: 100%;
+
+    border: none;
+    outline: none;
+
+    background: transparent;
+
+    font-size: 16px;
+
+    color: #243b53;
+}
+
+.buscador-veterinarios input::placeholder {
+    color: #8da1b3;
+}
+
+
+/* =========================================
+   FILTRO ESPECIALIDAD
+========================================= */
+
+.filtro-especialidad-veterinarios {
+    height: 50px;
+}
+
+.filtro-especialidad-veterinarios select {
+    height: 50px;
+
+    min-width: 190px;
+
+    padding: 0 12px;
+
+    border: 1px solid #d8e0e6;
+
+    border-radius: 7px;
+
+    background: white;
+
+    color: #526b82;
+
+    font-size: 15px;
+
+    outline: none;
+
+    cursor: pointer;
+}
+
+
+/* =========================================
+   PAGINACIÓN
+========================================= */
+
+.paginacion-veterinarios {
+    display: flex;
+    align-items: center;
+
+    gap: 7px;
+
+    margin-left: auto;
+
+    white-space: nowrap;
+}
+
+.paginacion-veterinarios span {
+    font-size: 14px;
+
+    color: #526b82;
+}
+
+.paginacion-veterinarios strong {
+    color: #243b53;
+}
+
+.btn-paginacion-veterinario {
+    width: 38px;
+    height: 38px;
+
+    border: 1px solid #d8e0e6;
+
+    border-radius: 7px;
+
+    background: white;
+
+    color: #52708a;
+
+    font-size: 24px;
+
+    cursor: pointer;
+
+    transition: background 0.2s ease;
+}
+
+.btn-paginacion-veterinario:hover {
+    background: #f1f5f8;
+}
+
+
+/* =========================================
+   CONTENEDOR TABLA
+========================================= */
+
+.tabla-veterinarios-container {
+    width: 100%;
+
+    overflow-x: auto;
+
+    border: 1px solid #dce3e8;
+
+    border-radius: 7px;
+
+    background: white;
+}
+
+
+/* =========================================
+   TABLA
+========================================= */
+
+.tabla-veterinarios {
+    width: 100%;
+
+    border-collapse: collapse;
+}
+
+.tabla-veterinarios thead {
+    background: #f7f9fa;
+}
+
+.tabla-veterinarios th {
+    height: 47px;
+
+    padding: 0 16px;
+
+    text-align: left;
+
+    border-bottom: 1px solid #dce3e8;
+
+    color: #243b53;
+
+    font-size: 14px;
+
+    font-weight: 700;
+}
+
+.tabla-veterinarios td {
+    height: 62px;
+
+    padding: 0 16px;
+
+    border-bottom: 1px solid #e1e7eb;
+
+    color: #344e65;
+
+    font-size: 14px;
+}
+
+.tabla-veterinarios tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.tabla-veterinarios tbody tr:hover {
+    background: #fafcfd;
+}
+
+
+/* =========================================
+   INFORMACIÓN DEL VETERINARIO
+========================================= */
+
+.veterinario-info {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+}
+
+.avatar-veterinario {
+    width: 40px;
+    height: 40px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    background: #e2f0ff;
+
+    color: #1976d2;
+
+    font-size: 17px;
+
+    font-weight: 600;
+}
+
+.veterinario-info div:last-child {
+    display: flex;
+    flex-direction: column;
+
+    gap: 3px;
+}
+
+.veterinario-info strong {
+    color: #243b53;
+
+    font-size: 15px;
+}
+
+.veterinario-info span {
+    color: #7890a6;
+
+    font-size: 12px;
+}
+
+
+/* =========================================
+   ESPECIALIDAD
+========================================= */
+
+.especialidad-veterinario {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 6px 11px;
+
+    border-radius: 15px;
+
+    background: #e4f4ea;
+
+    color: #31804b;
+
+    font-size: 13px;
+
+    font-weight: 600;
+}
+
+.especialidad-cirugia {
+    background: #e7effc;
+    color: #356db4;
+}
+
+.especialidad-dermatologia {
+    background: #f0e9fb;
+    color: #7252a2;
+}
+
+.especialidad-cardiologia {
+    background: #fdebed;
+    color: #c34d5d;
+}
+
+.especialidad-traumatologia {
+    background: #fff1dc;
+    color: #a66a18;
+}
+
+
+/* =========================================
+   SUCURSAL
+========================================= */
+
+.sucursal-veterinario {
+    display: flex;
+    flex-direction: column;
+
+    gap: 3px;
+}
+
+.sucursal-veterinario strong {
+    color: #344e65;
+
+    font-size: 14px;
+}
+
+.sucursal-veterinario span {
+    color: #7890a6;
+
+    font-size: 12px;
+}
+
+
+/* =========================================
+   ACCIONES
+========================================= */
+
+.acciones-veterinarios {
+    display: flex;
+    align-items: center;
+
+    gap: 7px;
+}
+
+.acciones-veterinarios button {
+    width: 38px;
+    height: 38px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+
+    border-radius: 7px;
+
+    font-size: 16px;
+
+    cursor: pointer;
+
+    transition: opacity 0.2s ease;
+}
+
+.acciones-veterinarios button:hover {
+    opacity: 0.75;
+}
+
+
+/* Ver */
+
+.btn-ver-veterinario {
+    background: #e8f5e9;
+
+    color: #39804d;
+}
+
+
+/* Editar */
+
+.btn-editar-veterinario {
+    background: #e4f1fc;
+
+    color: #1976d2;
+}
+
+
+/* Eliminar */
+
+.btn-eliminar-veterinario {
+    background: #fdebed;
+
+    color: #d64b5c;
+}
+
+
+/* =========================================
+   FOOTER
+========================================= */
+
+.veterinarios-footer {
+    padding: 14px 4px;
+}
+
+.veterinarios-footer span {
+    color: #526b82;
+
+    font-size: 14px;
+}
+
+.veterinarios-footer strong {
+    color: #243b53;
+
+    font-size: 15px;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 1100px) {
+
+    .veterinarios-toolbar {
+        flex-wrap: wrap;
+    }
+
+    .buscador-veterinarios {
+        min-width: 300px;
+    }
+
+    .paginacion-veterinarios {
+        margin-left: 0;
+    }
+
+}
+
+
+@media (max-width: 700px) {
+
+    .veterinarios {
+        padding: 0 15px;
+    }
+
+    .veterinarios-header {
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        gap: 10px;
+    }
+
+    .veterinarios-header h2 {
+        font-size: 23px;
+    }
+
+    .veterinarios-toolbar {
+        flex-direction: column;
+
+        align-items: stretch;
+    }
+
+    .buscador-veterinarios {
+        width: auto;
+    }
+
+    .filtro-especialidad-veterinarios select {
+        width: 100%;
+    }
+
+    .paginacion-veterinarios {
+        justify-content: flex-end;
+    }
+
+}
