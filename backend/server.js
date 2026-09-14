@@ -15,21 +15,8 @@ app.get("/", (req, res) => {
     });
 });
 
-app.get("/api/productos", (req, res) => {
-
-    const sql = "SELECT * FROM producto";
-
-    conexion.query(sql, (error, resultados) => {
-
-        if (error) {
-            return res.status(500).json({
-                error: "Error al obtener productos"
-            });
-        }
-
-        res.json(resultados);
-    });
-});
+const rutasUsuarios = require('./routes/usuarios.routes');
+app.use('/api/usuarios', rutasUsuarios);
 
 app.listen(process.env.PORT, () => {
     console.log(`Servidor funcionando en puerto http://localhost:${process.env.PORT}`);
