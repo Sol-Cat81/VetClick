@@ -1,0 +1,127 @@
+<section class="stock-page">
+  <div class="stock-header">
+    <div>
+      <h2>Panel de Administración - Stock</h2>
+      <p>Gestión de inventario por producto y sucursal</p>
+    </div>
+    <button class="btn-agregar-stock" id="btnAgregarStock">
+      <span>+</span> Añadir registro
+    </button>
+  </div>
+
+  <div class="stock-filtros">
+    <div class="buscador-stock">
+      <input
+        type="search"
+        id="buscarStock"
+        placeholder="Buscar por producto o sucursal..."
+      />
+    </div>
+    <div class="filtro-stock">
+      <select id="filtroSucursalStock" aria-label="Filtrar por sucursal">
+        <option value="">Todas las sucursales</option>
+        <option value="1">Sucursal Centro</option>
+        <option value="2">Sucursal Norte</option>
+        <option value="3">Sucursal Sur</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="tabla-stock-container">
+    <table class="tabla-stock">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Producto</th>
+          <th>Sucursal</th>
+          <th>Stock actual</th>
+          <th>Stock mínimo</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tablaStock">
+        <tr>
+          <td>#001</td>
+          <td>
+            <div class="producto-info">
+              <span class="producto-avatar">A</span>
+              <div><strong>Alimento Adulto</strong><small>ID producto: 1</small></div>
+            </div>
+          </td>
+          <td><strong>Sucursal Centro</strong><small class="dato-secundario">ID: 1</small></td>
+          <td><strong>24</strong> unidades</td>
+          <td>10 unidades</td>
+          <td><span class="stock-estado disponible">Disponible</span></td>
+          <td class="acciones-stock">
+            <button class="btn-ver-stock" title="Ver registro">⊙</button>
+            <button class="btn-editar-stock" title="Editar registro">✎</button>
+            <button class="btn-eliminar-stock" title="Eliminar registro">🗑</button>
+          </td>
+        </tr>
+        <tr>
+          <td>#002</td>
+          <td>
+            <div class="producto-info">
+              <span class="producto-avatar">P</span>
+              <div><strong>Alimento Puppy</strong><small>ID producto: 2</small></div>
+            </div>
+          </td>
+          <td><strong>Sucursal Centro</strong><small class="dato-secundario">ID: 1</small></td>
+          <td><strong>4</strong> unidades</td>
+          <td>8 unidades</td>
+          <td><span class="stock-estado bajo">Stock bajo</span></td>
+          <td class="acciones-stock">
+            <button class="btn-ver-stock" title="Ver registro">⊙</button>
+            <button class="btn-editar-stock" title="Editar registro">✎</button>
+            <button class="btn-eliminar-stock" title="Eliminar registro">🗑</button>
+          </td>
+        </tr>
+        <tr>
+          <td>#003</td>
+          <td>
+            <div class="producto-info">
+              <span class="producto-avatar">A</span>
+              <div><strong>Antiparasitario Interno</strong><small>ID producto: 3</small></div>
+            </div>
+          </td>
+          <td><strong>Sucursal Norte</strong><small class="dato-secundario">ID: 2</small></td>
+          <td><strong>0</strong> unidades</td>
+          <td>5 unidades</td>
+          <td><span class="stock-estado agotado">Agotado</span></td>
+          <td class="acciones-stock">
+            <button class="btn-ver-stock" title="Ver registro">⊙</button>
+            <button class="btn-editar-stock" title="Editar registro">✎</button>
+            <button class="btn-eliminar-stock" title="Eliminar registro">🗑</button>
+          </td>
+        </tr>
+        <tr>
+          <td>#004</td>
+          <td>
+            <div class="producto-info">
+              <span class="producto-avatar">J</span>
+              <div><strong>Juguete Mordillo</strong><small>ID producto: 4</small></div>
+            </div>
+          </td>
+          <td><strong>Sucursal Norte</strong><small class="dato-secundario">ID: 2</small></td>
+          <td><strong>18</strong> unidades</td>
+          <td>10 unidades</td>
+          <td><span class="stock-estado disponible">Disponible</span></td>
+          <td class="acciones-stock">
+            <button class="btn-ver-stock" title="Ver registro">⊙</button>
+            <button class="btn-editar-stock" title="Editar registro">✎</button>
+            <button class="btn-eliminar-stock" title="Eliminar registro">🗑</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="paginacion-stock" aria-label="Paginación de stock">
+    <button class="btn-paginacion-stock" title="Página anterior">‹</button>
+    <button class="btn-paginacion-stock pagina-activa">1</button>
+    <button class="btn-paginacion-stock">2</button>
+    <button class="btn-paginacion-stock">3</button>
+    <button class="btn-paginacion-stock" title="Página siguiente">›</button>
+  </div>
+</section>

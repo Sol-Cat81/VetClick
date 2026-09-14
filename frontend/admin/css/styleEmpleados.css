@@ -1,0 +1,547 @@
+/* =========================================
+   SECCIÓN EMPLEADOS
+========================================= */
+
+.empleados {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0 29px;
+    color: #243b53;
+}
+
+
+/* =========================================
+   CABECERA
+========================================= */
+
+.empleados-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 28px 0 24px;
+
+    border-top: 1px solid #dce3e8;
+}
+
+.empleados-header h2 {
+    margin: 0;
+
+    font-size: 29px;
+    font-weight: 700;
+
+    color: #243b53;
+}
+
+.empleados-header p {
+    margin: 5px 0 0;
+
+    font-size: 16px;
+
+    color: #7890a6;
+}
+
+.fecha-empleados {
+    font-size: 16px;
+    color: #7890a6;
+}
+
+
+/* =========================================
+   BARRA DE HERRAMIENTAS
+========================================= */
+
+.empleados-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    margin-bottom: 13px;
+}
+
+
+/* =========================================
+   BOTÓN AGREGAR
+========================================= */
+
+.btn-agregar-empleado {
+    height: 50px;
+
+    padding: 0 22px;
+
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    border: none;
+    border-radius: 7px;
+
+    background: #1976d2;
+    color: white;
+
+    font-size: 16px;
+
+    cursor: pointer;
+
+    transition: background 0.2s ease;
+}
+
+.btn-agregar-empleado:hover {
+    background: #1565c0;
+}
+
+.btn-agregar-empleado span {
+    font-size: 24px;
+    line-height: 1;
+}
+
+
+/* =========================================
+   BUSCADOR
+========================================= */
+
+.buscador-empleados {
+    height: 50px;
+
+    flex: 1;
+
+    display: flex;
+    align-items: center;
+
+    padding: 0 14px;
+
+    background: #f4f6f8;
+
+    border-radius: 7px;
+}
+
+.icono-busqueda-empleados {
+    margin-right: 10px;
+
+    font-size: 23px;
+
+    color: #6e8aa3;
+}
+
+.buscador-empleados input {
+    width: 100%;
+
+    border: none;
+    outline: none;
+
+    background: transparent;
+
+    font-size: 16px;
+
+    color: #243b53;
+}
+
+.buscador-empleados input::placeholder {
+    color: #8da1b3;
+}
+
+
+/* =========================================
+   FILTRO POR ROL
+========================================= */
+
+.filtro-rol-empleados {
+    height: 50px;
+}
+
+.filtro-rol-empleados select {
+    height: 50px;
+
+    min-width: 175px;
+
+    padding: 0 12px;
+
+    border: 1px solid #d8e0e6;
+    border-radius: 7px;
+
+    background: white;
+
+    color: #526b82;
+
+    font-size: 15px;
+
+    outline: none;
+
+    cursor: pointer;
+}
+
+
+/* =========================================
+   PAGINACIÓN
+========================================= */
+
+.paginacion-empleados {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+
+    white-space: nowrap;
+
+    margin-left: auto;
+}
+
+.paginacion-empleados span {
+    font-size: 14px;
+
+    color: #526b82;
+}
+
+.paginacion-empleados strong {
+    color: #243b53;
+}
+
+.btn-paginacion-empleados {
+    width: 38px;
+    height: 38px;
+
+    border: 1px solid #d8e0e6;
+    border-radius: 7px;
+
+    background: white;
+
+    color: #52708a;
+
+    font-size: 24px;
+
+    cursor: pointer;
+
+    transition: background 0.2s ease;
+}
+
+.btn-paginacion-empleados:hover {
+    background: #f1f5f8;
+}
+
+
+/* =========================================
+   CONTENEDOR TABLA
+========================================= */
+
+.tabla-empleados-container {
+    width: 100%;
+
+    overflow-x: auto;
+
+    border: 1px solid #dce3e8;
+    border-radius: 7px;
+
+    background: white;
+}
+
+
+/* =========================================
+   TABLA
+========================================= */
+
+.tabla-empleados {
+    width: 100%;
+
+    border-collapse: collapse;
+
+    table-layout: auto;
+}
+
+.tabla-empleados thead {
+    background: #f7f9fa;
+}
+
+.tabla-empleados th {
+    height: 47px;
+
+    padding: 0 16px;
+
+    text-align: left;
+
+    border-bottom: 1px solid #dce3e8;
+
+    color: #243b53;
+
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.tabla-empleados td {
+    height: 62px;
+
+    padding: 0 16px;
+
+    border-bottom: 1px solid #e1e7eb;
+
+    color: #344e65;
+
+    font-size: 14px;
+}
+
+.tabla-empleados tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.tabla-empleados tbody tr:hover {
+    background: #fafcfd;
+}
+
+
+/* =========================================
+   INFORMACIÓN DEL EMPLEADO
+========================================= */
+
+.empleado-info {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+}
+
+.avatar-empleado {
+    width: 40px;
+    height: 40px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    background: #e2f0ff;
+
+    color: #1976d2;
+
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.empleado-info div:last-child {
+    display: flex;
+    flex-direction: column;
+
+    gap: 3px;
+}
+
+.empleado-info strong {
+    color: #243b53;
+
+    font-size: 15px;
+}
+
+.empleado-info span {
+    color: #7890a6;
+
+    font-size: 12px;
+}
+
+
+/* =========================================
+   ROLES
+========================================= */
+
+.rol-empleado {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 6px 11px;
+
+    border-radius: 15px;
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+
+/* Veterinario */
+
+.rol-veterinario {
+    background: #e4f4ea;
+    color: #31804b;
+}
+
+
+/* Administrador */
+
+.rol-administrador {
+    background: #e7effc;
+    color: #356db4;
+}
+
+
+/* Recepcionista */
+
+.rol-recepcionista {
+    background: #fff1dc;
+    color: #a66a18;
+}
+
+
+/* Asistente */
+
+.rol-asistente {
+    background: #f0e9fb;
+    color: #7252a2;
+}
+
+
+/* =========================================
+   SUCURSAL
+========================================= */
+
+.sucursal-empleado {
+    display: flex;
+    flex-direction: column;
+
+    gap: 3px;
+}
+
+.sucursal-empleado strong {
+    color: #344e65;
+
+    font-size: 14px;
+}
+
+.sucursal-empleado span {
+    color: #7890a6;
+
+    font-size: 12px;
+}
+
+
+/* =========================================
+   ACCIONES
+========================================= */
+
+.acciones-empleados {
+    display: flex;
+    align-items: center;
+
+    gap: 7px;
+}
+
+.acciones-empleados button {
+    width: 38px;
+    height: 38px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    border-radius: 7px;
+
+    font-size: 16px;
+
+    cursor: pointer;
+
+    transition: opacity 0.2s ease;
+}
+
+.acciones-empleados button:hover {
+    opacity: 0.75;
+}
+
+
+/* Ver */
+
+.btn-ver-empleado {
+    background: #e8f5e9;
+    color: #39804d;
+}
+
+
+/* Editar */
+
+.btn-editar-empleado {
+    background: #e4f1fc;
+    color: #1976d2;
+}
+
+
+/* Eliminar */
+
+.btn-eliminar-empleado {
+    background: #fdebed;
+    color: #d64b5c;
+}
+
+
+/* =========================================
+   FOOTER
+========================================= */
+
+.empleados-footer {
+    padding: 14px 4px;
+}
+
+.empleados-footer span {
+    color: #526b82;
+
+    font-size: 14px;
+}
+
+.empleados-footer strong {
+    color: #243b53;
+
+    font-size: 15px;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 1100px) {
+
+    .empleados-toolbar {
+        flex-wrap: wrap;
+    }
+
+    .buscador-empleados {
+        min-width: 300px;
+    }
+
+    .paginacion-empleados {
+        margin-left: 0;
+    }
+
+}
+
+
+@media (max-width: 700px) {
+
+    .empleados {
+        padding: 0 15px;
+    }
+
+    .empleados-header {
+        align-items: flex-start;
+        flex-direction: column;
+
+        gap: 10px;
+    }
+
+    .empleados-header h2 {
+        font-size: 23px;
+    }
+
+    .empleados-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .buscador-empleados {
+        width: auto;
+    }
+
+    .filtro-rol-empleados select {
+        width: 100%;
+    }
+
+    .paginacion-empleados {
+        justify-content: flex-end;
+    }
+
+}

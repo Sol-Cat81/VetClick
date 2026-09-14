@@ -1,22 +1,22 @@
-<section class="veterinarios">
+<section class="empleados">
 
     <!-- =====================================
          CABECERA
     ====================================== -->
 
-    <div class="veterinarios-header">
+    <div class="empleados-header">
 
         <div>
 
-            <h2>Panel de Administración - Veterinarios</h2>
+            <h2>Panel de Administración - Empleados</h2>
 
             <p>
-                Gestión de veterinarios y especialidades profesionales
+                Gestión del personal de la veterinaria
             </p>
 
         </div>
 
-        <span class="fecha-veterinarios">
+        <span class="fecha-empleados">
             Septiembre 2026
         </span>
 
@@ -27,67 +27,56 @@
          BARRA DE HERRAMIENTAS
     ====================================== -->
 
-    <div class="veterinarios-toolbar">
+    <div class="empleados-toolbar">
 
         <!-- BOTÓN AGREGAR -->
 
-        <button
-            class="btn-agregar-veterinario"
-            id="btnAgregarVeterinario"
-        >
+        <button class="btn-agregar-empleado" id="btnAgregarEmpleado">
 
             <span>+</span>
 
-            Añadir Veterinario
+            Añadir Empleado
 
         </button>
 
 
         <!-- BUSCADOR -->
 
-        <div class="buscador-veterinarios">
+        <div class="buscador-empleados">
 
-            <span class="icono-busqueda-veterinarios">
+            <span class="icono-busqueda-empleados">
                 ⌕
             </span>
 
-            <input
-                type="text"
-                id="buscarVeterinario"
-                placeholder="Filtrar por nombre o especialidad..."
-            >
+            <input type="text" id="buscarEmpleado" placeholder="Filtrar por nombre, apellido o rol...">
 
         </div>
 
 
-        <!-- FILTRO ESPECIALIDAD -->
+        <!-- FILTRO POR ROL -->
 
-        <div class="filtro-especialidad-veterinarios">
+        <div class="filtro-rol-empleados">
 
-            <select id="filtroEspecialidadVeterinario">
+            <select id="filtroRolEmpleado">
 
                 <option value="">
-                    Todas las especialidades
+                    Todos los roles
                 </option>
 
-                <option value="clinica">
-                    Clínica general
+                <option value="veterinario">
+                    Veterinario
                 </option>
 
-                <option value="cirugia">
-                    Cirugía
+                <option value="recepcionista">
+                    Recepcionista
                 </option>
 
-                <option value="dermatologia">
-                    Dermatología
+                <option value="administrador">
+                    Administrador
                 </option>
 
-                <option value="cardiologia">
-                    Cardiología
-                </option>
-
-                <option value="traumatologia">
-                    Traumatología
+                <option value="asistente">
+                    Asistente
                 </option>
 
             </select>
@@ -97,33 +86,27 @@
 
         <!-- PAGINACIÓN -->
 
-        <div class="paginacion-veterinarios">
+        <div class="paginacion-empleados">
 
             <span>
 
                 1 - 25 de
 
-                <strong id="totalVeterinarios">
-                    25
+                <strong id="totalEmpleados">
+                    50
                 </strong>
 
-                Veterinarios
+                Empleados
 
             </span>
 
 
-            <button
-                class="btn-paginacion-veterinario"
-                id="paginaAnteriorVeterinario"
-            >
+            <button class="btn-paginacion-empleados" id="paginaAnteriorEmpleado">
                 ‹
             </button>
 
 
-            <button
-                class="btn-paginacion-veterinario"
-                id="paginaSiguienteVeterinario"
-            >
+            <button class="btn-paginacion-empleados" id="paginaSiguienteEmpleado">
                 ›
             </button>
 
@@ -136,9 +119,9 @@
          TABLA
     ====================================== -->
 
-    <div class="tabla-veterinarios-container">
+    <div class="tabla-empleados-container">
 
-        <table class="tabla-veterinarios">
+        <table class="tabla-empleados">
 
             <thead>
 
@@ -146,9 +129,9 @@
 
                     <th>ID</th>
 
-                    <th>Veterinario</th>
+                    <th>Empleado</th>
 
-                    <th>Especialidad</th>
+                    <th>Rol</th>
 
                     <th>Teléfono</th>
 
@@ -161,11 +144,11 @@
             </thead>
 
 
-            <tbody id="tablaVeterinarios">
+            <tbody id="tablaEmpleados">
 
 
                 <!-- =================================
-                     VETERINARIO 1
+                     EMPLEADO 1
                 ================================== -->
 
                 <tr>
@@ -177,9 +160,9 @@
 
                     <td>
 
-                        <div class="veterinario-info">
+                        <div class="empleado-info">
 
-                            <div class="avatar-veterinario">
+                            <div class="avatar-empleado">
                                 J
                             </div>
 
@@ -190,7 +173,7 @@
                                 </strong>
 
                                 <span>
-                                    ID Veterinario: 1
+                                    ID Empleado: 1
                                 </span>
 
                             </div>
@@ -202,8 +185,8 @@
 
                     <td>
 
-                        <span class="especialidad-veterinario">
-                            Clínica general
+                        <span class="rol-empleado rol-veterinario">
+                            Veterinario
                         </span>
 
                     </td>
@@ -216,7 +199,7 @@
 
                     <td>
 
-                        <div class="sucursal-veterinario">
+                        <div class="sucursal-empleado">
 
                             <strong>
                                 Sucursal Centro
@@ -231,28 +214,19 @@
                     </td>
 
 
-                    <td class="acciones-veterinarios">
+                    <td class="acciones-empleados">
 
-                        <button
-                            class="btn-ver-veterinario"
-                            title="Ver veterinario"
-                        >
+                        <button class="btn-ver-empleado" title="Ver empleado">
                             👁
                         </button>
 
 
-                        <button
-                            class="btn-editar-veterinario"
-                            title="Editar veterinario"
-                        >
+                        <button class="btn-editar-empleado" title="Editar empleado">
                             ✎
                         </button>
 
 
-                        <button
-                            class="btn-eliminar-veterinario"
-                            title="Eliminar veterinario"
-                        >
+                        <button class="btn-eliminar-empleado" title="Eliminar empleado">
                             🗑
                         </button>
 
@@ -262,7 +236,7 @@
 
 
                 <!-- =================================
-                     VETERINARIO 2
+                     EMPLEADO 2
                 ================================== -->
 
                 <tr>
@@ -274,9 +248,9 @@
 
                     <td>
 
-                        <div class="veterinario-info">
+                        <div class="empleado-info">
 
-                            <div class="avatar-veterinario">
+                            <div class="avatar-empleado">
                                 A
                             </div>
 
@@ -287,7 +261,7 @@
                                 </strong>
 
                                 <span>
-                                    ID Veterinario: 2
+                                    ID Empleado: 2
                                 </span>
 
                             </div>
@@ -299,8 +273,8 @@
 
                     <td>
 
-                        <span class="especialidad-veterinario especialidad-cirugia">
-                            Cirugía
+                        <span class="rol-empleado rol-veterinario">
+                            Veterinario
                         </span>
 
                     </td>
@@ -313,7 +287,7 @@
 
                     <td>
 
-                        <div class="sucursal-veterinario">
+                        <div class="sucursal-empleado">
 
                             <strong>
                                 Sucursal Norte
@@ -328,26 +302,17 @@
                     </td>
 
 
-                    <td class="acciones-veterinarios">
+                    <td class="acciones-empleados">
 
-                        <button
-                            class="btn-ver-veterinario"
-                            title="Ver veterinario"
-                        >
+                        <button class="btn-ver-empleado" title="Ver empleado">
                             👁
                         </button>
 
-                        <button
-                            class="btn-editar-veterinario"
-                            title="Editar veterinario"
-                        >
+                        <button class="btn-editar-empleado" title="Editar empleado">
                             ✎
                         </button>
 
-                        <button
-                            class="btn-eliminar-veterinario"
-                            title="Eliminar veterinario"
-                        >
+                        <button class="btn-eliminar-empleado" title="Eliminar empleado">
                             🗑
                         </button>
 
@@ -357,7 +322,7 @@
 
 
                 <!-- =================================
-                     VETERINARIO 3
+                     EMPLEADO 3
                 ================================== -->
 
                 <tr>
@@ -369,9 +334,9 @@
 
                     <td>
 
-                        <div class="veterinario-info">
+                        <div class="empleado-info">
 
-                            <div class="avatar-veterinario">
+                            <div class="avatar-empleado">
                                 C
                             </div>
 
@@ -382,7 +347,7 @@
                                 </strong>
 
                                 <span>
-                                    ID Veterinario: 3
+                                    ID Empleado: 3
                                 </span>
 
                             </div>
@@ -394,8 +359,8 @@
 
                     <td>
 
-                        <span class="especialidad-veterinario especialidad-dermatologia">
-                            Dermatología
+                        <span class="rol-empleado rol-administrador">
+                            Administrador
                         </span>
 
                     </td>
@@ -408,7 +373,7 @@
 
                     <td>
 
-                        <div class="sucursal-veterinario">
+                        <div class="sucursal-empleado">
 
                             <strong>
                                 Sucursal Centro
@@ -423,26 +388,17 @@
                     </td>
 
 
-                    <td class="acciones-veterinarios">
+                    <td class="acciones-empleados">
 
-                        <button
-                            class="btn-ver-veterinario"
-                            title="Ver veterinario"
-                        >
+                        <button class="btn-ver-empleado" title="Ver empleado">
                             👁
                         </button>
 
-                        <button
-                            class="btn-editar-veterinario"
-                            title="Editar veterinario"
-                        >
+                        <button class="btn-editar-empleado" title="Editar empleado">
                             ✎
                         </button>
 
-                        <button
-                            class="btn-eliminar-veterinario"
-                            title="Eliminar veterinario"
-                        >
+                        <button class="btn-eliminar-empleado" title="Eliminar empleado">
                             🗑
                         </button>
 
@@ -452,7 +408,7 @@
 
 
                 <!-- =================================
-                     VETERINARIO 4
+                     EMPLEADO 4
                 ================================== -->
 
                 <tr>
@@ -464,9 +420,9 @@
 
                     <td>
 
-                        <div class="veterinario-info">
+                        <div class="empleado-info">
 
-                            <div class="avatar-veterinario">
+                            <div class="avatar-empleado">
                                 M
                             </div>
 
@@ -477,7 +433,7 @@
                                 </strong>
 
                                 <span>
-                                    ID Veterinario: 4
+                                    ID Empleado: 4
                                 </span>
 
                             </div>
@@ -489,8 +445,8 @@
 
                     <td>
 
-                        <span class="especialidad-veterinario especialidad-cardiologia">
-                            Cardiología
+                        <span class="rol-empleado rol-recepcionista">
+                            Recepcionista
                         </span>
 
                     </td>
@@ -503,7 +459,7 @@
 
                     <td>
 
-                        <div class="sucursal-veterinario">
+                        <div class="sucursal-empleado">
 
                             <strong>
                                 Sucursal Sur
@@ -518,26 +474,17 @@
                     </td>
 
 
-                    <td class="acciones-veterinarios">
+                    <td class="acciones-empleados">
 
-                        <button
-                            class="btn-ver-veterinario"
-                            title="Ver veterinario"
-                        >
+                        <button class="btn-ver-empleado" title="Ver empleado">
                             👁
                         </button>
 
-                        <button
-                            class="btn-editar-veterinario"
-                            title="Editar veterinario"
-                        >
+                        <button class="btn-editar-empleado" title="Editar empleado">
                             ✎
                         </button>
 
-                        <button
-                            class="btn-eliminar-veterinario"
-                            title="Eliminar veterinario"
-                        >
+                        <button class="btn-eliminar-empleado" title="Eliminar empleado">
                             🗑
                         </button>
 
@@ -547,7 +494,7 @@
 
 
                 <!-- =================================
-                     VETERINARIO 5
+                     EMPLEADO 5
                 ================================== -->
 
                 <tr>
@@ -559,9 +506,9 @@
 
                     <td>
 
-                        <div class="veterinario-info">
+                        <div class="empleado-info">
 
-                            <div class="avatar-veterinario">
+                            <div class="avatar-empleado">
                                 P
                             </div>
 
@@ -572,7 +519,7 @@
                                 </strong>
 
                                 <span>
-                                    ID Veterinario: 5
+                                    ID Empleado: 5
                                 </span>
 
                             </div>
@@ -584,8 +531,8 @@
 
                     <td>
 
-                        <span class="especialidad-veterinario especialidad-traumatologia">
-                            Traumatología
+                        <span class="rol-empleado rol-asistente">
+                            Asistente
                         </span>
 
                     </td>
@@ -598,7 +545,7 @@
 
                     <td>
 
-                        <div class="sucursal-veterinario">
+                        <div class="sucursal-empleado">
 
                             <strong>
                                 Sucursal Norte
@@ -613,26 +560,17 @@
                     </td>
 
 
-                    <td class="acciones-veterinarios">
+                    <td class="acciones-empleados">
 
-                        <button
-                            class="btn-ver-veterinario"
-                            title="Ver veterinario"
-                        >
+                        <button class="btn-ver-empleado" title="Ver empleado">
                             👁
                         </button>
 
-                        <button
-                            class="btn-editar-veterinario"
-                            title="Editar veterinario"
-                        >
+                        <button class="btn-editar-empleado" title="Editar empleado">
                             ✎
                         </button>
 
-                        <button
-                            class="btn-eliminar-veterinario"
-                            title="Eliminar veterinario"
-                        >
+                        <button class="btn-eliminar-empleado" title="Eliminar empleado">
                             🗑
                         </button>
 
@@ -652,15 +590,15 @@
          FOOTER
     ====================================== -->
 
-    <div class="veterinarios-footer">
+    <div class="empleados-footer">
 
         <span>
 
-            <strong id="veterinariosRegistrados">
-                25
+            <strong id="empleadosRegistrados">
+                50
             </strong>
 
-            Veterinarios Registrados
+            Empleados Registrados
 
         </span>
 

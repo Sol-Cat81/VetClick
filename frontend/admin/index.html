@@ -18,6 +18,16 @@
     <link rel="stylesheet" href="css/styleTratamiento.css">
     <link rel="stylesheet" href="css/styleVacunas.css">
     <link rel="stylesheet" href="css/styleProductos.css">
+    <link rel="stylesheet" href="css/styleSurcursales.css">
+    <link rel="stylesheet" href="css/styleStock.css">
+    <link rel="stylesheet" href="css/stylePedidos.css">
+    <link rel="stylesheet" href="css/stylePagos.css">
+    <link rel="stylesheet" href="css/styleEnvios.css">
+    <link rel="stylesheet" href="css/styleEmpleados.css">
+    <link rel="stylesheet" href="css/styleVeterinarios.css">
+    <link rel="stylesheet" href="css/styleRolesEmpleados.css">
+    <link rel="stylesheet" href="css/styleUsuarios.css">
+    <link rel="stylesheet" href="css/styleRolesYPermisos.css">
     <title>Admin - Vet Click</title>
 </head>
 
@@ -98,8 +108,8 @@
             </summary>
 
             <ul class="opciones">
-                <li><a href="">Stock</a></li>
-                <li><a href="">Surcursales</a></li>
+                <li><a href="#" data-page="stock.html">Stock</a></li>
+                <li><a href="#" data-page="surcursales.html">Surcursales</a></li>
             </ul>
         </details>
 
@@ -113,9 +123,9 @@
                 <span class="flecha">v</span>
             </summary>
             <ul class="opciones">
-                <li><a href="">Pedidos</a></li>
-                <li><a href="">Pagos</a></li>
-                <li><a href="">Envios</a></li>
+                <li><a href="#" data-page="pedidos.html">Pedidos</a></li>
+                <li><a href="#"data-page="pagos.html" >Pagos</a></li>
+                <li><a href="#" data-page="envios.html">Envios</a></li>
             </ul>
         </details>
 
@@ -129,9 +139,9 @@
                 <span class="flecha">v</span>
             </summary>
             <ul class="opciones">
-                <li><a href="">Empleados</a></li>
-                <li><a href="">Veterinarios</a></li>
-                <li><a href="">Roles de Empleados</a></li>
+                <li><a href="#" data-page="empleados.html">Empleados</a></li>
+                <li><a href="#" data-page="veterinarios.html">Veterinarios</a></li>
+                <li><a href="#" data-page="rolesEmpleados.html">Roles de Empleados</a></li>
             </ul>
         </details>
 
@@ -146,8 +156,8 @@
             </summary>
 
             <ul class="opciones">
-                <li><a href="">Usuarios</a></li>
-                <li><a href="">Roles de usuario</a></li>
+                <li><a href="#" data-page="usuarios.html">Usuarios</a></li>
+                <li><a href="" data-page="rolesypermisos.html">Usuarios y permisos</a></li>
             </ul>
         </details>
 
@@ -181,6 +191,9 @@
         <main id="contenido-principal-main">
         </main>
     </div>
+    <script src="js/envios.js"></script>
+    <script src="js/pagos.js"></script>
+    <script src="js/pedidos.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@7.0.2/index.global.min.js"></script>
     <script src="js/navejacionAdmin.js"></script>
     <script src="js/turnos_ui.js"></script>
