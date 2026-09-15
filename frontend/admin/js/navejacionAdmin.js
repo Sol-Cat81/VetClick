@@ -2,6 +2,18 @@ const contenidoPrincipalmain = document.getElementById("contenido-principal-main
 
 const enlaces = document.querySelectorAll("[data-page]");
 
+// Cada vista registra aquí su inicialización específica, evitando una cadena
+// creciente de condiciones al agregar nuevas secciones.
+const inicializadoresVistas = {
+    "empleados.html": () => cargarEmpleados(),
+    "rolesEmpleados.html": () => cargarRolesEmpleados(),
+    "turnos.html": () => {
+        if (typeof window.inicializarTurnosUI === "function") {
+            window.inicializarTurnosUI();
+        }
+    }
+};
+
 
 // ========================================
 // CARGAR DASHBOARD AL ENTRAR AL ADMIN
@@ -28,6 +40,11 @@ enlaces.forEach(enlace => {
             .then(respuesta => respuesta.text())
             .then(contenido => {
                 contenidoPrincipalmain.innerHTML = contenido;
+
+                const inicializarVista = inicializadoresVistas[pagina];
+                if (inicializarVista) {
+                    inicializarVista();
+                }
             });
     });
 });

@@ -7,35 +7,60 @@
   const rowsPerPage = 25;
 
   // Elementos
-  const buscar = document.getElementById('buscarTurno');
-  const filtroFecha = document.getElementById('filtroFecha');
-  const filtroEstado = document.getElementById('filtroEstado');
-  const tabla = document.getElementById('tablaTurnos');
+  let buscar;
+  let filtroFecha;
+  let filtroEstado;
+  let tabla;
   const filas = () => Array.from(tabla.querySelectorAll('tr'));
-  const totalTurnosEl = document.getElementById('totalTurnos');
-  const turnosRegistradosEl = document.getElementById('turnosRegistrados');
-  const infoPagina = document.getElementById('infoPagina');
-  const prevBtn = document.getElementById('paginaAnteriorTurno');
-  const nextBtn = document.getElementById('paginaSiguienteTurno');
+  let totalTurnosEl;
+  let turnosRegistradosEl;
+  let infoPagina;
+  let prevBtn;
+  let nextBtn;
 
   // Modal
-  const modal = document.getElementById('modalTurno');
-  const btnAbrir = document.getElementById('btnAgregarTurno');
-  const btnCerrar = document.getElementById('modalTurnoClose');
-  const btnCancelar = document.getElementById('formCancelar');
-  const formGuardar = document.getElementById('formGuardar');
-  const modalTitle = document.getElementById('modalTurnoTitle');
+  let modal;
+  let btnAbrir;
+  let btnCerrar;
+  let btnCancelar;
+  let formGuardar;
+  let modalTitle;
 
   // Estado UI
   let currentPage = 1;
   let filtered = [];
+  let initialized = false;
 
   // Inicial
-  document.addEventListener('DOMContentLoaded', () => {
+  function initialize() {
+    if (initialized) return;
+
+    tabla = document.getElementById('tablaTurnos');
+    if (!tabla) return;
+
+    buscar = document.getElementById('buscarTurno');
+    filtroFecha = document.getElementById('filtroFechaTurno');
+    filtroEstado = document.getElementById('filtroEstadoTurno');
+    totalTurnosEl = document.getElementById('totalTurnos');
+    turnosRegistradosEl = document.getElementById('turnosRegistrados');
+    infoPagina = document.getElementById('infoPagina');
+    prevBtn = document.getElementById('paginaAnteriorTurno');
+    nextBtn = document.getElementById('paginaSiguienteTurno');
+    modal = document.getElementById('modalTurno');
+    btnAbrir = document.getElementById('btnAgregarTurno');
+    btnCerrar = document.getElementById('modalTurnoClose');
+    btnCancelar = document.getElementById('formCancelar');
+    formGuardar = document.getElementById('formGuardar');
+    modalTitle = document.getElementById('modalTurnoTitle');
+
+    initialized = true;
     applyCounts();
     applyFilters();
     attachEvents();
-  });
+  }
+
+  window.inicializarTurnosUI = initialize;
+  document.addEventListener('DOMContentLoaded', initialize);
 
   function attachEvents(){
     buscar.addEventListener('input', debounce(applyFilters, 250));
@@ -45,10 +70,10 @@
     nextBtn.addEventListener('click', () => { if(currentPage < Math.ceil(filtered.length/rowsPerPage)){ currentPage++; renderPage(); }});
 
     // Modal events
-    btnAbrir.addEventListener('click', () => openModal());
-    btnCerrar.addEventListener('click', closeModal);
-    btnCancelar.addEventListener('click', closeModal);
-    formGuardar.addEventListener('click', () => {
+    if (btnAbrir) btnAbrir.addEventListener('click', () => openModal());
+    if (btnCerrar) btnCerrar.addEventListener('click', closeModal);
+    if (btnCancelar) btnCancelar.addEventListener('click', closeModal);
+    if (formGuardar) formGuardar.addEventListener('click', () => {
       // UI-only: animación de guardado y cierre. Aquí se debe integrar el POST/PUT en el backend.
       showToast('Guardando turno (solo UI)...', 1200);
       setTimeout(() => { closeModal(); }, 700);
@@ -77,7 +102,7 @@
 
     // Cerrar modal con ESC
     document.addEventListener('keydown', (e) => {
-      if(e.key === 'Escape' && modal.getAttribute('aria-hidden') === 'false') closeModal();
+      if(e.key === 'Escape' && modal && modal.getAttribute('aria-hidden') === 'false') closeModal();
     });
   }
 
@@ -116,7 +141,9 @@
     const total = filtered.length;
     const displayStart = total === 0 ? 0 : start + 1;
     const displayEnd = Math.min(end, total);
-    infoPagina.textContent = `${displayStart} - ${displayEnd} de ${total} Turnos`;
+    if (infoPagina) {
+      infoPagina.textContent = `${displayStart} - ${displayEnd} de ${total} Turnos`;
+    }
     // Desactivar botones según página
     prevBtn.disabled = currentPage === 1;
     nextBtn.disabled = currentPage >= Math.ceil(Math.max(1,total)/rowsPerPage);
@@ -130,15 +157,18 @@
 
   /* Modal UI */
   function openModal(){
+    if (!modal || !modalTitle) return;
     modal.setAttribute('aria-hidden','false');
     modalTitle.textContent = 'Nuevo Turno';
     // animación suave de foco
     setTimeout(() => document.getElementById('form_id_mascota')?.focus(), 220);
   }
   function closeModal(){
+    if (!modal) return;
     modal.setAttribute('aria-hidden','true');
   }
   function openModalForRow(tr){
+    if (!modal || !modalTitle) return;
     modal.setAttribute('aria-hidden','false');
     modalTitle.textContent = 'Editar Turno';
     // rellenar campos UI con datos de la fila (si están presentes)
