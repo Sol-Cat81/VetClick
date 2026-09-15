@@ -18,6 +18,14 @@ app.get("/", (req, res) => {
 const rutasUsuarios = require('./routes/usuarios.routes');
 app.use('/api/usuarios', rutasUsuarios);
 
-app.listen(process.env.PORT, () => {
-    console.log(`Servidor funcionando en puerto http://localhost:${process.env.PORT}`);
+const empleadosRoutes = require('./routes/empleados.routes');
+app.use('/api/empleados' , empleadosRoutes);
+
+const rolesEmpleadosRoutes = require('./routes/rolesEmpleados.routes');
+app.use('/api/rol_empleados' , rolesEmpleadosRoutes);   
+
+const puerto = process.env.PORT || 3000;
+
+app.listen(puerto, () => {
+    console.log(`Servidor funcionando en puerto http://localhost:${puerto}`);
 });
