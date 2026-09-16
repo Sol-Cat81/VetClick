@@ -55,9 +55,17 @@ const registrarUsuario = async (req, res) => {
       "SELECT * FROM usuarios WHERE email = ?",
       [gmail]
     );
+    const [nombreUsuarioEncontrados] = await db.query(
+      "SELECT * FROM usuarios WHERE username = ?",
+      [usuario]
+    );
 
     if (usuariosEncontrados.length > 0) {
       return res.status(400).json({ mensaje: "Este gmail ya esta registrado" });
+    }
+
+    if (nombreUsuarioEncontrados.length > 0) {
+      return res.status(400).json({ mensaje: "Este nombre de usuario ya esta en uso" });
     }
 
     const hashPassword = await bcrypt.hash(password, 10);

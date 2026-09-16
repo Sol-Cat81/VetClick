@@ -171,12 +171,13 @@ formInicio.addEventListener("submit", async (evento) => {
 
       localStorage.setItem("usuario", JSON.stringify(confirmBackend.usuario));
 
-      if (confirmBackend.usuario.rol === '1') {
+      if (confirmBackend.usuario.rol === "1") {
         window.location.href = "./admin/index.html";
       } else {
         window.location.href = "./index.html";
       }
     } else {
+      alerta.removeAttribute('hidden')
       alerta.innerHTML = confirmBackend.mensaje;
     }
   } catch (error) {
@@ -192,38 +193,56 @@ const formRegistro = document.getElementById("formRegistro");
 formRegistro.addEventListener("submit", async (evento) => {
   evento.preventDefault();
 
-  const nombreUsuario = document.getElementById("nombre-usuario").value;
-  const gmailUsuario = document.getElementById("correo-registro").value;
+  const nombreUsuario = document.getElementById("nombre-usuario").value.trim();
+  const gmailUsuario = document.getElementById("correo-registro").value.trim();
   const passwordUsuario = document.getElementById("password-registro").value;
+  const registroError = document.getElementById("registroError");
+  registroError.textContent = ""
+  let formularioValido = true;
 
-  const registrarUsuario = {
-    usuario: nombreUsuario,
-    gmail: gmailUsuario,
-    password: passwordUsuario,
-  };
+  if (nombreUsuario.length < 4) {
+    registroError.textContent = "El usuario debe tener al menos 4 caracteres.";
+    formularioValido = false;
+  }
+  const regexPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&()<>/])[A-Za-z\d@$!%*?&()<>/]{8,}$/;
+  if (!regexPassword.test(passwordUsuario)) {
+    registroError.textContent =
+      "La contraseña contener al menos 8 caracteres(max 30), incluir una mayúscula, minusculas, un número y un carácter especial.";
+    formularioValido = false;
+  }
 
-  try {
-    const resgistrar = await fetch(
-      "http://localhost:3000/api/usuarios/registrarUsuario",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+  if (formularioValido) {
+    const registrarUsuario = {
+      usuario: nombreUsuario,
+      gmail: gmailUsuario,
+      password: passwordUsuario,
+    };
+
+    try {
+      const resgistrar = await fetch(
+        "http://localhost:3000/api/usuarios/registrarUsuario",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(registrarUsuario),
         },
-        body: JSON.stringify(registrarUsuario),
-      },
-    );
+      );
 
-    const confirmRegistro = await resgistrar.json();
+      const confirmRegistro = await resgistrar.json();
 
-    if (resgistrar.ok) {
-      alert(confirmRegistro.mensaje);
-      location.reload();
-    } else {
-      alert("Hubo un problemas: " + confirmRegistro.mensaje);
+      if (resgistrar.ok) {
+        alert(confirmRegistro.mensaje);
+        window.location.reload();
+      } else {
+        alert("Hubo un problemas: " + confirmRegistro.mensaje);
+      }
+    } catch (error) {
+      console.error("Error de conexión:", error);
+      alert("No se pudo conectar con el servidor de la veterinaria.");
     }
-  } catch (error) {
-    console.error("Error de conexión:", error);
-    alert("No se pudo conectar con el servidor de la veterinaria.");
+  } else{
+    registroError.removeAttribute('hidden')
   }
 });
