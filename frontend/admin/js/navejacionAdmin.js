@@ -7,6 +7,7 @@ const enlaces = document.querySelectorAll("[data-page]");
 const inicializadoresVistas = {
     "empleados.html": () => cargarEmpleados(),
     "rolesEmpleados.html": () => cargarRolesEmpleados(),
+    "usuarios.html": ()=>cargarUsuarios(),
     "turnos.html": () => {
         if (typeof window.inicializarTurnosUI === "function") {
             window.inicializarTurnosUI();
