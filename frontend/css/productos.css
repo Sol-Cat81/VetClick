@@ -354,7 +354,46 @@ details summary:hover{
     font-size: 1.2rem;
     font-weight: bold;
     color: var(--elem-importantes);
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
 }
+#productos-detacados .card-pie .precio-anterior{
+    color: #78909c;
+    font-size: 0.85rem;
+    font-weight: normal;
+    text-decoration: line-through;
+}
+
+#productos-detacados .card-text{
+    display: flex;
+    gap: 5px;
+    margin-top: 10px;
+}
+.card-text .opcion{
+    background: transparent;
+    font-family: inherit;
+    font-size: inherit;
+    padding: 2px 10px;
+    border: var(--elem-secun) 1px solid;
+    color: var(--elem-secun);
+    border-radius: 15px;
+    cursor: pointer;
+}
+.card-text .elegido{
+    background-color: var(--elem-secun);
+    color: var(--secundario-fondo);
+}
+.desc{
+    position: absolute;
+    z-index: 100;
+    color: white;
+    background-color: #155E75;
+    padding: 2px 15px;
+    margin: 7px;
+    border-radius: 10px 0px 10px 0px;
+}
+
 .swiper-productos .swiper-wrapper{
     align-items: center;
 }

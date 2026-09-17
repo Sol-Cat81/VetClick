@@ -6,13 +6,18 @@ const solicitarProductosDestacados = async(req, res) =>{
             p.id_producto,
             p.nombre,
             p.descripcion,
+            p.descuento,
             v.id_variante,
+            v.id_valor_atributo,
+            av.nombre AS atributo,
             v.precio,
             v.stock,
-            v.imagen
+            p.imagen
             FROM productos AS p 
             INNER JOIN variantes AS v
-            ON p.id_producto = v.id_producto
+            ON p.id_producto = v.id_producto 
+            INNER JOIN valores_atributo AS av
+            ON v.id_valor_atributo = av.id_valor
             `);
 
         const ordenarDest = {}
@@ -23,15 +28,18 @@ const solicitarProductosDestacados = async(req, res) =>{
                     id: producto.id_producto,
                     nombre: producto.nombre,
                     descripcion: producto.descripcion,
+                    descuento: producto.descuento,
+                    imagen: producto.imagen,
                     variantes: []
                 }
             }
 
             ordenarDest[producto.id_producto].variantes.push({
                 id: producto.id_variante,
+                id_atributo: producto.id_valor_atributo,
                 precio: producto.precio,
                 stock: producto.stock,
-                imagen: producto.imagen
+                atributo: producto.atributo
             })
         } )
         

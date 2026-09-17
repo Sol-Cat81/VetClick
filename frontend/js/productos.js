@@ -1,78 +1,109 @@
-const swiper = new Swiper('.swiper-hero', {
+const swiper = new Swiper(".swiper-hero", {
   // Optional parameters
-  direction: 'horizontal',
+  direction: "horizontal",
   loop: true,
   allowTouchMove: true,
 
   // If we need pagination
   pagination: {
-    el: '.swiper-pagination',
-    type: 'bullets',
+    el: ".swiper-pagination",
+    type: "bullets",
     dynamicBullets: true,
   },
 
   // Navigation arrows
   navigation: {
-    nextEl: '.swiper-button-next',
-    prevEl: '.swiper-button-prev',
+    nextEl: ".swiper-button-next",
+    prevEl: ".swiper-button-prev",
   },
 
-  effect: 'fade',
+  effect: "fade",
   fadeEffect: {
-    crossFade: true
-  }
+    crossFade: true,
+  },
 });
 
-const swiperBeneficios = new Swiper('.swiper-cards-beneficios', {
-  slidesPerView: 'auto',
+const swiperBeneficios = new Swiper(".swiper-cards-beneficios", {
+  slidesPerView: "auto",
   spaceBetween: 20,
   watchOverflow: true,
   centerInsufficientSlides: true,
-  direction: 'horizontal',
+  direction: "horizontal",
   allowTouchMove: true,
 });
 
-const swiperProductos = new Swiper('.swiper-productos', {
-  slidesPerView: 'auto',
+const swiperProductos = new Swiper(".swiper-productos", {
+  slidesPerView: "auto",
+  loop: "false",
   spaceBetween: 20,
   centerInsufficientSlides: true,
   watchOverflow: true,
-  direction: 'horizontal',
+  direction: "horizontal",
   pagination: {
-    el: '.swiper-pagination',
-    type: 'bullets',
+    el: ".swiper-pagination",
+    type: "bullets",
     dynamicBullets: true,
   },
 
   // Navigation arrows
   navigation: {
-    nextEl: '.swiper-button-next',
-    prevEl: '.swiper-button-prev',
-  }
+    nextEl: ".swiper-button-next",
+    prevEl: ".swiper-button-prev",
+  },
 });
-const header = document.querySelector('header')
-const busqueda = document.querySelector('.search-bar')
-const contenedor = document.querySelector('.contenedor')
+const header = document.querySelector("header");
+const busqueda = document.querySelector(".search-bar");
+const contenedor = document.querySelector(".contenedor");
 
-const contenedorProdDestacados = document.querySelector('.swiper-wrapper')
+const contenedorProdDestacados = document.querySelector(
+  ".productos-destacados",
+);
+const imagen404 =
+  "https://assets.hellovector.com/product-images/b_5023.jpg";
 
 /*==========================================
 
        = = = = = FUNCIONES = = = = =
 
 ============================================*/
-function cerrarLoader(){
-   let loader = document.querySelector('.loader');
-   loader.style.display = 'none';
+function cerrarLoader() {
+  let loader = document.querySelector(".loader");
+  loader.style.display = "none";
 }
 const reponsive = () => {
-  if(window.innerWidth < 600){
-    header.appendChild(busqueda)
-  }else{
-    contenedor.appendChild(busqueda)
+  if (window.innerWidth < 600) {
+    header.appendChild(busqueda);
+  } else {
+    contenedor.appendChild(busqueda);
   }
-}
-reponsive()
+};
+reponsive();
+
+const formatearNumero = (numero) => {
+  // Si el número es entero (decimales igual a 0), no muestra decimales
+  const decimales = numero % 1 === 0 ? 0 : 2;
+
+  return new Intl.NumberFormat('es-AR', { // 'es-AR' o 'es-ES' usan punto para miles y coma para decimales
+    minimumFractionDigits: decimales,
+    maximumFractionDigits: decimales
+  }).format(numero);
+};
+
+const calcularPrecioConDescuento = (precio, descuento) =>
+  precio * (1 - descuento / 100);
+
+const renderizarPrecio = (precio, descuento) => {
+  const precioFinal = calcularPrecioConDescuento(precio, descuento);
+
+  if (descuento <= 0) {
+    return `$${formatearNumero(precio)}`;
+  }
+
+  return `
+    <span class="precio-nuevo">$${formatearNumero(precioFinal)}</span>
+    <span class="precio-anterior">$${formatearNumero(precio)}</span>
+  `;
+};
 
 /*==========================================
 
@@ -80,43 +111,83 @@ reponsive()
        
 ============================================*/
 
-window.addEventListener('load', async() => {
-    cerrarLoader()
-    try {
-      const solicitarDestacados = await fetch('http://localhost:3000/api/productos/destacados');
+window.addEventListener("load", async () => {
+  cerrarLoader();
+  try {
+    const solicitarDestacados = await fetch(
+      "http://localhost:3000/api/productos/destacados",
+    );
 
-      const destacados = await solicitarDestacados.json();
+    const destacados = await solicitarDestacados.json();
 
-      if(solicitarDestacados.ok){
-        contenedorProdDestacados.innerHTML = ''
+    if (solicitarDestacados.ok) {
+      contenedorProdDestacados.innerHTML = "";
 
-        destacados.forEach(prod => {
-          contenedorProdDestacados.innerHTML = `
+      destacados
+        .filter((prod) => prod.imagen && prod.variantes.length > 0)
+        .forEach((prod) => {
+        const primeraVariante = prod.variantes[0];
+        const descuento = Number(prod.descuento) || 0;
+        const variantes = prod.variantes
+          .map(
+            (variante, indice) =>
+              `<button type="button" class="opcion${
+                indice === 0 ? " elegido" : ""
+              }" data-id="${variante.id}" data-atributo="${variante.id_atributo}" data-precio="${variante.precio}">${variante.atributo}</button>`,
+          )
+          .join("");
+
+        contenedorProdDestacados.innerHTML += `
           <div class="swiper-slide">
-                <div class="card-productos mx-auto">
+                <div class="card-productos mx-auto" data-producto-id="${prod.id}" data-descuento="${descuento}">
                   <img
-                    src="https://jumboargentina.vtexassets.com/arquivos/ids/760152/Alimento-Para-Perros-Pedigree-Cachorros-1-5-Kg-1-38587.jpg?v=638048145825670000"
+                    src="${prod.imagen || imagen404}"
                     class="card-img-top"
-                    alt="..."
+                    onerror="this.onerror=null; this.src='${imagen404}';" 
+                    alt="${prod.nombre}"
                   />
+                  ${prod.descuento > 0 ? `<div class="desc">${prod.descuento}%</div>` : ""}
                   <div class="card-body">
-                    <h5 class="card-title">Alimento para perro</h5>
+                    <h6 class="card-title"><b>${prod.nombre}</b></h6>
                     <div class="card-text">
-                      Some quick example text to build on the
+                    ${variantes}
                     </div>
                   </div>
                   <div class="card-pie">
-                    <div class="precio">$29.99</div>
+                    <div class="precio">${renderizarPrecio(
+                      Number(primeraVariante.precio),
+                      descuento,
+                    )}</div>
                     <button class="btn btn-comprar">Comprar</button>
                   </div>
                 </div>
               </div>
-          `
+          `;
         });
-      }
-    } catch (error) {
-      console.error("Error de conexión:", error);
-      alert("No se pudo conectar con el servidor de la veterinaria.");
+
+      contenedorProdDestacados.querySelectorAll(".card-productos").forEach((tarjeta) => {
+        tarjeta.addEventListener("click", (evento) => {
+          const opcion = evento.target.closest(".opcion");
+
+          if (!opcion || !tarjeta.contains(opcion)) return;
+
+          tarjeta.querySelectorAll(".opcion").forEach((variante) => {
+            variante.classList.remove("elegido");
+          });
+          opcion.classList.add("elegido");
+
+          tarjeta.querySelector(".precio").innerHTML = renderizarPrecio(
+            Number(opcion.dataset.precio),
+            Number(tarjeta.dataset.descuento) || 0,
+          );
+        });
+      });
+
+      swiperProductos.update();
     }
-})
-window.addEventListener('resize', reponsive)
+  } catch (error) {
+    console.error("Error de conexión:", error);
+    alert("No se pudo conectar con el servidor de la veterinaria.");
+  }
+});
+window.addEventListener("resize", reponsive);
