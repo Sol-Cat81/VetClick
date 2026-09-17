@@ -383,6 +383,7 @@ INSERT + TRUNCATE
 =============================
 TRUNCATE: PARA REINICIAR LOS CONTADORES DE LAS TABLAS 
 */
+
 -- ====================================================
 -- SCRIPT DE DATOS DE PRUEBA (INSERTS) - VETERINARIA
 -- ====================================================
