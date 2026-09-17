@@ -27,6 +27,12 @@ app.use('/api/empleados' , empleadosRoutes);
 const rolesEmpleadosRoutes = require('./routes/rolesEmpleados.routes');
 app.use('/api/rol_empleados' , rolesEmpleadosRoutes);   
 
+const clientesRoutes = require('./routes/clientes.routes');
+app.use('/api/clientes', clientesRoutes);
+
+const mascotasRoutes = require('./routes/mascotas.routes');
+app.use('/api/mascotas' , mascotasRoutes)
+
 const puerto = process.env.PORT || 3000;
 
 app.listen(puerto, () => {
