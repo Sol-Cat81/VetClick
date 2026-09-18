@@ -8,6 +8,8 @@ const inicializadoresVistas = {
     "empleados.html": () => cargarEmpleados(),
     "rolesEmpleados.html": () => cargarRolesEmpleados(),
     "usuarios.html": ()=>cargarUsuarios(),
+    "clientes.html": ()=> cargarClientes(),
+    "mascotas.html": ()=>cargarMascotas(),
     "turnos.html": () => {
         if (typeof window.inicializarTurnosUI === "function") {
             window.inicializarTurnosUI();
