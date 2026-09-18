@@ -51,9 +51,6 @@ const swiperProductos = new Swiper(".swiper-productos", {
     prevEl: ".swiper-button-prev",
   },
 });
-const header = document.querySelector("header");
-const busqueda = document.querySelector(".search-bar");
-const contenedor = document.querySelector(".contenedor");
 
 const contenedorProdDestacados = document.querySelector(
   ".productos-destacados",
@@ -70,14 +67,6 @@ function cerrarLoader() {
   let loader = document.querySelector(".loader");
   loader.style.display = "none";
 }
-const reponsive = () => {
-  if (window.innerWidth < 600) {
-    header.appendChild(busqueda);
-  } else {
-    contenedor.appendChild(busqueda);
-  }
-};
-reponsive();
 
 const formatearNumero = (numero) => {
   // Si el número es entero (decimales igual a 0), no muestra decimales
@@ -133,7 +122,7 @@ window.addEventListener("load", async () => {
             (variante, indice) =>
               `<button type="button" class="opcion${
                 indice === 0 ? " elegido" : ""
-              }" data-id="${variante.id}" data-atributo="${variante.id_atributo}" data-precio="${variante.precio}">${variante.atributo}</button>`,
+              }" data-id="${variante.id}" data-atributo="${variante.id_atributo}" data-precio="${variante.precio}" data-stock="${variante.stock}">${variante.atributo}</button>`,
           )
           .join("");
 
@@ -190,4 +179,3 @@ window.addEventListener("load", async () => {
     alert("No se pudo conectar con el servidor de la veterinaria.");
   }
 });
-window.addEventListener("resize", reponsive);
