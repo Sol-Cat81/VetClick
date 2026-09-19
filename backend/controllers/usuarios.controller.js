@@ -7,7 +7,7 @@ const verificarUsuario = async (req, res) => {
   try {
     const [usuarioSession] = await db.query(
       "SELECT * FROM usuarios WHERE email = ?",
-      [email]
+      [email],
     );
 
     if (usuarioSession.length === 1) {
@@ -15,7 +15,7 @@ const verificarUsuario = async (req, res) => {
 
       const contraseñaValida = await bcrypt.compare(
         password,
-        usuarioEncontrado.password_hash || usuarioEncontrado.password 
+        usuarioEncontrado.password_hash || usuarioEncontrado.password,
       );
 
       if (!contraseñaValida) {
@@ -24,12 +24,23 @@ const verificarUsuario = async (req, res) => {
           .json({ mensaje: "El email o la contraseña es incorrecto." });
       }
 
+      const token = jwt.sign(
+        { id: usuarioEncontrado.id, rol: usuarioEncontrado.rol },
+        process.env.SECRETO_JWT,
+        { expiresIn: "2h" },
+      );
+      res.cookie("token_veterinaria", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 2 * 60 * 60 * 1000,
+      });
+
       res.status(201).json({
         mensaje: "usuario validado",
         usuario: {
           id: usuarioEncontrado.id_usuario,
           name: usuarioEncontrado.username,
-          email: usuarioEncontrado.email,
           rol: usuarioEncontrado.id_rol_usuario,
         },
       });
@@ -53,11 +64,11 @@ const registrarUsuario = async (req, res) => {
   try {
     const [usuariosEncontrados] = await db.query(
       "SELECT * FROM usuarios WHERE email = ?",
-      [gmail]
+      [gmail],
     );
     const [nombreUsuarioEncontrados] = await db.query(
       "SELECT * FROM usuarios WHERE username = ?",
-      [usuario]
+      [usuario],
     );
 
     if (usuariosEncontrados.length > 0) {
@@ -65,19 +76,19 @@ const registrarUsuario = async (req, res) => {
     }
 
     if (nombreUsuarioEncontrados.length > 0) {
-      return res.status(400).json({ mensaje: "Este nombre de usuario ya esta en uso" });
+      return res
+        .status(400)
+        .json({ mensaje: "Este nombre de usuario ya esta en uso" });
     }
 
     const hashPassword = await bcrypt.hash(password, 10);
 
     const [nuevoUsuario] = await db.query(
       "INSERT INTO usuarios(username, email, password_hash, id_rol_usuario) VALUES (?, ?, ?, ?)",
-      [usuario, gmail, hashPassword, 2]
+      [usuario, gmail, hashPassword, 2],
     );
 
-    res
-      .status(201)
-      .json({ mensaje: "Registro exitoso, puede iniciar sesion" });
+    res.status(201).json({ mensaje: "Registro exitoso, puede iniciar sesion" });
   } catch (error) {
     console.error("Error en el registro:", error);
     res.status(500).json({ mensaje: "Hubo un error en el servidor" });

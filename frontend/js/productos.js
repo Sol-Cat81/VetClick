@@ -63,10 +63,6 @@ const imagen404 =
        = = = = = FUNCIONES = = = = =
 
 ============================================*/
-function cerrarLoader() {
-  let loader = document.querySelector(".loader");
-  loader.style.display = "none";
-}
 
 const formatearNumero = (numero) => {
   // Si el número es entero (decimales igual a 0), no muestra decimales
@@ -101,7 +97,6 @@ const renderizarPrecio = (precio, descuento) => {
 ============================================*/
 
 window.addEventListener("load", async () => {
-  cerrarLoader();
   try {
     const solicitarDestacados = await fetch(
       "http://localhost:3000/api/productos/destacados",
@@ -112,8 +107,7 @@ window.addEventListener("load", async () => {
     if (solicitarDestacados.ok) {
       contenedorProdDestacados.innerHTML = "";
 
-      destacados
-        .filter((prod) => prod.imagen && prod.variantes.length > 0)
+      destacados.filter((prod) => prod.imagen && prod.variantes.length > 0)
         .forEach((prod) => {
         const primeraVariante = prod.variantes[0];
         const descuento = Number(prod.descuento) || 0;

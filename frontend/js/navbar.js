@@ -1,6 +1,6 @@
 class MiNavbar extends HTMLElement {
   connectedCallback() {
-    const ruta = this.getAttribute('ruta-base') || '';
+    const ruta = this.getAttribute("ruta-base") || "";
 
     this.innerHTML = `
       <style>
@@ -247,27 +247,7 @@ class MiNavbar extends HTMLElement {
           
           <details class="desplegar-categoria">
             <summary>Categorias <span class="flecha"><i class="ph-thin ph-caret-down"></i></span></summary>
-            <ul>
-              <li>
-                <details class="categoria-offcanvas">
-                  <summary>Perros <span class="sub-flecha"><i class="ph-thin ph-caret-down"></i></span></summary>
-                  <ul>
-                    <li>Alimentos secos</li>
-                    <li>Alimentos humedos</li>
-                    <li>Comederos</li>
-                  </ul>
-                </details>
-              </li>
-              <li>
-                <details class="categoria-offcanvas">
-                  <summary>Gatos <span class="sub-flecha"><i class="ph-thin ph-caret-down"></i></span></summary>
-                  <ul>
-                    <li>Alimentos secos</li>
-                    <li>Alimentos humedos</li>
-                    <li>Comederos</li>
-                  </ul>
-                </details>
-              </li>
+            <ul class="categoriasPadre">
             </ul>
           </details>
         </div>
@@ -285,4 +265,59 @@ class MiNavbar extends HTMLElement {
 }
 
 // Solo necesitas registrar el componente, eliminamos el eventListener de resize
-customElements.define('mi-navbar', MiNavbar);
+customElements.define("mi-navbar", MiNavbar);
+
+window.addEventListener("load", async () => {
+  try {
+    const response = await fetch("http://localhost:3000/api/productos/categorias");
+
+    if (!response.ok) {
+      throw new Error("Error al obtener categorías");
+    }
+
+    const data = await response.json();
+    const categorias = data.categorias;
+    const contenedores = document.querySelectorAll(".categoriasPadre");
+
+    contenedores.forEach((contenedor) => {
+      contenedor.innerHTML = "";
+
+      categorias.forEach((categoriaPadre) => {
+        if (categoriaPadre.subcategorias.length > 0) {
+          let subCategorias = "";
+
+          categoriaPadre.subcategorias.forEach((subCat) => {
+            subCategorias += `
+              <li class="subCategoria" data-id="${subCat.id_categoria}" data-padre="${subCat.categoria_padre}">
+                ${subCat.nombre}
+              </li>
+            `;
+          });
+
+          contenedor.innerHTML += `
+            <li>
+              <details class="categoria-offcanvas">
+                <summary data-id="${categoriaPadre.id_categoria}">
+                  ${categoriaPadre.nombre}
+                  <span class="sub-flecha"><i class="ph-thin ph-caret-down"></i></span>
+                </summary>
+                <ul>
+                  ${subCategorias}
+                </ul>
+              </details>
+            </li>
+          `;
+        } else {
+          contenedor.innerHTML += `
+            <li data-id="${categoriaPadre.id_categoria}">
+              ${categoriaPadre.nombre}
+            </li>
+          `;
+        }
+      });
+    });
+  } catch (error) {
+    console.error("Error de conexión:", error);
+    alert("No se pudo conectar con el servidor de la veterinaria.");
+  }
+});
