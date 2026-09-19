@@ -1,207 +1,70 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="../assets/icons/ChatGPT-Image-Logo.png" type="image/x-icon">
-    <link rel="stylesheet" href="css/styleadmin.css">
-    <!-- calendario -->
-    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@7.0.2/index.global.min.css" rel="stylesheet">
-    <!--estilos de views-->
-    <link rel="stylesheet" href="css/styleDashboard.css">
-    <link rel="stylesheet" href="css/styleClientes.css">
-    <link rel="stylesheet" href="css/styleMascotas.css">
-    <link rel="stylesheet" href="css/styleDirecciones.css">
-    <link rel="stylesheet" href="css/styleTurnos.css">
-    <link rel="stylesheet" href="css/styleHistorialMedico.css">
-    <link rel="stylesheet" href="css/styleTratamiento.css">
-    <link rel="stylesheet" href="css/styleVacunas.css">
-    <link rel="stylesheet" href="css/styleProductos.css">
-    <link rel="stylesheet" href="css/styleSurcursales.css">
-    <link rel="stylesheet" href="css/styleStock.css">
-    <link rel="stylesheet" href="css/stylePedidos.css">
-    <link rel="stylesheet" href="css/stylePagos.css">
-    <link rel="stylesheet" href="css/styleEnvios.css">
-    <link rel="stylesheet" href="css/styleEmpleados.css">
-    <link rel="stylesheet" href="css/styleVeterinarios.css">
-    <link rel="stylesheet" href="css/styleRolesEmpleados.css">
-    <link rel="stylesheet" href="css/styleUsuarios.css">
-    <link rel="stylesheet" href="css/styleRolesYPermisos.css">
-    <title>Admin - Vet Click</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vet Click · Panel administrativo</title>
+  <link rel="stylesheet" href="css/styles.css">
 </head>
-
 <body>
-
-    <!--
-    MENU LATERAL
-    -->
-    <aside class="menu-lateral">
-        <div class="logo">
-            <h2>Vet Click</h2>
-        </div>
-
-        <a href="#" class="menu-item activo" data-page="dashboard.html">
-            <span class="icono"></span>
-            <span>Home</span>
-        </a>
-
-        <!--Clientes-->
-        <details class="menu-desplegable">
-            <summary class="boton-principal">
-                <span>
-                    <span class="icono"></span>
-                    Clienes
-                </span>
-
-                <span class="flecha">v</span>
-            </summary>
-            <ul class="opciones">
-                <li><a href="#" data-page="clientes.html">Clientes</a></li>
-                <li><a href="#" data-page="mascotas.html">Mascotas</a></li>
-                <li><a href="#" data-page="direcciones.html">Direcciones</a></li>
-            </ul>
-        </details>
-
-        <!--Veterinaria-->
-        <details class="menu-desplegable">
-            <summary class="boton-principal">
-                <span>
-                    <span class="icono"></span>
-                    Veterinaria
-                </span>
-                <span class="flecha">v</span>
-            </summary>
-            <ul class="opciones">
-                <li><a href="" data-page="turnos.html">Turnos</a></li>
-                <li><a href="" data-page="historialmedico.html">Historial medico</a></li>
-                <li><a href="" data-page="tratamientos.html">Tratamiento</a></li>
-                <li><a href="" data-page="vacunas.html">Vacunas</a></li>
-            </ul>
-        </details>
-
-        <!--Tienda-->
-        <details class="menu-desplegable">
-            <summary class="boton-principal">
-                <span>
-                    <span class="icono"></span>
-                    Tienda
-                </span>
-                <span class="flecha">v</span>
-            </summary>
-            <ul class="opciones">
-                <li><a href="#" data-page="productos.html">Productos</a></li>
-                <li><a href="#" data-page="categorias.html">Categoria</a></li>
-                <li><a href="#" data-page="marcas.html">Marcas</a></li>
-                <li><a href="#" data-page="variantes.html">Variantes</a></li>
-            </ul>
-        </details>
-
-        <!--Inventario-->
-        <details class="menu-desplegable">
-            <summary class="boton-principal">
-                <span>
-                    <span class="icono"></span>
-                    Inventario
-                </span>
-                <span class="flecha">v</span>
-            </summary>
-
-            <ul class="opciones">
-                <li><a href="#" data-page="stock.html">Stock</a></li>
-                <li><a href="#" data-page="surcursales.html">Surcursales</a></li>
-            </ul>
-        </details>
-
-        <!--Ventas-->
-        <details class="menu-desplegable">
-            <summary class="boton-principal">
-                <span>
-                    <span class="icono"></span>
-                    Ventas
-                </span>
-                <span class="flecha">v</span>
-            </summary>
-            <ul class="opciones">
-                <li><a href="#" data-page="pedidos.html">Pedidos</a></li>
-                <li><a href="#"data-page="pagos.html" >Pagos</a></li>
-                <li><a href="#" data-page="envios.html">Envios</a></li>
-            </ul>
-        </details>
-
-        <!--Personal-->
-        <details class="menu-desplegable">
-            <summary class="boton-principal">
-                <span>
-                    <span class="icono"></span>
-                    Personal
-                </span>
-                <span class="flecha">v</span>
-            </summary>
-            <ul class="opciones">
-                <li><a href="#" data-page="empleados.html">Empleados</a></li>
-                <li><a href="#" data-page="veterinarios.html">Veterinarios</a></li>
-                <li><a href="#" data-page="rolesEmpleados.html">Roles de Empleados</a></li>
-            </ul>
-        </details>
-
-        <!--Configuracion-->
-        <details class="menu-desplegable">
-            <summary class="boton-principal">
-                <span>
-                    <span class="icono"></span>
-                    Configuracion
-                </span>
-                <span class="flecha">v</span>
-            </summary>
-
-            <ul class="opciones">
-                <li><a href="#" data-page="usuarios.html">Usuarios</a></li>
-                <li><a href="" data-page="rolesypermisos.html">Usuarios y permisos</a></li>
-            </ul>
-        </details>
-
-        <div class="cerrar-session">
-            <a href="" class="menu-item">
-                <span class="icono"></span>
-                <span>Cerrar sesion</span>
-            </a>
-        </div>
-    </aside>
-
-    <!--Zona Principal-->
-    <div class="contenido-principal">
-        <header class="navbar-login">
-            <div class="busqueda">
-                <span></span>
-                <input type="search" name="search-navbar" id="search-navbar" placeholder="Buscar paciente , citas...">
-            </div>
-
-            <div class="usuario">
-                <div class="datos-usuario">
-                    <strong>Roko chayanne</strong>
-                    <span>Administrador</span>
-                </div>
-                <div class="avatar">
-                    RC
-                </div>
-            </div>
-        </header>
-
-        <main id="contenido-principal-main">
-        </main>
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">VC</div>
+      <div>
+        <strong>Vet Click</strong>
+        <span>Panel administrativo</span>
+      </div>
     </div>
-    <script src="js/envios.js"></script>
-    <script src="js/pagos.js"></script>
-    <script src="js/pedidos.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@7.0.2/index.global.min.js"></script>
-    <script src="js/navejacionAdmin.js"></script>
-    <script src="js/turnos_ui.js"></script>
 
-    <script src="js/conexion/rolesEmpleados_bd.js"></script>
-    <script src="js/conexion/empleados_bd.js"></script>
-    <script src="js/conexion/usuarios_bd.js"></script>
-    <script src="js/conexion/clientes_bd.js"></script>
-    <script src="js/conexion/mascotas_bd.js"> </script>
+    <nav class="side-nav" aria-label="Navegación principal">
+      <a href="#dashboard" class="nav-item active" data-view="dashboard">
+        <span class="nav-icon">⌂</span><span>Dashboard</span>
+      </a>
+      <a href="#clientes" class="nav-item" data-view="clientes">
+        <span class="nav-icon">◉</span><span>Clientes</span>
+      </a>
+      <a href="#clinica" class="nav-item" data-view="clinica">
+        <span class="nav-icon">✚</span><span>Clínica</span>
+      </a>
+      <a href="#catalogo" class="nav-item" data-view="catalogo">
+        <span class="nav-icon">▦</span><span>Catálogo</span>
+      </a>
+      <a href="#inventario" class="nav-item" data-view="inventario">
+        <span class="nav-icon">▤</span><span>Inventario</span>
+      </a>
+      <a href="#ventas" class="nav-item" data-view="ventas">
+        <span class="nav-icon">▣</span><span>Ventas</span>
+      </a>
+      <a href="#personal" class="nav-item" data-view="personal">
+        <span class="nav-icon">♙</span><span>Personal y seguridad</span>
+      </a>
+    </nav>
+
+    <button class="logout-btn" id="logoutBtn">
+      <span>↪</span> Cerrar sesión
+    </button>
+  </aside>
+
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="search-box">
+        <span>⌕</span>
+        <input type="search" placeholder="Buscar paciente, cliente, cita..." aria-label="Buscar">
+      </div>
+      <div class="user-menu">
+        <div class="user-copy">
+          <strong>Administrador</strong>
+          <span>Administrador del sistema</span>
+        </div>
+        <div class="avatar">AD</div>
+      </div>
+    </header>
+
+    <main id="app-content" class="main-content" aria-live="polite"></main>
+  </div>
+
+  <div id="toast" class="toast" role="status"></div>
+  <script src="js/conexion_html.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>

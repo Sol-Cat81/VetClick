@@ -1,7 +1,8 @@
+// Pool de conexiones utilizado por este modelo.
 const conexion = require('../config/database');
-const { obtnerTodos } = require('./empleados.model');
 
 const UsuarioModel ={
+    // Devuelve información pública del usuario y el nombre de su rol.
     obtnerTodos: async ()=>{
         const query =`
     SELECT u.id_usuario , u.username , u.email , u.activo, ru.nombre 

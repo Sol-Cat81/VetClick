@@ -1,6 +1,8 @@
+// Importamos el pool de conexiones de la base de datos.
 const conexion = require ('../config/database');
 
 const MascotasModel = {
+    // Consulta mascotas y resuelve los nombres de sus relaciones.
     obtnerTodos: async()=>{
         const query = `
         SELECT
@@ -11,10 +13,10 @@ const MascotasModel = {
         m.sexo ,
         m.fecha_nacimiento,
         m.peso,cli.nombre AS propietario
-	    FROM mascota m
+        FROM mascota m
         JOIN clientes cli ON m.id_cliente = cli.id_cliente
         JOIN especies es ON m.id_especie = es.id_especie 
-        JOIN razas ra ON ra.id_especie = es.id_especie;
+        JOIN razas ra ON ra.id_raza = m.id_raza;
         `;
         const [mascotas] = await conexion.query(query);
         return mascotas;
