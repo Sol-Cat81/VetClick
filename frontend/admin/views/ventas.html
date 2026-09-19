@@ -1,0 +1,20 @@
+<section>
+  <div class="page-head"><div><h1>Ventas</h1><p>Pedidos, pagos y envíos</p></div><div class="page-date">2 pedidos registrados · datos demo</div></div>
+  <div class="subnav"><button class="active" data-section="pedidos">Pedidos</button><button data-section="pagos">Pagos</button><button data-section="envios">Envíos</button></div>
+
+  <div data-panel="pedidos">
+    <div class="toolbar"><div class="filter-box">⌕ <input placeholder="Buscar pedido o cliente..."></div><button class="btn btn-primary" data-toast="Nuevo pedido preparado para conectar">＋ Nuevo pedido</button></div>
+    <article class="card table-card"><div class="table-wrap"><table><thead><tr><th>Pedido</th><th>Cliente</th><th>Fecha</th><th>Estado</th><th>Subtotal</th><th>Envío</th><th>Total</th></tr></thead><tbody>
+      <tr><td>#1</td><td>Juan Pérez</td><td>01/03/2026 10:30</td><td><span class="status success">Entregado</span></td><td>$35.000</td><td>$2.500</td><td><strong>$37.500</strong></td></tr>
+      <tr><td>#2</td><td>María López</td><td>10/03/2026 16:15</td><td><span class="status warning">Preparando</span></td><td>$22.000</td><td>$0</td><td><strong>$22.000</strong></td></tr>
+    </tbody></table></div></article>
+  </div>
+
+  <div data-panel="pagos" hidden><article class="card table-card"><div class="table-wrap"><table><thead><tr><th>Pago</th><th>Pedido</th><th>Método</th><th>Estado</th></tr></thead><tbody>
+    <tr><td>#1</td><td>#1</td><td>Crédito</td><td><span class="status success">Realizado</span></td></tr><tr><td>#2</td><td>#2</td><td>Transferencia</td><td><span class="status warning">Pendiente</span></td></tr>
+  </tbody></table></div></article></div>
+
+  <div data-panel="envios" hidden><article class="card table-card"><div class="table-wrap"><table><thead><tr><th>Envío</th><th>Pedido</th><th>Tipo</th><th>C.P.</th><th>Fecha estimada</th><th>Estado</th></tr></thead><tbody>
+    <tr><td>#1</td><td>#1</td><td>Domicilio</td><td>C1046</td><td>02/03/2026</td><td><span class="status success">Entregado</span></td></tr><tr><td>#2</td><td>#2</td><td>Domicilio</td><td>C1428</td><td>12/03/2026</td><td><span class="status info">En camino</span></td></tr>
+  </tbody></table></div></article></div>
+</section>

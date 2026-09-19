@@ -1,126 +1,162 @@
-<section class="clientes">
-
-    <!-- =====================================
-         CABECERA
-    ====================================== -->
-
-    <div class="clientes-header">
-
-        <div>
-            <h2>Panel de Administración - Clientes</h2>
-
-            <p>
-                Gestión de propietarios y sus mascotas
-            </p>
-        </div>
-
-        <span class="fecha-clientes">
-            Septiembre 2026
-        </span>
-
+<section>
+  <div class="page-head">
+    <div>
+      <h1>Clientes</h1>
+      <p>Gestión de propietarios, mascotas y direcciones</p>
     </div>
+    <div class="page-date">3 clientes registrados · datos demo</div>
+  </div>
+  <div class="subnav">
+    <button class="active" data-section="clientes">Clientes</button><button
+      data-section="mascotas">Mascotas</button><button data-section="direcciones">Direcciones</button>
+  </div>
 
-
-    <!-- =====================================
-         BARRA DE HERRAMIENTAS
-    ====================================== -->
-
-    <div class="clientes-toolbar">
-
-        <button class="btn-agregar-cliente" id="btnAgregarCliente">
-
-            <span>+</span>
-
-            Añadir Cliente
-
-        </button>
-
-
-        <div class="buscador-clientes">
-
-            <span class="icono-busqueda">⌕</span>
-
-            <input type="text" id="buscarCliente" placeholder="Filtrar por nombre o email...">
-
-        </div>
-
-
-        <div class="paginacion">
-
-            <span>
-                1 - 25 de
-                <strong id="totalClientes">
-                    150
-                </strong>
-                Clientes
-            </span>
-
-            <button class="btn-paginacion" id="paginaAnterior">
-                ‹
-            </button>
-
-            <button class="btn-paginacion" id="paginaSiguiente">
-                ›
-            </button>
-
-        </div>
-
+  <div data-panel="clientes">
+    <div class="toolbar">
+      <div class="filter-box">⌕ <input data-table-filter="#clientes-table"
+          placeholder="Filtrar por nombre, apellido o teléfono..."></div><button class="btn btn-primary"
+        data-toast="Formulario de cliente listo para conectar">＋ Añadir cliente</button>
     </div>
-
-
-    <!-- =====================================
-         TABLA CLIENTES
-    ====================================== -->
-
-    <div class="tabla-clientes-container">
-
-        <table class="tabla-clientes">
-
-            <thead>
-
-                <tr>
-
-                    <th>ID</th>
-
-                    <th>Nombre</th>
-
-                    <th>Apellido</th>
-
-                    <th>Email</th>
-
-                    <th>Teléfono</th>
-
-                    <th>Estado</th>
-
-                    <th>Acciones</th>
-
-                </tr>
-
-            </thead>
-
-
-            <tbody id="tablaClientes">
-                
-            </tbody>
-
+    <article class="card table-card">
+      <div class="table-wrap">
+        <table id="clientes-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Apellido</th>
+              <th>Teléfono</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>Juan</td>
+              <td>Pérez</td>
+              <td>1144332211</td>
+              <td><span class="status success">Activo</span></td>
+              <td><button class="btn btn-secondary" data-toast="Editar cliente #1">Editar</button></td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>María</td>
+              <td>López</td>
+              <td>1155667788</td>
+              <td><span class="status success">Activo</span></td>
+              <td><button class="btn btn-secondary" data-toast="Editar cliente #2">Editar</button></td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>Carlos</td>
+              <td>Giménez</td>
+              <td>1122334455</td>
+              <td><span class="status success">Activo</span></td>
+              <td><button class="btn btn-secondary" data-toast="Editar cliente #3">Editar</button></td>
+            </tr>
+          </tbody>
         </table>
+      </div>
+    </article>
+  </div>
 
+  <div data-panel="mascotas" hidden>
+    <div class="toolbar">
+      <div class="filter-box">⌕ <input data-table-filter="#mascotas-table"
+          placeholder="Buscar mascota, propietario..."></div><button
+        class="btn btn-primary" data-toast="Formulario de mascota listo para conectar">＋ Añadir mascota</button>
     </div>
+    <article class="card table-card">
+      <div class="table-wrap">
+        <table id="mascotas-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Paciente</th>
+              <th>Propietario</th>
+              <th>Especie</th>
+              <th>Raza</th>
+              <th>Sexo</th>
+              <th>Peso</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td><strong>Thor</strong></td>
+              <td>Juan Pérez</td>
+              <td>Perro</td>
+              <td>Labrador Retriever</td>
+              <td>Macho</td>
+              <td>28,50 kg</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td><strong>Cleo</strong></td>
+              <td>Juan Pérez</td>
+              <td>Gato</td>
+              <td>Siames</td>
+              <td>Hembra</td>
+              <td>3,80 kg</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td><strong>Toby</strong></td>
+              <td>María López</td>
+              <td>Perro</td>
+              <td>Caniche Toy</td>
+              <td>Macho</td>
+              <td>6,20 kg</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+  </div>
 
-
-    <!-- =====================================
-         PIE DE TABLA
-    ====================================== -->
-
-    <div class="clientes-footer">
-
-        <span>
-            <strong id="clientesRegistrados">
-                150
-            </strong>
-            Clientes Registrados
-        </span>
-
+  <div data-panel="direcciones" hidden>
+    <div class="toolbar">
+      <div class="filter-box">⌕ <input data-table-filter="#direcciones-table"
+          placeholder="Filtrar por cliente, dirección, localidad o código postal..."></div><button class="btn btn-primary" data-toast="Formulario de dirección listo para conectar">＋ Añadir
+        dirección</button>
     </div>
-
+    <article class="card table-card">
+      <div class="table-wrap">
+        <table id="direcciones-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Cliente</th>
+              <th>Tipo</th>
+              <th>Dirección</th>
+              <th>Localidad</th>
+              <th>C.P.</th>
+              <th>Referencia</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>Juan Pérez</td>
+              <td>DOMICILIO</td>
+              <td>Av. Corrientes 2500 · 4 B</td>
+              <td>Buenos Aires</td>
+              <td>C1046</td>
+              <td>Entre Paso y Larrea</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>María López</td>
+              <td>DOMICILIO</td>
+              <td>Juramento 1820</td>
+              <td>Buenos Aires</td>
+              <td>C1428</td>
+              <td>Frente a la plaza</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+  </div>
 </section>

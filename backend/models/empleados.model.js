@@ -1,6 +1,8 @@
+// Importamos la conexión reutilizable a MySQL.
 const conexion = require('../config/database');
 
 const EmpleadoModel = {
+    // Une empleados con su rol y sucursal para devolver datos listos para la UI.
     obtnerTodos: async ()=>{
         const query = `
         SELECT e.id_empleado , e.nombre, e.apellido,e.telefono, r.nombre AS rol , s.nombre AS sucursal
