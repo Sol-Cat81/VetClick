@@ -13,7 +13,10 @@ const conexion = require("./config/database");
 const app = express();
 
 // Permitimos solicitudes del frontend y cuerpos JSON en POST.
-app.use(cors());
+app.use(cors({
+  origin: 'http://127.0.0.1:5500', // El origen exacto de tu frontend
+  credentials: true                // Permite el intercambio de cookies/sesiones
+}));
 app.use(express.json());
 app.use(cookieParser());
 

@@ -1,3 +1,4 @@
+const jwt = require("jsonwebtoken");
 // El controlador recibe HTTP y aplica las reglas de login/registro.
 const db = require("./../config/database");
 // bcrypt compara y genera hashes sin guardar contraseñas en texto plano.
@@ -33,18 +34,22 @@ const verificarUsuario = async (req, res) => {
       }
 
       const token = jwt.sign(
-        { id: usuarioEncontrado.id, rol: usuarioEncontrado.rol },
+        {
+          id: usuarioEncontrado.id_usuario,
+          usuario:usuarioEncontrado.username,
+          rol: usuarioEncontrado.id_rol_usuario,
+        },
         process.env.SECRETO_JWT,
-        { expiresIn: "2h" },
+        { expiresIn: "24h" },
       );
       res.cookie("token_veterinaria", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
-        maxAge: 2 * 60 * 60 * 1000,
+        maxAge: 24 * 60 * 60 * 1000,
       });
 
-      res.status(201).json({
+      res.status(200).json({
         mensaje: "usuario validado",
         usuario: {
           id: usuarioEncontrado.id_usuario,
@@ -111,4 +116,33 @@ const registrarUsuario = async (req, res) => {
   }
 };
 
-module.exports = { verificarUsuario, registrarUsuario };
+const detectarsession = async (req, res) => {
+  // 1. Leer la cookie
+  const token = req.cookies.token_veterinaria;
+
+  if (!token) {
+    return res.status(401).json({ mensaje: "No hay token" });
+  }
+
+  try {
+    // 2. Verificar y decodificar el token usando tu clave secreta
+    const decoded = jwt.verify(token, process.env.SECRETO_JWT);
+
+    // 3. Acceder a la información guardada
+    const id = decoded.id;
+    const usuario = decoded.usuario
+    const rol = decoded.rol;
+
+    res.json({ mensaje: "Acceso concedido", usuario: decoded });
+  } catch (error) {
+    // Si el token expiró o fue alterado, jwt.verify lanzará un error
+    res.status(401).json({ mensaje: "Token inválido o expirado" });
+  }
+};
+
+const logout = async (req, res) => {
+  res.clearCookie('token_veterinaria');
+  res.status(201).json({ mensaje: "Sesión cerrada correctamente" });
+}
+
+module.exports = { verificarUsuario, registrarUsuario, detectarsession, logout };

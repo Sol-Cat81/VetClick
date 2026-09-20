@@ -136,6 +136,31 @@ irARegistro.addEventListener("click", function () {
 irALogin.addEventListener("click", function () {
   mostrarPanel(panelLogin, panelRegistro);
 });
+/* TOAST DE BOOSTRAP PARA REEMPLAZAR LOS ALERT */
+function mostrarToast(mensaje, tipo = 'exito') {
+    const toastElemento = document.getElementById('miToast');
+    const toastCuerpo = document.getElementById('toast-mensaje');
+
+    // 1. Limpiamos las clases de color previas
+    toastElemento.classList.remove('text-bg-success', 'text-bg-danger');
+
+    // 2. Asignamos el color dependiendo del tipo de mensaje
+    if (tipo === 'error') {
+        toastElemento.classList.add('text-bg-danger'); // Fondo rojo
+    } else {
+        toastElemento.classList.add('text-bg-success'); // Fondo verde
+    }
+
+    // 3. Insertamos el mensaje enviado
+    toastCuerpo.textContent = mensaje;
+
+    // 4. Usamos la API de Bootstrap para inicializar y mostrar el Toast
+    const toast = new bootstrap.Toast(toastElemento, {
+        delay: 3000 // Se ocultará solo después de 3 segundos (3000 ms)
+    });
+    
+    toast.show();
+}
 
 /* INICIAR SESSION */
 const formInicio = document.getElementById("formLogin");
@@ -154,12 +179,13 @@ formInicio.addEventListener("submit", async (evento) => {
 
   try {
     const respuesta = await fetch(
-      "http://localhost:3000/api/usuarios/iniciarsession",
+      "http://127.0.0.1:3000/api/usuarios/iniciarsession",
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json", // Le avisa a Express que le mandamos un JSON
         },
+        credentials: "include",
         body: JSON.stringify(usuario),
       },
     );
@@ -167,11 +193,11 @@ formInicio.addEventListener("submit", async (evento) => {
     const confirmBackend = await respuesta.json();
 
     if (respuesta.ok) {
-      alert(confirmBackend.mensaje);
+      mostrarToast(confirmBackend.mensaje || 'Inicio de session exitoso', 'exito');
 
       localStorage.setItem("usuario", JSON.stringify(confirmBackend.usuario));
 
-      if (confirmBackend.usuario.rol === "1") {
+      if (Number(confirmBackend.usuario.rol) === 1) {
         window.location.href = "./admin/index.html";
       } else {
         window.location.href = "./index.html";
@@ -183,7 +209,7 @@ formInicio.addEventListener("submit", async (evento) => {
   } catch (error) {
     // Esto se ejecuta si el servidor está apagado o no hay internet
     console.error("Error de conexión:", error);
-    alert("No se pudo conectar con el servidor de la veterinaria.");
+    mostrarToast('No se pudo conectar con el sevidor.', 'error');
   }
 });
 
@@ -220,12 +246,13 @@ formRegistro.addEventListener("submit", async (evento) => {
 
     try {
       const resgistrar = await fetch(
-        "http://localhost:3000/api/usuarios/registrarUsuario",
+        "http://127.0.0.1:3000/api/usuarios/registrarusuario",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
+          credentials: "include",
           body: JSON.stringify(registrarUsuario),
         },
       );
@@ -233,14 +260,14 @@ formRegistro.addEventListener("submit", async (evento) => {
       const confirmRegistro = await resgistrar.json();
 
       if (resgistrar.ok) {
-        alert(confirmRegistro.mensaje);
+        mostrarToast(confirmRegistro.mensaje || 'Registro exitoso.', 'exito');
         window.location.reload();
       } else {
-        alert("Hubo un problemas: " + confirmRegistro.mensaje);
+        mostrarToast(confirmRegistro.mensaje || 'Hubo un problema en el registro', 'error');
       }
     } catch (error) {
       console.error("Error de conexión:", error);
-      alert("No se pudo conectar con el servidor de la veterinaria.");
+      mostrarToast('No se pudo conectar con el sevidor.', 'error');
     }
   } else{
     registroError.removeAttribute('hidden')

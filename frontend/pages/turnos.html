@@ -31,263 +31,281 @@
   <body>
     <!-- BARRA DE NAVEGACION -->
     <mi-navbar ruta-base="../" pagina-actual="turnos"></mi-navbar>
-    
+
     <main class="turnos-main">
-        <section class="turnos-hero">
-          <p class="eyebrow">Atención veterinaria</p>
-          <h1>Reservá tu turno</h1>
-          <p>
-            Elegí la sucursal, el servicio y el horario que mejor se adapten a
-            vos.
-          </p>
-        </section>
+      <section class="turnos-hero">
+        <p class="eyebrow">Atención veterinaria</p>
+        <h1>Reservá tu turno</h1>
+        <p>
+          Elegí la sucursal, el servicio y el horario que mejor se adapten a
+          vos.
+        </p>
+      </section>
 
-        <div class="turnos-layout">
-          <aside class="turnos-progreso" aria-label="Progreso de la reserva">
-            <span class="paso-activo" data-step-indicator="1">01 <small>Sucursal</small></span>
-            <span data-step-indicator="2">02 <small>Servicio</small></span>
-            <span data-step-indicator="3">03 <small>Especialidad</small></span>
-            <span data-step-indicator="4">04 <small>Profesional</small></span>
-            <span data-step-indicator="5">05 <small>Fecha y hora</small></span>
-            <span data-step-indicator="6">06 <small>Tus datos</small></span>
-          </aside>
+      <div class="turnos-layout">
+        <aside class="turnos-progreso" aria-label="Progreso de la reserva">
+          <span class="paso-activo" data-step-indicator="1"
+            >01 <small>Sucursal</small></span
+          >
+          <span data-step-indicator="2">02 <small>Servicio</small></span>
+          <span data-step-indicator="3">03 <small>Especialidad</small></span>
+          <span data-step-indicator="4">04 <small>Profesional</small></span>
+          <span data-step-indicator="5">05 <small>Fecha y hora</small></span>
+          <span data-step-indicator="6">06 <small>Tus datos</small></span>
+        </aside>
 
-          <div class="turnos-contenido">
-            <section class="turno-seccion activa" data-step="1">
-              <div class="seccion-heading">
-                <p class="eyebrow">Paso 01</p>
-                <h2>Elegí una sucursal</h2>
-                <p>Seleccioná el consultorio más cómodo para tu visita.</p>
-              </div>
-              <div class="sucursales-grid">
-                <article class="sucursal-card">
-                  <img
-                    src="https://images.unsplash.com/photo-1586773860418-d37222d8fce3?auto=format&fit=crop&w=900&q=80"
-                    alt="Interior de una clínica veterinaria"/>
-                  <div>
-                    <h3>VetClick Centro</h3>
-                    <p><i class="ph ph-map-pin"></i> Av. Colón 1250, Córdoba</p>
-                    <button
-                      class="boton-seleccionar"
-                      data-action="branch"
-                      data-value="VetClick Centro">
-                      Seleccionar
-                    </button>
-                  </div>
-                </article>
-                <article class="sucursal-card">
-                  <img
-                    src="https://images.unsplash.com/photo-1612531385446-f7e6d131a7f4?auto=format&fit=crop&w=900&q=80"
-                    alt="Sala de atención veterinaria"/>
-                  <div>
-                    <h3>VetClick Norte</h3>
-                    <p>
-                      <i class="ph ph-map-pin"></i> Av. Rafael Núñez 4800,
-                      Córdoba
-                    </p>
-                    <button
-                      class="boton-seleccionar"
-                      data-action="branch"
-                      data-value="VetClick Norte">
-                      Seleccionar
-                    </button>
-                  </div>
-                </article>
-                <article class="sucursal-card">
-                  <img
-                    src="https://images.unsplash.com/photo-1576201836106-db1758fd1c97?auto=format&fit=crop&w=900&q=80"
-                    alt="Mascota en una consulta veterinaria"/>
-                  <div>
-                    <h3>VetClick Jardín</h3>
-                    <p><i class="ph ph-map-pin"></i> Richieri 220, Córdoba</p>
-                    <button
-                      class="boton-seleccionar"
-                      data-action="branch"
-                      data-value="VetClick Jardín">
-                      Seleccionar
-                    </button>
-                  </div>
-                </article>
-              </div>
-            </section>
-
-            <section class="turno-seccion" data-step="2" hidden>
-              <div class="seccion-heading">
-                <p class="eyebrow">Paso 02</p>
-                <h2>¿Qué necesita tu mascota?</h2>
-                <p>Elegí el servicio principal de la visita.</p>
-              </div>
-              <div class="opciones-grid">
-                <button
-                  class="opcion-card"
-                  data-action="service"
-                  data-value="Veterinaria"
-                >
-                  <i class="ph ph-heartbeat"></i><strong>Veterinaria</strong
-                  ><span>Controles y consultas</span>
-                </button>
-                <button
-                  class="opcion-card"
-                  data-action="service"
-                  data-value="Peluquería"
-                >
-                  <i class="ph ph-scissors"></i><strong>Peluquería</strong
-                  ><span>Higiene y estética</span>
-                </button>
-                <button
-                  class="opcion-card"
-                  data-action="service"
-                  data-value="Vacunación"
-                >
-                  <i class="ph ph-syringe"></i><strong>Vacunación</strong
-                  ><span>Calendario al día</span>
-                </button>
-                <button
-                  class="opcion-card"
-                  data-action="service"
-                  data-value="Estudios"
-                >
-                  <i class="ph ph-microscope"></i><strong>Estudios</strong
-                  ><span>Diagnóstico y control</span>
-                </button>
-              </div>
-            </section>
-
-            <section class="turno-seccion" data-step="3" hidden>
-              <div class="seccion-heading">
-                <p class="eyebrow">Paso 03</p>
-                <h2>Elegí el tipo de atención</h2>
-                <p>Seleccioná la opción que describe mejor lo que necesitás.</p>
-              </div>
-              <div class="opciones-lista" id="tipo-servicio"></div>
-            </section>
-
-            <section class="turno-seccion" data-step="4" hidden>
-              <div class="seccion-heading">
-                <p class="eyebrow">Paso 04</p>
-                <h2>Elegí un profesional</h2>
-                <p>Conocé al equipo disponible para tu atención.</p>
-              </div>
-              <div class="profesionales-grid">
-                <button
-                  class="profesional-card"
-                  data-action="vet"
-                  data-value="Dra. Sofía Martínez"
-                >
-                  <span class="avatar">SM</span
-                  ><strong>Dra. Sofía Martínez</strong
-                  ><small>Clínica general</small>
-                </button>
-                <button
-                  class="profesional-card"
-                  data-action="vet"
-                  data-value="Dr. Tomás Ríos"
-                >
-                  <span class="avatar">TR</span><strong>Dr. Tomás Ríos</strong
-                  ><small>Dermatología</small>
-                </button>
-                <button
-                  class="profesional-card"
-                  data-action="vet"
-                  data-value="Dra. Valentina Paz"
-                >
-                  <span class="avatar">VP</span
-                  ><strong>Dra. Valentina Paz</strong
-                  ><small>Peluquería y bienestar</small>
-                </button>
-              </div>
-            </section>
-
-            <section class="turno-seccion" data-step="5" hidden>
-              <div class="seccion-heading">
-                <p class="eyebrow">Paso 05</p>
-                <h2>Elegí día y horario</h2>
-                <p>Los días disponibles aparecen marcados en el calendario.</p>
-              </div>
-              <div class="agenda-grid">
+        <div class="turnos-contenido">
+          <section class="turno-seccion activa" data-step="1">
+            <div class="seccion-heading">
+              <p class="eyebrow">Paso 01</p>
+              <h2>Elegí una sucursal</h2>
+              <p>Seleccioná el consultorio más cómodo para tu visita.</p>
+            </div>
+            <div class="sucursales-grid">
+              <article class="sucursal-card">
+                <img
+                  src="https://images.unsplash.com/photo-1586773860418-d37222d8fce3?auto=format&fit=crop&w=900&q=80"
+                  alt="Interior de una clínica veterinaria"
+                />
                 <div>
-                  <p class="campo-label">Día de atención</p>
-                  <div class="calendario" id="calendario"></div>
-                </div>
-                <div>
-                  <p class="campo-label">Horarios disponibles</p>
-                  <div class="horarios-grid" id="horarios-disponibles">
-                    <span class="estado-vacio"
-                      >Elegí una fecha para ver los horarios.</span
-                    >
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            <section class="turno-seccion" data-step="6" hidden>
-              <div class="seccion-heading">
-                <p class="eyebrow">Paso 06</p>
-                <h2>Completá tus datos</h2>
-                <p>Dejanos la información necesaria para confirmar el turno.</p>
-              </div>
-              <div class="datos-layout">
-                <form class="datos-form" id="datos-form">
-                  <label class="campo"
-                    >Nombre y apellido<input name="nombre" required /></label
-                  ><label class="campo"
-                    >Correo electrónico<input
-                      type="email"
-                      name="correo"
-                      required /></label
-                  ><label class="campo"
-                    >Teléfono<input
-                      type="tel"
-                      name="telefono"
-                      required /></label
-                  ><label class="campo"
-                    >Nombre de la mascota<input
-                      name="mascota"
-                      required /></label
-                  ><label class="campo"
-                    >Especie<select name="especie">
-                      <option>Perro</option>
-                      <option>Gato</option>
-                      <option>Otro</option>
-                    </select></label
-                  ><label class="campo campo-ancho"
-                    >Motivo de la consulta<textarea
-                      name="motivo"
-                      rows="3"
-                    ></textarea></label
-                  ><button class="boton-primario campo-ancho" type="submit">
-                    Confirmar turno
+                  <h3>VetClick Centro</h3>
+                  <p><i class="ph ph-map-pin"></i> Av. Colón 1250, Córdoba</p>
+                  <button
+                    class="boton-seleccionar"
+                    data-action="branch"
+                    data-value="VetClick Centro"
+                  >
+                    Seleccionar
                   </button>
-                </form>
-                <aside class="resumen-turno">
-                  <p class="eyebrow">Resumen</p>
-                  <h3>Tu turno</h3>
-                  <dl id="resumen-datos"></dl>
-                </aside>
-              </div>
-            </section>
+                </div>
+              </article>
+              <article class="sucursal-card">
+                <img
+                  src="https://images.unsplash.com/photo-1612531385446-f7e6d131a7f4?auto=format&fit=crop&w=900&q=80"
+                  alt="Sala de atención veterinaria"
+                />
+                <div>
+                  <h3>VetClick Norte</h3>
+                  <p>
+                    <i class="ph ph-map-pin"></i> Av. Rafael Núñez 4800, Córdoba
+                  </p>
+                  <button
+                    class="boton-seleccionar"
+                    data-action="branch"
+                    data-value="VetClick Norte"
+                  >
+                    Seleccionar
+                  </button>
+                </div>
+              </article>
+              <article class="sucursal-card">
+                <img
+                  src="https://images.unsplash.com/photo-1576201836106-db1758fd1c97?auto=format&fit=crop&w=900&q=80"
+                  alt="Mascota en una consulta veterinaria"
+                />
+                <div>
+                  <h3>VetClick Jardín</h3>
+                  <p><i class="ph ph-map-pin"></i> Richieri 220, Córdoba</p>
+                  <button
+                    class="boton-seleccionar"
+                    data-action="branch"
+                    data-value="VetClick Jardín"
+                  >
+                    Seleccionar
+                  </button>
+                </div>
+              </article>
+            </div>
+          </section>
 
-            <div class="turnos-navegacion">
+          <section class="turno-seccion" data-step="2" hidden>
+            <div class="seccion-heading">
+              <p class="eyebrow">Paso 02</p>
+              <h2>¿Qué necesita tu mascota?</h2>
+              <p>Elegí el servicio principal de la visita.</p>
+            </div>
+            <div class="opciones-grid">
               <button
-                class="boton-secundario"
-                id="anterior"
-                type="button"
-                hidden
+                class="opcion-card"
+                data-action="service"
+                data-value="Veterinaria"
               >
-                Anterior</button
-              ><button
-                class="boton-primario"
-                id="siguiente"
-                type="button"
-                disabled
+                <i class="ph ph-heartbeat"></i><strong>Veterinaria</strong
+                ><span>Controles y consultas</span>
+              </button>
+              <button
+                class="opcion-card"
+                data-action="service"
+                data-value="Peluquería"
               >
-                Continuar
+                <i class="ph ph-scissors"></i><strong>Peluquería</strong
+                ><span>Higiene y estética</span>
+              </button>
+              <button
+                class="opcion-card"
+                data-action="service"
+                data-value="Vacunación"
+              >
+                <i class="ph ph-syringe"></i><strong>Vacunación</strong
+                ><span>Calendario al día</span>
+              </button>
+              <button
+                class="opcion-card"
+                data-action="service"
+                data-value="Estudios"
+              >
+                <i class="ph ph-microscope"></i><strong>Estudios</strong
+                ><span>Diagnóstico y control</span>
               </button>
             </div>
-            <p class="mensaje-turno" id="mensaje-turno" role="status"></p>
+          </section>
+
+          <section class="turno-seccion" data-step="3" hidden>
+            <div class="seccion-heading">
+              <p class="eyebrow">Paso 03</p>
+              <h2>Elegí el tipo de atención</h2>
+              <p>Seleccioná la opción que describe mejor lo que necesitás.</p>
+            </div>
+            <div class="opciones-lista" id="tipo-servicio"></div>
+          </section>
+
+          <section class="turno-seccion" data-step="4" hidden>
+            <div class="seccion-heading">
+              <p class="eyebrow">Paso 04</p>
+              <h2>Elegí un profesional</h2>
+              <p>Conocé al equipo disponible para tu atención.</p>
+            </div>
+            <div class="profesionales-grid">
+              <button
+                class="profesional-card"
+                data-action="vet"
+                data-value="Dra. Sofía Martínez"
+              >
+                <span class="avatar">SM</span
+                ><strong>Dra. Sofía Martínez</strong
+                ><small>Clínica general</small>
+              </button>
+              <button
+                class="profesional-card"
+                data-action="vet"
+                data-value="Dr. Tomás Ríos"
+              >
+                <span class="avatar">TR</span><strong>Dr. Tomás Ríos</strong
+                ><small>Dermatología</small>
+              </button>
+              <button
+                class="profesional-card"
+                data-action="vet"
+                data-value="Dra. Valentina Paz"
+              >
+                <span class="avatar">VP</span><strong>Dra. Valentina Paz</strong
+                ><small>Peluquería y bienestar</small>
+              </button>
+            </div>
+          </section>
+
+          <section class="turno-seccion" data-step="5" hidden>
+            <div class="seccion-heading">
+              <p class="eyebrow">Paso 05</p>
+              <h2>Elegí día y horario</h2>
+              <p>Los días disponibles aparecen marcados en el calendario.</p>
+            </div>
+            <div class="agenda-grid">
+              <div>
+                <p class="campo-label">Día de atención</p>
+                <div class="calendario" id="calendario"></div>
+              </div>
+              <div>
+                <p class="campo-label">Horarios disponibles</p>
+                <div class="horarios-grid" id="horarios-disponibles">
+                  <span class="estado-vacio"
+                    >Elegí una fecha para ver los horarios.</span
+                  >
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="turno-seccion" data-step="6" hidden>
+            <div class="seccion-heading">
+              <p class="eyebrow">Paso 06</p>
+              <h2>Completá tus datos</h2>
+              <p>Dejanos la información necesaria para confirmar el turno.</p>
+            </div>
+            <div class="datos-layout">
+              <form class="datos-form" id="datos-form">
+                <label class="campo"
+                  >Nombre y apellido<input name="nombre" required /></label
+                ><label class="campo"
+                  >Correo electrónico<input
+                    type="email"
+                    name="correo"
+                    required /></label
+                ><label class="campo"
+                  >Teléfono<input type="tel" name="telefono" required /></label
+                ><label class="campo"
+                  >Nombre de la mascota<input name="mascota" required /></label
+                ><label class="campo"
+                  >Especie<select name="especie">
+                    <option>Perro</option>
+                    <option>Gato</option>
+                    <option>Otro</option>
+                  </select></label
+                ><label class="campo campo-ancho"
+                  >Motivo de la consulta<textarea
+                    name="motivo"
+                    rows="3"
+                  ></textarea></label
+                ><button class="boton-primario campo-ancho" type="submit">
+                  Confirmar turno
+                </button>
+              </form>
+              <aside class="resumen-turno">
+                <p class="eyebrow">Resumen</p>
+                <h3>Tu turno</h3>
+                <dl id="resumen-datos"></dl>
+              </aside>
+            </div>
+          </section>
+
+          <div class="turnos-navegacion">
+            <button class="boton-secundario" id="anterior" type="button" hidden>
+              Anterior</button
+            ><button
+              class="boton-primario"
+              id="siguiente"
+              type="button"
+              disabled
+            >
+              Continuar
+            </button>
           </div>
+          <p class="mensaje-turno" id="mensaje-turno" role="status"></p>
         </div>
-      </main>
+      </div>
+    </main>
+    <div
+      class="toast-container position-fixed botton-0 end-0 p-3"
+      style="z-index: 1055"
+    >
+      <div
+        id="miToast"
+        class="toast align-items-center text-bg-success border-0"
+        role="alert"
+        aria-live="assertive"
+        aria-atomic="true"
+      >
+        <div class="d-flex">
+          <div class="toast-body" id="toast-mensaje">¡Operación exitosa!</div>
+          <button
+            type="button"
+            class="btn-close btn-close-white me-2 m-auto"
+            data-bs-dismiss="toast"
+            aria-label="Close"
+          ></button>
+        </div>
+      </div>
+    </div>
     <!-- PIE DE PAGINA -->
     <footer>
       <div class="container-fluid">
