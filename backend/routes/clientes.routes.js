@@ -1,10 +1,10 @@
-// Router separa las rutas de clientes del archivo principal.
-const express = require ('express');
-const router = express.Router();
-// El router delega la lógica de negocio al service.
-const ClientesService = require('../service/clientes.service');
+const express = require('express');
+const controller = require('../controllers/clientes.controller');
 
-// GET /api/clientes devuelve todos los clientes.
-router.get('/',ClientesService.listarclientes);
+const router = express.Router();
+
+router.get('/', controller.clientes);
+router.get('/mascotas', controller.mascotas);
+router.get('/direcciones', controller.direcciones);
 
 module.exports = router;

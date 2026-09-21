@@ -1,27 +1,86 @@
 <section>
-  <div class="page-head"><div><h1>Personal y seguridad</h1><p>Empleados, veterinarios, usuarios, roles y permisos</p></div><div class="page-date">Configuración administrativa</div></div>
-  <div class="subnav"><button class="active" data-section="empleados">Empleados</button><button data-section="veterinarios">Veterinarios</button><button data-section="usuarios">Usuarios</button><button data-section="roles">Roles y permisos</button></div>
+  <div class="page-head">
+    <div>
+      <h1>Personal y seguridad</h1>
+      <p>Empleados, veterinarios, usuarios, roles y permisos</p>
+    </div>
+    <div class="page-date">Configuración administrativa</div>
+  </div>
+  <div class="subnav"><button class="active" data-section="empleados">Empleados</button><button
+      data-section="veterinarios">Veterinarios</button><button data-section="usuarios">Usuarios</button><button
+      data-section="roles">Roles y permisos</button></div>
 
   <div data-panel="empleados">
-    <div class="toolbar"><div class="filter-box">⌕ <input placeholder="Buscar empleado..."></div><button class="btn btn-primary" data-toast="Formulario de empleado listo para conectar">＋ Añadir empleado</button></div>
-    <article class="card table-card"><div class="table-wrap"><table id="empleados-table"><thead><tr><th>ID</th><th>Empleado</th><th>Rol</th><th>Teléfono</th><th>Sucursal</th></tr></thead><tbody>
-      <tr><td>1</td><td><strong>Dr. Carlos Gómez</strong></td><td>Veterinario Principal</td><td>1199887766</td><td>Central - Palermo</td></tr>
-      <tr><td>2</td><td><strong>Dra. Laura Martínez</strong></td><td>Veterinario Principal</td><td>1188776655</td><td>Belgrano</td></tr>
-      <tr><td>3</td><td><strong>Sofía Rodríguez</strong></td><td>Cajero/Recepcionista</td><td>1177665544</td><td>Central - Palermo</td></tr>
-    </tbody></table></div></article>
+    <div class="toolbar">
+      <div class="filter-box">⌕ <input placeholder="Buscar empleado..."></div><button class="btn btn-primary"
+        data-toast="Formulario de empleado listo para conectar">＋ Añadir empleado</button>
+    </div>
+    <article class="card table-card">
+      <div class="table-wrap">
+        <table id="empleados-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Empleado</th>
+              <th>Rol</th>
+              <th>Teléfono</th>
+              <th>Sucursal</th>
+            </tr>
+          </thead>
+          <tbody>
+
+          </tbody>
+        </table>
+      </div>
+    </article>
   </div>
 
-  <div data-panel="veterinarios" hidden><article class="card table-card"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Veterinario</th><th>Especialidad</th><th>Empleado</th></tr></thead><tbody>
-    <tr><td>1</td><td>Dr. Carlos Gómez</td><td>Cirugía General y Traumatología</td><td>#1</td></tr><tr><td>2</td><td>Dra. Laura Martínez</td><td>Dermatología y Nutrición</td><td>#2</td></tr>
-  </tbody></table></div></article></div>
+  <div data-panel="veterinarios" hidden>
+    <article class="card table-card">
+      <div class="table-wrap">
+        <table id="veterinarios-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Veterinario</th>
+              <th>Especialidad</th>
+              <th>Empleado</th>
+            </tr>
+          </thead>
+          <tbody>
 
-  <div data-panel="usuarios" hidden><article class="card table-card"><div class="table-wrap"><table id="usuarios-table"><thead><tr><th>ID</th><th>Usuario</th><th>Email</th><th>Rol</th><th>Estado</th></tr></thead><tbody>
-    <tr><td>1</td><td>admin</td><td>admin@veterinaria.com</td><td>Administrador</td><td><span class="status success">Activo</span></td></tr><tr><td>2</td><td>vet_carlos</td><td>carlos.gomez@veterinaria.com</td><td>Empleado</td><td><span class="status success">Activo</span></td></tr><tr><td>3</td><td>vet_laura</td><td>laura.martinez@veterinaria.com</td><td>Empleado</td><td><span class="status success">Activo</span></td></tr>
-  </tbody></table></div></article><p style="color:var(--muted);font-size:12px;margin:12px 0">Por seguridad, la interfaz no muestra <code>password_hash</code>.</p></div>
+          </tbody>
+        </table>
+      </div>
+    </article>
+  </div>
 
-  <div data-panel="roles" hidden><div class="detail-grid" id="roles-empleados-list">
-    <article class="card info-card"><h3>Administrador</h3><div class="info-row"><span>Dashboard</span><b>Acceso</b></div><div class="info-row"><span>Clientes</span><b>Gestionar</b></div><div class="info-row"><span>Historial</span><b>Gestionar</b></div><div class="info-row"><span>Ventas</span><b>Gestionar</b></div><div class="info-row"><span>Sistema</span><b>Control total</b></div></article>
-    <article class="card info-card"><h3>Empleado</h3><div class="info-row"><span>Dashboard</span><b>Acceso</b></div><div class="info-row"><span>Clientes</span><b>Gestionar</b></div><div class="info-row"><span>Historial</span><b>Gestionar</b></div><div class="info-row"><span>Ventas</span><b>Gestionar</b></div></article>
-    <article class="card info-card"><h3>Permisos definidos</h3><div class="info-row"><span>1</span><b>VER_DASHBOARD</b></div><div class="info-row"><span>2</span><b>GESTIONAR_CLIENTES</b></div><div class="info-row"><span>3</span><b>GESTIONAR_HISTORIAL</b></div><div class="info-row"><span>4</span><b>VENTAS_POS</b></div><div class="info-row"><span>5</span><b>ADMIN_SISTEMA</b></div></article>
-  </div></div>
+  <div data-panel="usuarios" hidden>
+    <article class="card table-card">
+      <div class="table-wrap">
+        <table id="usuarios-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Usuario</th>
+              <th>Email</th>
+              <th>Rol</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+
+          </tbody>
+        </table>
+      </div>
+    </article>
+    <p style="color:var(--muted);font-size:12px;margin:12px 0">Por seguridad, la interfaz no muestra
+      <code>password_hash</code>.</p>
+  </div>
+
+  <div data-panel="roles" hidden>
+    <div class="detail-grid" id="roles-list">
+      
+    </div>
+  </div>
 </section>

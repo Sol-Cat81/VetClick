@@ -23,23 +23,23 @@ app.get("/", (req, res) => {
 });
 
 // Cada router agrupa las operaciones de una tabla o módulo.
-const rutasUsuarios = require('./routes/usuarios.routes');
-app.use('/api/usuarios', rutasUsuarios);
-
-const rutasProductos = require('./routes/productos.routes')
-app.use('/api/productos', rutasProductos)
-
-const empleadosRoutes = require('./routes/empleados.routes');
-app.use('/api/empleados' , empleadosRoutes);
-
-const rolesEmpleadosRoutes = require('./routes/rolesEmpleados.routes');
-app.use('/api/rol_empleados' , rolesEmpleadosRoutes);   
-
 const clientesRoutes = require('./routes/clientes.routes');
 app.use('/api/clientes', clientesRoutes);
 
-const mascotasRoutes = require('./routes/mascotas.routes');
-app.use('/api/mascotas' , mascotasRoutes);
+const clinicaRoutes = require('./routes/clinica.routes');
+app.use('/api/clinica', clinicaRoutes);
+
+const catalogoRoutes = require('./routes/catalogo.routes');
+app.use('/api/catalogo', catalogoRoutes);
+
+const inventarioRoutes = require('./routes/inventario.routes');
+app.use('/api/inventario', inventarioRoutes);
+
+const ventasRoutes = require('./routes/ventas.routes');
+app.use('/api/ventas', ventasRoutes);
+
+const personalRoutes = require('./routes/personal.routes');
+app.use('/api/personal', personalRoutes);
 
 // Usamos el puerto configurado o 3000 durante el desarrollo.
 const puerto = process.env.PORT || 3000;
