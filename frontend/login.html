@@ -1,124 +1,240 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>VetClick · Iniciar sesión</title>
-    <link rel="shortcut icon" href="assets/icons/ChatGPT-Image-Logo.png" type="image/x-icon">
-    <link rel="stylesheet" href="css/login.css">
-</head>
-<body>
+    <link
+      rel="shortcut icon"
+      href="assets/icons/ChatGPT-Image-Logo.png"
+      type="image/x-icon"
+    />
+    <link rel="stylesheet" href="css/login.css" />
+  </head>
+  <body>
     <main class="login-container">
+      <!-- Panel de bienvenida -->
+      <section class="panel-bienvenida">
+        <div class="logo-container">
+          <img
+            src="assets/icons/LogoPrincipal.jpeg"
+            alt="Logo VetClick"
+            class="logo"
+          />
+        </div>
+        <h1>Bienvenido</h1>
+        <p class="descripcion">
+          VetClick<br />
+          Clínica veterinaria
+        </p>
 
-        <!-- Panel de bienvenida -->
-        <section class="panel-bienvenida">
-            <div class="logo-container">
-                <img src="assets/icons/LogoPrincipal.jpeg" alt="Logo VetClick" class="logo">
+        <!-- Reservado para ilustración / animación de mascotas -->
+        <div class="mascotas-container" aria-hidden="true">
+          <img
+            src="assets/img/imagen-ilustrada-login.svg"
+            alt="imagen de veterinario"
+            class="imagen-ilustrada-login"
+          />
+        </div>
+      </section>
+
+      <!-- Panel de inicio de sesión -->
+      <section class="panel-login" id="panelLogin">
+        <div class="icono-login">
+          <span>🐾</span>
+        </div>
+        <h2>Iniciar sesión</h2>
+        <p class="subtitulo">Ingresa tus datos para continuar</p>
+
+        <p class="mensaje-error" id="loginError" role="alert" hidden></p>
+
+        <form id="formLogin">
+          <div class="campo">
+            <label for="correo-session">Correo electrónico</label>
+            <div class="input-container">
+              <input
+                type="email"
+                name="correo"
+                id="correo-session"
+                placeholder="ejemplo@veterinaria.com"
+                autocomplete="email"
+                required
+              />
             </div>
-            <h1>Bienvenido</h1>
-            <p class="descripcion">
-                VetClick<br>
-                Clínica veterinaria
-            </p>
+          </div>
 
-            <!-- Reservado para ilustración / animación de mascotas -->
-            <div class="mascotas-container" aria-hidden="true">
-                <img src="assets/img/imagen-ilustrada-login.svg" alt="imagen de veterinario" class="imagen-ilustrada-login">
+          <div class="campo">
+            <label for="password-session">Contraseña</label>
+            <div class="input-container">
+              <input
+                type="password"
+                name="password"
+                id="password-session"
+                placeholder="********"
+                autocomplete="current-password"
+                minlength="6"
+                required
+              />
+              <button
+                type="button"
+                class="btn-password"
+                data-target="password-session"
+                aria-label="Mostrar contraseña"
+              >
+                <svg
+                  class="icono-ojo"
+                  viewBox="0 0 24 24"
+                  width="18"
+                  height="18"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z"
+                  />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+              </button>
             </div>
-        </section>
+          </div>
 
-        <!-- Panel de inicio de sesión -->
-        <section class="panel-login" id="panelLogin">
-            <div class="icono-login">
-                <span>🐾</span>
+          <button type="submit" class="btn-session">
+            <span class="btn-texto">Iniciar sesión</span>
+          </button>
+        </form>
+
+        <p class="separador"><span>o</span></p>
+
+        <button type="button" class="btn-secundario" id="irARegistro">
+          Crear una cuenta
+        </button>
+      </section>
+
+      <!-- Panel de registro -->
+      <section class="panel-registro" id="panelRegistro" hidden>
+        <div class="icono-login">
+          <span>🐾</span>
+        </div>
+        <h2>Crear una cuenta</h2>
+        <p class="subtitulo">Completa los campos con tus datos</p>
+
+        <p class="mensaje-error" id="registroError" role="alert" hidden></p>
+
+        <form id="formRegistro">
+          <div class="campo">
+            <label for="nombre-usuario">Nombre de usuario</label>
+            <div class="input-container">
+              <input
+                type="text"
+                name="nombre-usuario"
+                id="nombre-usuario"
+                autocomplete="name"
+                required
+              />
             </div>
-            <h2>Iniciar sesión</h2>
-            <p class="subtitulo">Ingresa tus datos para continuar</p>
+          </div>
 
-            <p class="mensaje-error" id="loginError" role="alert" hidden></p>
-
-            <form id="formLogin">
-                <div class="campo">
-                    <label for="correo-session">Correo electrónico</label>
-                    <div class="input-container">
-                        <input type="email" name="correo" id="correo-session" placeholder="ejemplo@veterinaria.com" autocomplete="email" required>
-                    </div>
-                </div>
-
-                <div class="campo">
-                    <label for="password-session">Contraseña</label>
-                    <div class="input-container">
-                        <input type="password" name="password" id="password-session" placeholder="********" autocomplete="current-password" minlength="6" required>
-                        <button type="button" class="btn-password" data-target="password-session" aria-label="Mostrar contraseña">
-                            <svg class="icono-ojo" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z"/><circle cx="12" cy="12" r="3"/></svg>
-                        </button>
-                    </div>
-                </div>
-
-                <button type="submit" class="btn-session">
-                    <span class="btn-texto">Iniciar sesión</span>
-                </button>
-            </form>
-
-            <p class="separador"><span>o</span></p>
-
-            <button type="button" class="btn-secundario" id="irARegistro">Crear una cuenta</button>
-        </section>
-
-        <!-- Panel de registro -->
-        <section class="panel-registro" id="panelRegistro" hidden>
-            <div class="icono-login">
-                <span>🐾</span>
+          <div class="campo">
+            <label for="correo-registro">Correo electrónico</label>
+            <div class="input-container">
+              <input
+                type="email"
+                name="correo-registro"
+                id="correo-registro"
+                autocomplete="email"
+                required
+              />
             </div>
-            <h2>Crear una cuenta</h2>
-            <p class="subtitulo">Completa los campos con tus datos</p>
+          </div>
 
-            <p class="mensaje-error" id="registroError" role="alert" hidden></p>
+          <div class="campo">
+            <label for="password-registro">Contraseña</label>
+            <div class="input-container">
+              <input
+                type="password"
+                name="password-registro"
+                id="password-registro"
+                autocomplete="new-password"
+                minlength="6"
+                required
+              />
+              <button
+                type="button"
+                class="btn-password"
+                data-target="password-registro"
+                aria-label="Mostrar contraseña"
+              >
+                <svg
+                  class="icono-ojo"
+                  viewBox="0 0 24 24"
+                  width="18"
+                  height="18"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z"
+                  />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+              </button>
+            </div>
+          </div>
 
-            <form id="formRegistro">
-                <div class="campo">
-                    <label for="nombre-usuario">Nombre de usuario</label>
-                    <div class="input-container">
-                        <input type="text" name="nombre-usuario" id="nombre-usuario" autocomplete="name" required>
-                    </div>
-                </div>
+          <div class="opciones">
+            <label class="politica-privacidad">
+              <input
+                type="checkbox"
+                name="politica-privacidad"
+                id="politica-privacidad-registro"
+                required
+              />
+              <span>Acepto las políticas de seguridad</span>
+            </label>
+          </div>
 
-                <div class="campo">
-                    <label for="correo-registro">Correo electrónico</label>
-                    <div class="input-container">
-                        <input type="email" name="correo-registro" id="correo-registro" autocomplete="email" required>
-                    </div>
-                </div>
+          <button type="submit" class="btn-session">
+            <span class="btn-texto">Crear una cuenta</span>
+          </button>
+        </form>
 
-                <div class="campo">
-                    <label for="password-registro">Contraseña</label>
-                    <div class="input-container">
-                        <input type="password" name="password-registro" id="password-registro" autocomplete="new-password" minlength="6" required>
-                        <button type="button" class="btn-password" data-target="password-registro" aria-label="Mostrar contraseña">
-                            <svg class="icono-ojo" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z"/><circle cx="12" cy="12" r="3"/></svg>
-                        </button>
-                    </div>
-                </div>
+        <p class="separador"><span>o</span></p>
 
-                <div class="opciones">
-                    <label class="politica-privacidad">
-                        <input type="checkbox" name="politica-privacidad" id="politica-privacidad-registro" required>
-                        <span>Acepto las políticas de seguridad</span>
-                    </label>
-                </div>
-
-                <button type="submit" class="btn-session">
-                    <span class="btn-texto">Crear una cuenta</span>
-                </button>
-            </form>
-
-            <p class="separador"><span>o</span></p>
-
-            <button type="button" class="btn-secundario" id="irALogin">Iniciar sesión</button>
-        </section>
+        <button type="button" class="btn-secundario" id="irALogin">
+          Iniciar sesión
+        </button>
+      </section>
     </main>
+    <div
+      class="toast-container position-fixed botton-0 end-0 p-3"
+      style="z-index: 1055"
+    >
+      <div
+        id="miToast"
+        class="toast align-items-center text-bg-success border-0"
+        role="alert"
+        aria-live="assertive"
+        aria-atomic="true"
+      >
+        <div class="d-flex">
+          <div class="toast-body" id="toast-mensaje">¡Operación exitosa!</div>
+          <button
+            type="button"
+            class="btn-close btn-close-white me-2 m-auto"
+            data-bs-dismiss="toast"
+            aria-label="Close"
+          ></button>
+        </div>
+      </div>
+    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
     <script src="js/login.js"></script>
-</body>
+  </body>
 </html>

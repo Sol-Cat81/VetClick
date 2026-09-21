@@ -29,17 +29,8 @@
   </head>
 
   <body>
-    <lottie-player
-      class="loader"
-      src="../assets/img/animal.json"
-      background="transparent"
-      speed="1"
-      style="width: 300px; height: 300px"
-      loop
-      autoplay
-    ></lottie-player>
     <!-- BARRA DE NAVEGACION -->
-     <mi-navbar ruta-base="../" pagina-actual="productos"></mi-navbar>
+    <mi-navbar ruta-base="../" pagina-actual="productos"></mi-navbar>
 
     <main>
       <!-- SECCION HERO (CARRUSEL) -->
@@ -186,8 +177,7 @@
           <h2>Destacados</h2>
           <div class="swiper swiper-productos">
             <!-- Additional required wrapper -->
-            <div class="swiper-wrapper productos-destacados">
-            </div>
+            <div class="swiper-wrapper productos-destacados"></div>
             <!-- If we need pagination -->
             <div class="swiper-pagination"></div>
 
@@ -262,6 +252,28 @@
         </div>
       </section>
     </main>
+    <div
+      class="toast-container position-fixed botton-0 end-0 p-3"
+      style="z-index: 1055"
+    >
+      <div
+        id="miToast"
+        class="toast align-items-center text-bg-success border-0"
+        role="alert"
+        aria-live="assertive"
+        aria-atomic="true"
+      >
+        <div class="d-flex">
+          <div class="toast-body" id="toast-mensaje">¡Operación exitosa!</div>
+          <button
+            type="button"
+            class="btn-close btn-close-white me-2 m-auto"
+            data-bs-dismiss="toast"
+            aria-label="Close"
+          ></button>
+        </div>
+      </div>
+    </div>
 
     <!-- PIE DE PAGINA -->
     <footer>

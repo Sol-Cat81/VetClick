@@ -1,6 +1,3 @@
-const header = document.querySelector("header");
-const busqueda = document.querySelector(".search-bar");
-const contenedor = document.querySelector(".contenedor");
 const secciones = [...document.querySelectorAll(".turno-seccion")];
 const indicadores = [...document.querySelectorAll("[data-step-indicator]")];
 const siguiente = document.querySelector("#siguiente");
@@ -16,16 +13,6 @@ const reserva = {
 };
 let pasoActual = 1;
 let mesCalendario = new Date();
-
-function cerrarLoader() {
-  const loader = document.querySelector(".loader");
-  if (loader) loader.style.display = "none";
-}
-
-function responsive() {
-  if (window.innerWidth < 600) header.appendChild(busqueda);
-  else contenedor.appendChild(busqueda);
-}
 
 function mostrarPaso(paso) {
   pasoActual = paso;
@@ -236,6 +223,3 @@ document.querySelector("#datos-form").addEventListener("submit", (evento) => {
 
 renderCalendario();
 mostrarPaso(1);
-responsive();
-window.addEventListener("load", cerrarLoader);
-window.addEventListener("resize", responsive);

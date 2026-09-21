@@ -1,6 +1,6 @@
 class MiNavbar extends HTMLElement {
   connectedCallback() {
-    const ruta = this.getAttribute('ruta-base') || '';
+    const ruta = this.getAttribute("ruta-base") || "";
 
     this.innerHTML = `
       <style>
@@ -110,6 +110,9 @@ class MiNavbar extends HTMLElement {
             transition: all 0.3s ease-in-out;
             cursor: pointer;
         }
+        #usarioSession{
+            letter-spacing: 0px;
+        }
 
         /* Barra lateral */
         .offcanvas {
@@ -210,7 +213,6 @@ class MiNavbar extends HTMLElement {
         }
       </style>
 
-      <!-- AGREGAMOS LA ETIQUETA HEADER FALTANTE -->
       <header>
         <div class="contenedor">
           <div class="menu">
@@ -225,8 +227,9 @@ class MiNavbar extends HTMLElement {
           
           <div class="header-icons">
             <i class="ph-thin ph-shopping-cart"></i>
-            <i class="ph-thin ph-heart"></i>
-            <i class="ph-thin ph-user"></i>
+            <div id="usarioSession">
+              <a href="${ruta}login.html"><i class="ph-thin ph-user"></i></a>
+            </div>
           </div>
         </div>
       </header>
@@ -238,7 +241,7 @@ class MiNavbar extends HTMLElement {
           <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <div class="offcanvas-body">
-          <ul>
+          <ul class="navegacion">
             <li><a href="${ruta}index.html" class="ofcanvas-nav">Inicio</a></li>
             <li><a href="${ruta}pages/servicios.html" class="ofcanvas-nav">Servicios</a></li>
             <li><a href="${ruta}pages/turnos.html" class="ofcanvas-nav">Turnos</a></li>
@@ -247,27 +250,7 @@ class MiNavbar extends HTMLElement {
           
           <details class="desplegar-categoria">
             <summary>Categorias <span class="flecha"><i class="ph-thin ph-caret-down"></i></span></summary>
-            <ul>
-              <li>
-                <details class="categoria-offcanvas">
-                  <summary>Perros <span class="sub-flecha"><i class="ph-thin ph-caret-down"></i></span></summary>
-                  <ul>
-                    <li>Alimentos secos</li>
-                    <li>Alimentos humedos</li>
-                    <li>Comederos</li>
-                  </ul>
-                </details>
-              </li>
-              <li>
-                <details class="categoria-offcanvas">
-                  <summary>Gatos <span class="sub-flecha"><i class="ph-thin ph-caret-down"></i></span></summary>
-                  <ul>
-                    <li>Alimentos secos</li>
-                    <li>Alimentos humedos</li>
-                    <li>Comederos</li>
-                  </ul>
-                </details>
-              </li>
+            <ul class="categoriasPadre">
             </ul>
           </details>
         </div>
@@ -280,9 +263,150 @@ class MiNavbar extends HTMLElement {
           <div class="offcanvas-correo">vetclick2026@gmail.com</div>
         </div>
       </div>
+
+      <div class="toast align-items-center" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body">
+          Hello, world! This is a toast message.
+        </div>
+        <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+      </div>
+
     `;
   }
 }
 
-// Solo necesitas registrar el componente, eliminamos el eventListener de resize
-customElements.define('mi-navbar', MiNavbar);
+customElements.define("mi-navbar", MiNavbar);
+
+/* TOAST DE BOOSTRAP PARA REEMPLAZAR LOS ALERT */
+function mostrarToast(mensaje, tipo = 'exito') {
+    const toastElemento = document.getElementById('miToast');
+    const toastCuerpo = document.getElementById('toast-mensaje');
+
+    // 1. Limpiamos las clases de color previas
+    toastElemento.classList.remove('text-bg-success', 'text-bg-danger');
+
+    // 2. Asignamos el color dependiendo del tipo de mensaje
+    if (tipo === 'error') {
+        toastElemento.classList.add('text-bg-danger'); // Fondo rojo
+    } else {
+        toastElemento.classList.add('text-bg-success'); // Fondo verde
+    }
+
+    // 3. Insertamos el mensaje enviado
+    toastCuerpo.textContent = mensaje;
+
+    // 4. Usamos la API de Bootstrap para inicializar y mostrar el Toast
+    const toast = new bootstrap.Toast(toastElemento, {
+        delay: 3000 // Se ocultará solo después de 3 segundos (3000 ms)
+    });
+    
+    toast.show();
+}
+
+window.addEventListener("load", async () => {
+  try {
+    const response = await fetch(
+      "http://127.0.0.1:3000/api/productos/categorias",
+    );
+
+    if (!response.ok) {
+      throw new Error("Error al obtener categorías");
+    }
+
+    const data = await response.json();
+    const categorias = data.categorias;
+    const contenedores = document.querySelectorAll(".categoriasPadre");
+
+    contenedores.forEach((contenedor) => {
+      contenedor.innerHTML = "";
+
+      categorias.forEach((categoriaPadre) => {
+        if (categoriaPadre.subcategorias.length > 0) {
+          let subCategorias = "";
+
+          categoriaPadre.subcategorias.forEach((subCat) => {
+            subCategorias += `
+              <li class="subCategoria" data-id="${subCat.id_categoria}" data-padre="${subCat.categoria_padre}">
+                ${subCat.nombre}
+              </li>
+            `;
+          });
+
+          contenedor.innerHTML += `
+            <li>
+              <details class="categoria-offcanvas">
+                <summary data-id="${categoriaPadre.id_categoria}">
+                  ${categoriaPadre.nombre}
+                  <span class="sub-flecha"><i class="ph-thin ph-caret-down"></i></span>
+                </summary>
+                <ul>
+                  ${subCategorias}
+                </ul>
+              </details>
+            </li>
+          `;
+        } else {
+          contenedor.innerHTML += `
+            <li data-id="${categoriaPadre.id_categoria}">
+              ${categoriaPadre.nombre}
+            </li>
+          `;
+        }
+      });
+    });
+
+    const confirmaSession = await fetch(
+      "http://127.0.0.1:3000/api/usuarios/verificarsession",
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      },
+    );
+    const controlUsuario = document.getElementById("usarioSession");
+    const offCanvas = document.querySelector(".navegacion");
+
+    const session = await confirmaSession.json();
+
+    if (confirmaSession.ok) {
+      console.log(session.usuario.usuario);
+      controlUsuario.innerHTML = ``;
+      offCanvas.innerHTML += `
+      <li><a href="#" class="ofcanvas-nav">Mi cuenta</a></li>
+      <li onclick="cerrarSession()" class="ofcanvas-nav">Cerrar Sesion</li>
+      `
+    } else {
+      console.log("no hay session");
+      return;
+    }
+  } catch (error) {
+    console.error("Error de conexión:", error);
+    mostrarToast('No se pudo conectar con el sevidor.', 'error');
+  }
+});
+
+async function cerrarSession() {
+  try {
+    const cerrarSession = await fetch('http://127.0.0.1:3000/api/usuarios/logout',{
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    credentials: 'include'
+  });
+
+  const cerrado = await cerrarSession.json();
+  if(cerrarSession.ok){
+    mostrarToast(cerrado.mensaje || 'Session cerrada con exito.', 'exito');
+  }else{
+    mostrarToast('No se pudo cerrar session.', 'error');
+  }
+  } catch (error) {
+    console.error("Error de conexión:", error);
+    mostrarToast('No se pudo conectar con el sevidor.', 'error');
+  }
+}

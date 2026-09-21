@@ -63,10 +63,6 @@ const imagen404 =
        = = = = = FUNCIONES = = = = =
 
 ============================================*/
-function cerrarLoader() {
-  let loader = document.querySelector(".loader");
-  loader.style.display = "none";
-}
 
 const formatearNumero = (numero) => {
   // Si el número es entero (decimales igual a 0), no muestra decimales
@@ -94,6 +90,32 @@ const renderizarPrecio = (precio, descuento) => {
   `;
 };
 
+/* TOAST DE BOOSTRAP PARA REEMPLAZAR LOS ALERT */
+function mostrarToast(mensaje, tipo = 'exito') {
+    const toastElemento = document.getElementById('miToast');
+    const toastCuerpo = document.getElementById('toast-mensaje');
+
+    // 1. Limpiamos las clases de color previas
+    toastElemento.classList.remove('text-bg-success', 'text-bg-danger');
+
+    // 2. Asignamos el color dependiendo del tipo de mensaje
+    if (tipo === 'error') {
+        toastElemento.classList.add('text-bg-danger'); // Fondo rojo
+    } else {
+        toastElemento.classList.add('text-bg-success'); // Fondo verde
+    }
+
+    // 3. Insertamos el mensaje enviado
+    toastCuerpo.textContent = mensaje;
+
+    // 4. Usamos la API de Bootstrap para inicializar y mostrar el Toast
+    const toast = new bootstrap.Toast(toastElemento, {
+        delay: 3000 // Se ocultará solo después de 3 segundos (3000 ms)
+    });
+    
+    toast.show();
+}
+
 /*==========================================
 
          = = = = = EVENTOS = = = = =
@@ -101,7 +123,6 @@ const renderizarPrecio = (precio, descuento) => {
 ============================================*/
 
 window.addEventListener("load", async () => {
-  cerrarLoader();
   try {
     const solicitarDestacados = await fetch(
       "http://localhost:3000/api/productos/destacados",
@@ -112,8 +133,7 @@ window.addEventListener("load", async () => {
     if (solicitarDestacados.ok) {
       contenedorProdDestacados.innerHTML = "";
 
-      destacados
-        .filter((prod) => prod.imagen && prod.variantes.length > 0)
+      destacados.filter((prod) => prod.imagen && prod.variantes.length > 0)
         .forEach((prod) => {
         const primeraVariante = prod.variantes[0];
         const descuento = Number(prod.descuento) || 0;
@@ -176,6 +196,6 @@ window.addEventListener("load", async () => {
     }
   } catch (error) {
     console.error("Error de conexión:", error);
-    alert("No se pudo conectar con el servidor de la veterinaria.");
+    mostrarToast('No se pudo conectar con el sevidor.', 'error');
   }
 });
