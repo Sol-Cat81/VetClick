@@ -359,6 +359,10 @@ th {
   border-bottom: 1px solid var(--line)
 }
 
+th:last-child {
+  min-width: 190px
+}
+
 td {
   padding: 12px 13px;
   border-bottom: 1px solid #edf1f3;
@@ -526,6 +530,17 @@ td small {
   border: 1px solid var(--line)
 }
 
+.btn-danger {
+  background: var(--red-soft);
+  color: #cf4048;
+  border: 1px solid #f6c9cd
+}
+
+.btn-small {
+  padding: 7px 9px;
+  font-size: 10px
+}
+
 .subnav {
   display: flex;
   gap: 3px;
@@ -558,6 +573,30 @@ td small {
   gap: 14px;
   align-items: center;
   margin-bottom: 14px
+}
+
+.admin-toolbar .panel-caption {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 650
+}
+
+.row-actions,
+.card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px
+}
+
+.row-actions {
+  min-width: 190px;
+  vertical-align: middle
+}
+
+.card-actions {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #edf1f3
 }
 
 .filter-box {
@@ -634,6 +673,100 @@ td small {
   transform: translateY(0)
 }
 
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(23, 43, 58, .48);
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: .2s;
+  z-index: 60
+}
+
+.modal-backdrop.show {
+  opacity: 1;
+  pointer-events: auto
+}
+
+.modal {
+  width: min(100%, 680px);
+  max-height: min(90vh, 760px);
+  overflow-y: auto;
+  background: #fff;
+  border-radius: var(--radius);
+  box-shadow: 0 20px 55px rgba(23, 43, 58, .22);
+  padding: 22px
+}
+
+.modal-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 18px
+}
+
+.modal-kicker {
+  color: var(--blue);
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase
+}
+
+.modal h2 {
+  margin: 4px 0 0;
+  font-size: 20px
+}
+
+.modal-close {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 25px;
+  line-height: 1
+}
+
+.modal label {
+  display: block;
+  color: #567084;
+  font-size: 11px;
+  font-weight: 750;
+  margin-bottom: 13px
+}
+
+.modal input,
+.modal textarea,
+.modal select {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 11px;
+  color: var(--text);
+  outline-color: var(--blue)
+}
+
+.modal-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 14px
+}
+
+.modal-fields label:has(textarea) {
+  grid-column: 1 / -1
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px
+}
+
 @media(max-width:1050px) {
   .sidebar {
     width: 220px
@@ -658,6 +791,34 @@ td small {
 
   .detail-grid {
     grid-template-columns: 1fr
+  }
+
+  .modal-fields {
+    grid-template-columns: 1fr
+  }
+}
+
+@media(max-width:700px) {
+  .toolbar {
+    align-items: stretch;
+    flex-direction: column
+  }
+
+  .filter-box {
+    min-width: 0;
+    width: 100%
+  }
+
+  .admin-toolbar .btn {
+    width: 100%
+  }
+
+  .row-actions {
+    min-width: 170px
+  }
+
+  .row-actions .btn {
+    flex: 1 1 auto
   }
 }
 

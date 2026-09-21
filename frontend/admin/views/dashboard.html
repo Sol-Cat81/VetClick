@@ -1,44 +1,84 @@
 <section>
   <div class="page-head">
-    <div><h1>Panel administrativo</h1><p>Resumen general de Vet Click</p></div>
+    <div>
+      <h1>Panel administrativo</h1>
+      <p>Resumen general de Vet Click</p>
+    </div>
     <div class="page-date">Hoy, 19 de septiembre de 2026</div>
   </div>
 
   <div class="grid stats-grid">
     <article class="card stat-card">
-      <div><div class="stat-label">Ventas</div><div class="stat-value">$59.500</div><div class="stat-note">2 pedidos registrados</div></div>
+      <div>
+        <div class="stat-label">Ventas</div>
+        <div class="stat-value">$59.500</div>
+        <div class="stat-note">2 pedidos registrados</div>
+      </div>
       <div class="stat-icon">$</div>
     </article>
     <article class="card stat-card">
-      <div><div class="stat-label">Turnos de hoy</div><div class="stat-value">2</div><div class="stat-note">1 confirmado · 1 pendiente</div></div>
+      <div>
+        <div class="stat-label">Turnos de hoy</div>
+        <div class="stat-value">2</div>
+        <div class="stat-note">1 confirmado · 1 pendiente</div>
+      </div>
       <div class="stat-icon">✚</div>
     </article>
     <article class="card stat-card">
-      <div><div class="stat-label">Clientes</div><div class="stat-value">3</div><div class="stat-note">Registrados en el sistema</div></div>
+      <div>
+        <div class="stat-label">Clientes</div>
+        <div class="stat-value">3</div>
+        <div class="stat-note">Registrados en el sistema</div>
+      </div>
       <div class="stat-icon">◉</div>
     </article>
     <article class="card stat-card">
-      <div><div class="stat-label">Alertas</div><div class="stat-value">1</div><div class="stat-note">Requiere revisión</div></div>
+      <div>
+        <div class="stat-label">Alertas</div>
+        <div class="stat-value">1</div>
+        <div class="stat-note">Requiere revisión</div>
+      </div>
       <div class="stat-icon">!</div>
     </article>
   </div>
 
   <div class="grid dashboard-grid">
     <article class="card table-card">
-      <div class="card-head"><h2>Estado de turnos</h2><span>Turnos programados</span></div>
+      <div class="card-head">
+        <h2>Estado de turnos</h2><span>Turnos programados</span>
+      </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Hora</th><th>Paciente</th><th>Servicio</th><th>Estado</th></tr></thead>
+          <thead>
+            <tr>
+              <th>Hora</th>
+              <th>Paciente</th>
+              <th>Servicio</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
           <tbody>
-            <tr><td><strong>10:00</strong></td><td><strong>Thor</strong><br><small>Juan Pérez</small></td><td>Consulta General</td><td><span class="status success">Confirmado</span></td></tr>
-            <tr><td><strong>15:30</strong></td><td><strong>Toby</strong><br><small>María López</small></td><td>Corte y Baño</td><td><span class="status warning">Pendiente</span></td></tr>
+            <tr>
+              <td><strong>10:00</strong></td>
+              <td><strong>Thor</strong><br><small>Juan Pérez</small></td>
+              <td>Consulta General</td>
+              <td><span class="status success">Confirmado</span></td>
+            </tr>
+            <tr>
+              <td><strong>15:30</strong></td>
+              <td><strong>Toby</strong><br><small>María López</small></td>
+              <td>Corte y Baño</td>
+              <td><span class="status warning">Pendiente</span></td>
+            </tr>
           </tbody>
         </table>
       </div>
     </article>
 
     <article class="card">
-      <div class="card-head"><h2>Personal en turno</h2><span>3 activos</span></div>
+      <div class="card-head">
+        <h2>Personal en turno</h2><span>3 activos</span>
+      </div>
       <div class="card-body">
         <div class="info-row"><b>Dr. Carlos Gómez</b><span>Veterinario</span></div>
         <div class="info-row"><b>Dra. Laura Martínez</b><span>Veterinaria</span></div>
@@ -47,10 +87,16 @@
     </article>
 
     <article class="card">
-      <div class="card-head"><h2>Alertas de inventario</h2><span>Revisión</span></div>
+      <div class="card-head">
+        <h2>Alertas de inventario</h2><span>Revisión</span>
+      </div>
       <div class="card-body alert-list">
-        <div class="alert danger"><b>!</b><div><strong>Revisar stock</strong><small>Producto por debajo del umbral configurado</small></div></div>
-        <div class="alert success"><b>✓</b><div><strong>Stock correcto</strong><small>Resto de productos dentro del mínimo</small></div></div>
+        <div class="alert danger"><b>!</b>
+          <div><strong>Revisar stock</strong><small>Producto por debajo del umbral configurado</small></div>
+        </div>
+        <div class="alert success"><b>✓</b>
+          <div><strong>Stock correcto</strong><small>Resto de productos dentro del mínimo</small></div>
+        </div>
       </div>
     </article>
 
@@ -58,11 +104,13 @@
       <div class="quick-plus">+</div>
       <h3>Añadir cita</h3>
       <p>Registrar un nuevo turno para un paciente</p>
-      <button class="btn btn-primary" data-toast="Formulario de turno listo para conectar">Añadir cita</button>
+      <button class="btn btn-primary" data-modal-action="create" data-modal-entity="turno">Añadir cita</button>
     </article>
 
     <article class="card">
-      <div class="card-head"><h2>Últimas actividades</h2><span>Reciente</span></div>
+      <div class="card-head">
+        <h2>Últimas actividades</h2><span>Reciente</span>
+      </div>
       <div class="card-body">
         <div class="info-row"><b>Pedido #2</b><span>Preparando</span></div>
         <div class="info-row"><b>Pago #2</b><span>Pendiente</span></div>
@@ -74,7 +122,7 @@
       <div class="quick-plus">+</div>
       <h3>Registrar venta</h3>
       <p>Crear un nuevo pedido desde administración</p>
-      <button class="btn btn-secondary" data-toast="Formulario de venta listo para conectar">Nueva venta</button>
+      <button class="btn btn-secondary" data-modal-action="create" data-modal-entity="venta">Nueva venta</button>
     </article>
   </div>
 </section>
