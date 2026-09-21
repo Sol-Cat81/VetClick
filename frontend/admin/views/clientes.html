@@ -30,31 +30,8 @@
               <th>Acciones</th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <td>1</td>
-              <td>Juan</td>
-              <td>Pérez</td>
-              <td>1144332211</td>
-              <td><span class="status success">Activo</span></td>
-              <td><button class="btn btn-secondary" data-toast="Editar cliente #1">Editar</button></td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td>María</td>
-              <td>López</td>
-              <td>1155667788</td>
-              <td><span class="status success">Activo</span></td>
-              <td><button class="btn btn-secondary" data-toast="Editar cliente #2">Editar</button></td>
-            </tr>
-            <tr>
-              <td>3</td>
-              <td>Carlos</td>
-              <td>Giménez</td>
-              <td>1122334455</td>
-              <td><span class="status success">Activo</span></td>
-              <td><button class="btn btn-secondary" data-toast="Editar cliente #3">Editar</button></td>
-            </tr>
+          <tbody id="tablaClientes">
+           
           </tbody>
         </table>
       </div>
@@ -63,9 +40,9 @@
 
   <div data-panel="mascotas" hidden>
     <div class="toolbar">
-      <div class="filter-box">⌕ <input data-table-filter="#mascotas-table"
-          placeholder="Buscar mascota, propietario..."></div><button
-        class="btn btn-primary" data-toast="Formulario de mascota listo para conectar">＋ Añadir mascota</button>
+      <div class="filter-box">⌕ <input data-table-filter="#mascotas-table" placeholder="Buscar mascota, propietario...">
+      </div><button class="btn btn-primary" data-toast="Formulario de mascota listo para conectar">＋ Añadir
+        mascota</button>
     </div>
     <article class="card table-card">
       <div class="table-wrap">
@@ -82,33 +59,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>1</td>
-              <td><strong>Thor</strong></td>
-              <td>Juan Pérez</td>
-              <td>Perro</td>
-              <td>Labrador Retriever</td>
-              <td>Macho</td>
-              <td>28,50 kg</td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td><strong>Cleo</strong></td>
-              <td>Juan Pérez</td>
-              <td>Gato</td>
-              <td>Siames</td>
-              <td>Hembra</td>
-              <td>3,80 kg</td>
-            </tr>
-            <tr>
-              <td>3</td>
-              <td><strong>Toby</strong></td>
-              <td>María López</td>
-              <td>Perro</td>
-              <td>Caniche Toy</td>
-              <td>Macho</td>
-              <td>6,20 kg</td>
-            </tr>
+
           </tbody>
         </table>
       </div>
@@ -118,7 +69,8 @@
   <div data-panel="direcciones" hidden>
     <div class="toolbar">
       <div class="filter-box">⌕ <input data-table-filter="#direcciones-table"
-          placeholder="Filtrar por cliente, dirección, localidad o código postal..."></div><button class="btn btn-primary" data-toast="Formulario de dirección listo para conectar">＋ Añadir
+          placeholder="Filtrar por cliente, dirección, localidad o código postal..."></div><button
+        class="btn btn-primary" data-toast="Formulario de dirección listo para conectar">＋ Añadir
         dirección</button>
     </div>
     <article class="card table-card">
@@ -135,25 +87,8 @@
               <th>Referencia</th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <td>1</td>
-              <td>Juan Pérez</td>
-              <td>DOMICILIO</td>
-              <td>Av. Corrientes 2500 · 4 B</td>
-              <td>Buenos Aires</td>
-              <td>C1046</td>
-              <td>Entre Paso y Larrea</td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td>María López</td>
-              <td>DOMICILIO</td>
-              <td>Juramento 1820</td>
-              <td>Buenos Aires</td>
-              <td>C1428</td>
-              <td>Frente a la plaza</td>
-            </tr>
+          <tbody id="tablaDirecciones">
+
           </tbody>
         </table>
       </div>
