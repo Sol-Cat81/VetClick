@@ -1,30 +1,38 @@
 // Express crea el servidor HTTP y permite definir endpoints.
-const express = require("express");
+const express = require('express');
 // CORS permite que el frontend local consulte la API desde otro origen.
-const cors = require("cors");
+const cors = require('cors');
 // Carga variables como PORT y las credenciales de la base desde .env.
 const cookieParser = require('cookie-parser');
-require("dotenv").config();
+const cloudinary = require('cloudinary').v2;
+require('dotenv').config();
 
 // Importamos el pool para iniciar la conexión y comprobar su disponibilidad.
-const conexion = require("./config/database");
+const conexion = require('./config/database');
 
 // Creamos la aplicación Express.
 const app = express();
 
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
 // Permitimos solicitudes del frontend y cuerpos JSON en POST.
 app.use(cors({
-  origin: 'http://127.0.0.1:5500', // El origen exacto de tu frontend
-  credentials: true                // Permite el intercambio de cookies/sesiones
+  origin: ['http://127.0.0.1:5500', 'http://localhost:5500'],
+  credentials: true
 }));
-app.use(express.json());
+app.use(express.json({ limit: '5mb' }));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // Endpoint de comprobación: sirve para saber si la API está encendida.
-app.get("/", (req, res) => {
-    res.json({
-        mensaje: "API de Veterinaria funcionando"
-    });
+app.get('/', (req, res) => {
+  res.json({
+    mensaje: 'API de Veterinaria funcionando'
+  });
 });
 
 // Cada router agrupa las operaciones de una tabla o módulo.
@@ -51,5 +59,5 @@ const puerto = process.env.PORT || 3000;
 
 // Iniciamos el servidor y mostramos la URL para probarlo.
 app.listen(puerto, () => {
-    console.log(`Servidor funcionando en puerto http://localhost:${puerto}`);
+  console.log(`Servidor funcionando en puerto http://localhost:${puerto}`);
 });

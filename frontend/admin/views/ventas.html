@@ -77,4 +77,72 @@
       </div>
     </article>
   </div>
+
+  <div class="modal-backdrop" data-admin-modal="pedido">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="pedido-modal-title">
+      <div class="modal-head">
+        <div><span class="modal-kicker">Ventas</span>
+          <h2 id="pedido-modal-title" data-modal-title>Agregar pedido</h2>
+        </div><button class="modal-close" type="button" data-modal-close aria-label="Cerrar">×</button>
+      </div>
+      <form data-admin-modal-form>
+        <div class="modal-fields"><label>Pedido<input data-modal-field name="pedido"
+              required></label><label>Cliente<input data-modal-field name="cliente"></label><label>Fecha<input
+              data-modal-field name="fecha" type="date"></label><label>Estado<select data-modal-field name="estado">
+              <option>Pendiente</option>
+              <option>Preparando</option>
+              <option>Enviado</option>
+              <option>Entregado</option>
+            </select></label><label>Subtotal<input data-modal-field name="subtotal" type="number"
+              step="0.01"></label><label>Envío<input data-modal-field name="envio" type="number"
+              step="0.01"></label><label>Total<input data-modal-field name="total" type="number" step="0.01"></label>
+        </div>
+        <div class="modal-actions"><button class="btn btn-secondary" type="button"
+            data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar pedido</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="modal-backdrop" data-admin-modal="pago">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="pago-modal-title">
+      <div class="modal-head">
+        <div><span class="modal-kicker">Ventas</span>
+          <h2 id="pago-modal-title" data-modal-title>Agregar pago</h2>
+        </div><button class="modal-close" type="button" data-modal-close aria-label="Cerrar">×</button>
+      </div>
+      <form data-admin-modal-form>
+        <div class="modal-fields"><label>Pago<input data-modal-field name="pago" required></label><label>Pedido<input
+              data-modal-field name="pedido"></label><label>Método<input data-modal-field
+              name="metodo"></label><label>Estado<select data-modal-field name="estado">
+              <option>Pendiente</option>
+              <option>Aprobado</option>
+              <option>Rechazado</option>
+            </select></label></div>
+        <div class="modal-actions"><button class="btn btn-secondary" type="button"
+            data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar pago</button></div>
+      </form>
+    </div>
+  </div>
+  <div class="modal-backdrop" data-admin-modal="envío">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="envio-modal-title">
+      <div class="modal-head">
+        <div><span class="modal-kicker">Ventas</span>
+          <h2 id="envio-modal-title" data-modal-title>Agregar envío</h2>
+        </div><button class="modal-close" type="button" data-modal-close aria-label="Cerrar">×</button>
+      </div>
+      <form data-admin-modal-form>
+        <div class="modal-fields"><label>Envío<input data-modal-field name="envio" required></label><label>Pedido<input
+              data-modal-field name="pedido"></label><label>Tipo<input data-modal-field
+              name="tipo"></label><label>C.P.<input data-modal-field name="codigoPostal"></label><label>Fecha
+            estimada<input data-modal-field name="fechaEstimada" type="date"></label><label>Estado<select
+              data-modal-field name="estado">
+              <option>Pendiente</option>
+              <option>En camino</option>
+              <option>Entregado</option>
+            </select></label></div>
+        <div class="modal-actions"><button class="btn btn-secondary" type="button"
+            data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar envío</button></div>
+      </form>
+    </div>
+  </div>
 </section>

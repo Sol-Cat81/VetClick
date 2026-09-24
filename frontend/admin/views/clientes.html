@@ -31,7 +31,7 @@
             </tr>
           </thead>
           <tbody id="tablaClientes">
-           
+
           </tbody>
         </table>
       </div>
@@ -93,5 +93,72 @@
         </table>
       </div>
     </article>
+  </div>
+
+  <div class="modal-backdrop" data-admin-modal="cliente">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="cliente-modal-title">
+      <div class="modal-head">
+        <div><span class="modal-kicker">Gestión de clientes</span>
+          <h2 id="cliente-modal-title" data-modal-title>Agregar cliente</h2>
+        </div>
+        <button class="modal-close" type="button" data-modal-close aria-label="Cerrar">×</button>
+      </div>
+      <form data-admin-modal-form>
+        <div class="modal-fields">
+          <label>Nombre<input data-modal-field name="nombre" required></label><label>Apellido<input data-modal-field
+              name="apellido" required></label>
+          <label>Teléfono<input data-modal-field name="telefono"></label><label>Estado<select data-modal-field
+              name="estado">
+              <option value="1">Activo</option>
+              <option value="0">Inactivo</option>
+            </select></label>
+        </div>
+        <div class="modal-actions"><button class="btn btn-secondary" type="button"
+            data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar cliente</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="modal-backdrop" data-admin-modal="mascota">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="mascota-modal-title">
+      <div class="modal-head">
+        <div><span class="modal-kicker">Gestión de mascotas</span>
+          <h2 id="mascota-modal-title" data-modal-title>Agregar mascota</h2>
+        </div><button class="modal-close" type="button" data-modal-close aria-label="Cerrar">×</button>
+      </div>
+      <form data-admin-modal-form>
+        <div class="modal-fields">
+          <label>Paciente<input data-modal-field name="paciente" required></label><label>Propietario<input
+              data-modal-field name="propietario"></label>
+          <label>Especie<input data-modal-field name="especie"></label><label>Raza<input data-modal-field
+              name="raza"></label><label>Sexo<input data-modal-field name="sexo"></label><label>Peso<input
+              data-modal-field name="peso" type="number" step="0.01"></label>
+        </div>
+        <div class="modal-actions"><button class="btn btn-secondary" type="button"
+            data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar mascota</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="modal-backdrop" data-admin-modal="dirección">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="direccion-modal-title">
+      <div class="modal-head">
+        <div><span class="modal-kicker">Gestión de direcciones</span>
+          <h2 id="direccion-modal-title" data-modal-title>Agregar dirección</h2>
+        </div><button class="modal-close" type="button" data-modal-close aria-label="Cerrar">×</button>
+      </div>
+      <form data-admin-modal-form>
+        <div class="modal-fields">
+          <label>Cliente<input data-modal-field name="cliente" required></label><label>Tipo<input data-modal-field
+              name="tipo"></label><label>Dirección<input data-modal-field name="direccion" required></label>
+          <label>Localidad<input data-modal-field name="localidad"></label><label>C.P.<input data-modal-field
+              name="codigoPostal"></label><label>Referencia<textarea data-modal-field name="referencia"
+              rows="2"></textarea></label>
+        </div>
+        <div class="modal-actions"><button class="btn btn-secondary" type="button"
+            data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar dirección</button>
+        </div>
+      </form>
+    </div>
   </div>
 </section>

@@ -103,4 +103,86 @@
       </div>
     </article>
   </div>
+
+  <div class="modal-backdrop" data-admin-modal="turno">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="turno-modal-title">
+      <div class="modal-head">
+        <div><span class="modal-kicker">Gestión de turnos</span>
+          <h2 id="turno-modal-title" data-modal-title>Agregar turno</h2>
+        </div><button class="modal-close" type="button" data-modal-close aria-label="Cerrar">×</button>
+      </div>
+      <form data-admin-modal-form>
+        <div class="modal-fields"><label>Fecha<input data-modal-field name="fecha" type="date"
+              required></label><label>Hora<input data-modal-field name="hora" type="time"
+              required></label><label>Paciente<input data-modal-field name="paciente"
+              required></label><label>Servicio<input data-modal-field name="servicio"></label><label>Sucursal<input
+              data-modal-field name="sucursal"></label><label>Estado<select data-modal-field name="estado">
+              <option>Pendiente</option>
+              <option>Confirmado</option>
+              <option>Cancelado</option>
+            </select></label></div>
+        <div class="modal-actions"><button class="btn btn-secondary" type="button"
+            data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar turno</button></div>
+      </form>
+    </div>
+  </div>
+  <div class="modal-backdrop" data-admin-modal="historial médico">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="historial-modal-title">
+      <div class="modal-head">
+        <div><span class="modal-kicker">Historia clínica</span>
+          <h2 id="historial-modal-title" data-modal-title>Agregar historial médico</h2>
+        </div><button class="modal-close" type="button" data-modal-close aria-label="Cerrar">×</button>
+      </div>
+      <form data-admin-modal-form>
+        <div class="modal-fields"><label>Fecha<input data-modal-field name="fecha"
+              type="date"></label><label>Paciente<input data-modal-field name="paciente"
+              required></label><label>Veterinario<input data-modal-field
+              name="veterinario"></label><label>Motivo<textarea data-modal-field name="motivo"
+              rows="2"></textarea></label><label>Diagnóstico<textarea data-modal-field name="diagnostico"
+              rows="2"></textarea></label><label>Observación<textarea data-modal-field name="observacion"
+              rows="2"></textarea></label></div>
+        <div class="modal-actions"><button class="btn btn-secondary" type="button"
+            data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar historial</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="modal-backdrop" data-admin-modal="tratamiento">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="tratamiento-modal-title">
+      <div class="modal-head">
+        <div><span class="modal-kicker">Tratamientos</span>
+          <h2 id="tratamiento-modal-title" data-modal-title>Agregar tratamiento</h2>
+        </div><button class="modal-close" type="button" data-modal-close aria-label="Cerrar">×</button>
+      </div>
+      <form data-admin-modal-form>
+        <div class="modal-fields"><label>Historial<input data-modal-field
+              name="historial"></label><label>Medicamento<input data-modal-field name="medicamento"
+              required></label><label>Dosis<input data-modal-field name="dosis"></label><label>Frecuencia<input
+              data-modal-field name="frecuencia"></label><label>Duración<input data-modal-field name="duracion"></label>
+        </div>
+        <div class="modal-actions"><button class="btn btn-secondary" type="button"
+            data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar tratamiento</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="modal-backdrop" data-admin-modal="vacuna">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="vacuna-modal-title">
+      <div class="modal-head">
+        <div><span class="modal-kicker">Vacunación</span>
+          <h2 id="vacuna-modal-title" data-modal-title>Agregar vacuna</h2>
+        </div><button class="modal-close" type="button" data-modal-close aria-label="Cerrar">×</button>
+      </div>
+      <form data-admin-modal-form>
+        <div class="modal-fields"><label>Paciente<input data-modal-field name="paciente"
+              required></label><label>Vacuna<input data-modal-field name="vacuna"
+              required></label><label>Aplicación<input data-modal-field name="aplicacion"
+              type="date"></label><label>Próxima<input data-modal-field name="proxima"
+              type="date"></label><label>Veterinario<input data-modal-field name="veterinario"></label></div>
+        <div class="modal-actions"><button class="btn btn-secondary" type="button"
+            data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar vacuna</button>
+        </div>
+      </form>
+    </div>
+  </div>
 </section>
