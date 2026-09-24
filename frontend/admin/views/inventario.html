@@ -37,8 +37,50 @@
   <div data-panel="sucursales" hidden>
     <div class="detail-grid" id="sucursales-list">
       <article class="card info-card">
-        
+
       </article>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" data-admin-modal="registro de stock">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="stock-modal-title">
+      <div class="modal-head">
+        <div><span class="modal-kicker">Inventario</span>
+          <h2 id="stock-modal-title" data-modal-title>Ajustar registro de stock</h2>
+        </div><button class="modal-close" type="button" data-modal-close aria-label="Cerrar">×</button>
+      </div>
+      <form data-admin-modal-form>
+        <div class="modal-fields"><label>Producto / variante<input data-modal-field name="producto"
+              required></label><label>Sucursal<input data-modal-field name="sucursal"></label><label>Stock actual<input
+              data-modal-field name="stockActual" type="number"></label><label>Stock mínimo<input data-modal-field
+              name="stockMinimo" type="number"></label><label>Estado<select data-modal-field name="estado">
+              <option>Correcto</option>
+              <option>Bajo</option>
+            </select></label></div>
+        <div class="modal-actions"><button class="btn btn-secondary" type="button"
+            data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar stock</button></div>
+      </form>
+    </div>
+  </div>
+  <div class="modal-backdrop" data-admin-modal="sucursal">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="sucursal-modal-title">
+      <div class="modal-head">
+        <div><span class="modal-kicker">Inventario</span>
+          <h2 id="sucursal-modal-title" data-modal-title>Agregar sucursal</h2>
+        </div><button class="modal-close" type="button" data-modal-close aria-label="Cerrar">×</button>
+      </div>
+      <form data-admin-modal-form>
+        <div class="modal-fields"><label>Nombre<input data-modal-field name="nombre"
+              required></label><label>Dirección<input data-modal-field name="direccion"></label><label>Localidad<input
+              data-modal-field name="localidad"></label><label>Horario<input data-modal-field
+              name="horario"></label><label>Estado<select data-modal-field name="estado">
+              <option>Activa</option>
+              <option>Inactiva</option>
+            </select></label></div>
+        <div class="modal-actions"><button class="btn btn-secondary" type="button"
+            data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar sucursal</button>
+        </div>
+      </form>
     </div>
   </div>
 </section>

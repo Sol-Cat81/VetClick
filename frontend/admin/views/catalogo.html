@@ -28,6 +28,7 @@
               <th>Descripción</th>
               <th>Descuento</th>
               <th>Estado</th>
+              <th>Imagen URL</th>
             </tr>
           </thead>
           <tbody>
@@ -89,10 +90,80 @@
             </tr>
           </thead>
           <tbody>
-            
+
           </tbody>
         </table>
       </div>
     </article>
+  </div>
+
+  <div class="modal-backdrop" data-admin-modal="producto">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="producto-modal-title">
+      <div class="modal-head">
+        <div><span class="modal-kicker">Catálogo</span>
+          <h2 id="producto-modal-title" data-modal-title>Agregar producto</h2>
+        </div><button class="modal-close" type="button" data-modal-close aria-label="Cerrar">×</button>
+      </div>
+      <form data-admin-modal-form>
+        <div class="modal-fields"><label>Producto<input data-modal-field name="producto"
+              required></label><label>Marca<input data-modal-field name="marca"></label><label>Imagen<input type="file" data-modal-field name="Imagen"></label><label>Descripción<textarea
+              data-modal-field name="descripcion" rows="2"></textarea></label><label>Descuento<input data-modal-field
+              name="descuento" type="number" step="0.01"></label><label>Estado<select data-modal-field name="estado">
+              <option>Activo</option>
+              <option>Inactivo</option>
+            </select></label></div>
+        <div class="modal-actions"><button class="btn btn-secondary" type="button"
+            data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar producto</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="modal-backdrop" data-admin-modal="categoría">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="categoria-modal-title">
+      <div class="modal-head">
+        <div><span class="modal-kicker">Catálogo</span>
+          <h2 id="categoria-modal-title" data-modal-title>Agregar categoría</h2>
+        </div><button class="modal-close" type="button" data-modal-close aria-label="Cerrar">×</button>
+      </div>
+      <form data-admin-modal-form>
+        <div class="modal-fields"><label>Categoría<input data-modal-field name="categoria"
+              required></label><label>Categoría padre<input data-modal-field name="categoriaPadre"></label></div>
+        <div class="modal-actions"><button class="btn btn-secondary" type="button"
+            data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar categoría</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="modal-backdrop" data-admin-modal="marca">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="marca-modal-title">
+      <div class="modal-head">
+        <div><span class="modal-kicker">Catálogo</span>
+          <h2 id="marca-modal-title" data-modal-title>Agregar marca</h2>
+        </div><button class="modal-close" type="button" data-modal-close aria-label="Cerrar">×</button>
+      </div>
+      <form data-admin-modal-form>
+        <div class="modal-fields"><label>Marca<input data-modal-field name="marca" required></label></div>
+        <div class="modal-actions"><button class="btn btn-secondary" type="button"
+            data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar marca</button></div>
+      </form>
+    </div>
+  </div>
+  <div class="modal-backdrop" data-admin-modal="variante">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="variante-modal-title">
+      <div class="modal-head">
+        <div><span class="modal-kicker">Catálogo</span>
+          <h2 id="variante-modal-title" data-modal-title>Agregar variante</h2>
+        </div><button class="modal-close" type="button" data-modal-close aria-label="Cerrar">×</button>
+      </div>
+      <form data-admin-modal-form>
+        <div class="modal-fields"><label>Producto<input data-modal-field name="producto"
+              required></label><label>Precio<input data-modal-field name="precio" type="number"
+              step="0.01"></label><label>Stock base<input data-modal-field name="stockBase"
+              type="number"></label><label>Atributo<input data-modal-field name="atributo"></label></div>
+        <div class="modal-actions"><button class="btn btn-secondary" type="button"
+            data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar variante</button>
+        </div>
+      </form>
+    </div>
   </div>
 </section>

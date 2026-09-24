@@ -28,6 +28,38 @@ const ClientesModel = {
       ORDER BY d.id_direccion
     `);
     return rows;
+  },
+  crearCliente: async (cliente) => {
+    const [resultado] = await conexion.query(`
+    INSERT INTO clientes(nombre, apellido , telefono , estado) VALUES (?,?,?,?)
+    `,
+      [
+        cliente.nombre,
+        cliente.apellido,
+        cliente.telefono,
+        cliente.estado
+      ]
+    );
+
+    return resultado;
+  },
+  crearMascotas: async (mascota) => {
+    const [resultado] = await conexion.query(`
+      INSERT INTO mascota (id_cliente, nombre, id_especie, id_raza, sexo, fecha_nacimiento, peso, observaciones)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `,
+      [
+        mascota.id_cliente ?? 1,
+        mascota.nombre,
+        mascota.id_especie ?? 1,
+        mascota.id_raza ?? 1,
+        mascota.sexo ?? 'MACHO',
+        mascota.fecha_nacimiento ?? new Date().toISOString().slice(0, 10),
+        Number(mascota.peso ?? 0),
+        mascota.observaciones ?? ''
+      ]
+    );
+    return resultado;
   }
 };
 
