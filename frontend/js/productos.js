@@ -34,7 +34,7 @@ const swiperBeneficios = new Swiper(".swiper-cards-beneficios", {
 
 const swiperProductos = new Swiper(".swiper-productos", {
   slidesPerView: "auto",
-  loop: "false",
+  loop: false,
   spaceBetween: 20,
   centerInsufficientSlides: true,
   watchOverflow: true,
@@ -128,13 +128,19 @@ window.addEventListener("load", async () => {
       "http://localhost:3000/api/productos/destacados",
     );
 
+    if (!solicitarDestacados.ok) {
+      throw new Error(
+        `Error al obtener productos destacados (${solicitarDestacados.status})`,
+      );
+    }
+
     const destacados = await solicitarDestacados.json();
 
-    if (solicitarDestacados.ok) {
-      contenedorProdDestacados.innerHTML = "";
+    contenedorProdDestacados.innerHTML = "";
 
-      destacados.filter((prod) => prod.imagen && prod.variantes.length > 0)
-        .forEach((prod) => {
+    destacados
+      .filter((prod) => prod.variantes.length > 0)
+      .forEach((prod) => {
         const primeraVariante = prod.variantes[0];
         const descuento = Number(prod.descuento) || 0;
         const variantes = prod.variantes
@@ -142,7 +148,7 @@ window.addEventListener("load", async () => {
             (variante, indice) =>
               `<button type="button" class="opcion${
                 indice === 0 ? " elegido" : ""
-              }" data-id="${variante.id}" data-atributo="${variante.id_atributo}" data-precio="${variante.precio}" data-stock="${variante.stock}">${variante.atributo}</button>`,
+              }" data-id="${variante.id}" data-atributo="${variante.id_atributo ?? ""}" data-precio="${variante.precio}" data-stock="${variante.stock}" data-imagen="${variante.imagen || ""}">${variante.atributo || "Disponible"}</button>`,
           )
           .join("");
 
@@ -150,7 +156,7 @@ window.addEventListener("load", async () => {
           <div class="swiper-slide">
                 <div class="card-productos mx-auto" data-producto-id="${prod.id}" data-descuento="${descuento}">
                   <img
-                    src="${prod.imagen || imagen404}"
+                    src="${prod.imagen || primeraVariante.imagen || imagen404}"
                     class="card-img-top"
                     onerror="this.onerror=null; this.src='${imagen404}';" 
                     alt="${prod.nombre}"
@@ -172,9 +178,9 @@ window.addEventListener("load", async () => {
                 </div>
               </div>
           `;
-        });
+      });
 
-      contenedorProdDestacados.querySelectorAll(".card-productos").forEach((tarjeta) => {
+    contenedorProdDestacados.querySelectorAll(".card-productos").forEach((tarjeta) => {
         tarjeta.addEventListener("click", (evento) => {
           const opcion = evento.target.closest(".opcion");
 
@@ -189,11 +195,17 @@ window.addEventListener("load", async () => {
             Number(opcion.dataset.precio),
             Number(tarjeta.dataset.descuento) || 0,
           );
-        });
-      });
 
-      swiperProductos.update();
-    }
+          const imagen = tarjeta.querySelector(".card-img-top");
+          imagen.onerror = () => {
+            imagen.onerror = null;
+            imagen.src = imagen404;
+          };
+          imagen.src = opcion.dataset.imagen || prod.imagen || imagen404;
+        });
+    });
+
+    swiperProductos.update();
   } catch (error) {
     console.error("Error de conexión:", error);
     mostrarToast('No se pudo conectar con el sevidor.', 'error');

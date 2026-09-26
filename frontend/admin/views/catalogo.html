@@ -106,9 +106,17 @@
       </div>
       <form data-admin-modal-form>
         <div class="modal-fields"><label>Producto<input data-modal-field name="producto"
-              required></label><label>Marca<input data-modal-field name="marca"></label><label>Imagen<input type="file" data-modal-field name="Imagen"></label><label>Descripción<textarea
+              required></label><label>Marca<input data-modal-field name="marca_busqueda" list="producto-marcas"
+              data-relation="marcas" data-relation-field="id_marca" autocomplete="off" required>
+            <datalist id="producto-marcas"></datalist></label>
+          <input type="hidden" name="id_marca" data-relation-value="id_marca">
+          <label>Categoría<input data-modal-field name="categoria_busqueda" list="producto-categorias"
+              data-relation="categorias" data-relation-field="id_categoria" autocomplete="off" required>
+            <datalist id="producto-categorias"></datalist></label>
+          <input type="hidden" name="id_categoria" data-relation-value="id_categoria">
+          <label>Imagen<input type="file" data-modal-field name="imagen"></label><label>Descripción<textarea
               data-modal-field name="descripcion" rows="2"></textarea></label><label>Descuento<input data-modal-field
-              name="descuento" type="number" step="0.01"></label><label>Estado<select data-modal-field name="estado">
+              name="descuento" type="number" step="1" min="0" max="100"></label><label>Estado<select data-modal-field name="estado">
               <option>Activo</option>
               <option>Inactivo</option>
             </select></label></div>
@@ -126,8 +134,11 @@
         </div><button class="modal-close" type="button" data-modal-close aria-label="Cerrar">×</button>
       </div>
       <form data-admin-modal-form>
-        <div class="modal-fields"><label>Categoría<input data-modal-field name="categoria"
-              required></label><label>Categoría padre<input data-modal-field name="categoriaPadre"></label></div>
+        <div class="modal-fields"><label>Categoría<input data-modal-field name="nombre"
+              required></label><label>Categoría padre<input data-modal-field name="categoria_padre_busqueda"
+              list="categoria-padres" data-relation="categorias" data-relation-field="categoria_padre"
+              autocomplete="off"><datalist id="categoria-padres"></datalist></label>
+          <input type="hidden" name="categoria_padre" data-relation-value="categoria_padre"></div>
         <div class="modal-actions"><button class="btn btn-secondary" type="button"
             data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar categoría</button>
         </div>
@@ -142,7 +153,7 @@
         </div><button class="modal-close" type="button" data-modal-close aria-label="Cerrar">×</button>
       </div>
       <form data-admin-modal-form>
-        <div class="modal-fields"><label>Marca<input data-modal-field name="marca" required></label></div>
+        <div class="modal-fields"><label>Marca<input data-modal-field name="nombre" required></label></div>
         <div class="modal-actions"><button class="btn btn-secondary" type="button"
             data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar marca</button></div>
       </form>
@@ -156,10 +167,16 @@
         </div><button class="modal-close" type="button" data-modal-close aria-label="Cerrar">×</button>
       </div>
       <form data-admin-modal-form>
-        <div class="modal-fields"><label>Producto<input data-modal-field name="producto"
-              required></label><label>Precio<input data-modal-field name="precio" type="number"
-              step="0.01"></label><label>Stock base<input data-modal-field name="stockBase"
-              type="number"></label><label>Atributo<input data-modal-field name="atributo"></label></div>
+        <div class="modal-fields"><label>Producto<input data-modal-field name="producto_busqueda"
+              list="variante-productos" data-relation="productos" data-relation-field="id_producto"
+              autocomplete="off" required><datalist id="variante-productos"></datalist></label>
+          <input type="hidden" name="id_producto" data-relation-value="id_producto">
+          <label>Precio<input data-modal-field name="precio" type="number" step="0.01" required></label>
+          <label>Stock base<input data-modal-field name="stock" type="number"></label>
+          <label>Atributo<input data-modal-field name="atributo_busqueda" list="variante-atributos"
+              data-relation="valoresAtributo" data-relation-field="id_valor_atributo" autocomplete="off">
+            <datalist id="variante-atributos"></datalist></label>
+          <input type="hidden" name="id_valor_atributo" data-relation-value="id_valor_atributo"></div>
         <div class="modal-actions"><button class="btn btn-secondary" type="button"
             data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar variante</button>
         </div>

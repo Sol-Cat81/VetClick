@@ -39,6 +39,9 @@ app.get('/', (req, res) => {
 const clientesRoutes = require('./routes/clientes.routes');
 app.use('/api/clientes', clientesRoutes);
 
+const adminRoutes = require('./routes/admin.routes');
+app.use('/api/admin', adminRoutes);
+
 const clinicaRoutes = require('./routes/clinica.routes');
 app.use('/api/clinica', clinicaRoutes);
 
@@ -53,6 +56,12 @@ app.use('/api/ventas', ventasRoutes);
 
 const personalRoutes = require('./routes/personal.routes');
 app.use('/api/personal', personalRoutes);
+
+const productosRoutes = require('./routes/productos.routes');
+app.use('/api/productos', productosRoutes);
+
+const usuariosRoutes = require('./routes/usuarios.routes');
+app.use('/api/usuarios', usuariosRoutes);
 
 // Usamos el puerto configurado o 3000 durante el desarrollo.
 const puerto = process.env.PORT || 3000;

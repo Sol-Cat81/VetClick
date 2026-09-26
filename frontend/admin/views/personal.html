@@ -93,9 +93,22 @@
         </div><button class="modal-close" type="button" data-modal-close aria-label="Cerrar">×</button>
       </div>
       <form data-admin-modal-form>
-        <div class="modal-fields"><label>Empleado<input data-modal-field name="empleado"
-              required></label><label>Rol<input data-modal-field name="rol"></label><label>Teléfono<input
-              data-modal-field name="telefono"></label><label>Sucursal<input data-modal-field name="sucursal"></label>
+        <div class="modal-fields"><label>Nombre<input data-modal-field name="nombre" required></label>
+          <label>Apellido<input data-modal-field name="apellido" required></label>
+          <label>Rol<input data-modal-field name="rol_busqueda" list="empleado-roles"
+              data-relation="rolesEmpleados" data-relation-field="id_rol_empleado" autocomplete="off" required>
+            <datalist id="empleado-roles"></datalist></label>
+          <input type="hidden" name="id_rol_empleado" data-relation-value="id_rol_empleado">
+          <label>Teléfono<input data-modal-field name="telefono"></label>
+          <label>Dirección<input data-modal-field name="direccion"></label>
+          <label>Sucursal<input data-modal-field name="sucursal_busqueda" list="empleado-sucursales"
+              data-relation="sucursales" data-relation-field="id_sucursal" autocomplete="off">
+            <datalist id="empleado-sucursales"></datalist></label>
+          <input type="hidden" name="id_sucursal" data-relation-value="id_sucursal">
+          <label>Usuario asociado<input data-modal-field name="usuario_busqueda" list="empleado-usuarios"
+              data-relation="usuarios" data-relation-field="id_usuario" autocomplete="off">
+            <datalist id="empleado-usuarios"></datalist></label>
+          <input type="hidden" name="id_usuario" data-relation-value="id_usuario">
         </div>
         <div class="modal-actions"><button class="btn btn-secondary" type="button"
             data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar empleado</button>
@@ -111,9 +124,11 @@
         </div><button class="modal-close" type="button" data-modal-close aria-label="Cerrar">×</button>
       </div>
       <form data-admin-modal-form>
-        <div class="modal-fields"><label>Veterinario<input data-modal-field name="veterinario"
-              required></label><label>Especialidad<input data-modal-field
-              name="especialidad"></label><label>Empleado<input data-modal-field name="empleado"></label></div>
+        <div class="modal-fields"><label>Empleado<input data-modal-field name="empleado_busqueda"
+              list="veterinario-empleados" data-relation="empleados" data-relation-field="id_empleado"
+              autocomplete="off" required><datalist id="veterinario-empleados"></datalist></label>
+          <input type="hidden" name="id_empleado" data-relation-value="id_empleado">
+          <label>Especialidad<input data-modal-field name="especialidad"></label></div>
         <div class="modal-actions"><button class="btn btn-secondary" type="button"
             data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar veterinario</button>
         </div>
@@ -128,12 +143,15 @@
         </div><button class="modal-close" type="button" data-modal-close aria-label="Cerrar">×</button>
       </div>
       <form data-admin-modal-form>
-        <div class="modal-fields"><label>Usuario<input data-modal-field name="usuario"
-              required></label><label>Email<input data-modal-field name="email" type="email"></label><label>Rol<input
-              data-modal-field name="rol"></label><label>Estado<select data-modal-field name="estado">
-              <option>Activo</option>
-              <option>Inactivo</option>
-            </select></label></div>
+        <div class="modal-fields"><label>Usuario<input data-modal-field name="username" required></label>
+          <label>Email<input data-modal-field name="email" type="email" required></label>
+          <label>Contraseña<input data-modal-field name="password" type="password" minlength="8" required></label>
+          <label>Rol<input data-modal-field name="rol_busqueda" list="usuario-roles"
+              data-relation="rolesUsuario" data-relation-field="id_rol_usuario" autocomplete="off" required>
+            <datalist id="usuario-roles"></datalist></label>
+          <input type="hidden" name="id_rol_usuario" data-relation-value="id_rol_usuario">
+          <label>Estado<select data-modal-field name="activo"><option value="true">Activo</option>
+              <option value="false">Inactivo</option></select></label></div>
         <div class="modal-actions"><button class="btn btn-secondary" type="button"
             data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar usuario</button>
         </div>
@@ -148,7 +166,7 @@
         </div><button class="modal-close" type="button" data-modal-close aria-label="Cerrar">×</button>
       </div>
       <form data-admin-modal-form>
-        <div class="modal-fields"><label>Rol<input data-modal-field name="rol"
+        <div class="modal-fields"><label>Rol<input data-modal-field name="nombre"
               required></label><label>Descripción<textarea data-modal-field name="descripcion"
               rows="2"></textarea></label></div>
         <div class="modal-actions"><button class="btn btn-secondary" type="button"

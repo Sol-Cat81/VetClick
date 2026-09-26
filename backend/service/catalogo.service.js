@@ -14,9 +14,23 @@ module.exports = {
       throw error;
     }
 
-    const marca = Number(producto?.id_marca ?? 1);
-    if (!Number.isFinite(marca) || marca < 1) {
+    const marca = Number(producto?.id_marca);
+    if (!Number.isInteger(marca) || marca < 1) {
       const error = new Error('La marca del producto no es válida');
+      error.status = 400;
+      throw error;
+    }
+
+    const categoria = Number(producto?.id_categoria);
+    if (!Number.isInteger(categoria) || categoria < 1) {
+      const error = new Error('Debe seleccionar una categoría válida');
+      error.status = 400;
+      throw error;
+    }
+
+    const descuento = Number(producto?.descuento ?? 0);
+    if (!Number.isInteger(descuento) || descuento < 0 || descuento > 100) {
+      const error = new Error('El descuento debe ser un porcentaje entero entre 0 y 100');
       error.status = 400;
       throw error;
     }
@@ -25,8 +39,9 @@ module.exports = {
       ...producto,
       nombre,
       id_marca: marca,
+      id_categoria: categoria,
       activo: producto?.activo === undefined ? true : Boolean(producto.activo),
-      descuento: Number(producto?.descuento ?? 0),
+      descuento,
       imagen_url: producto?.imagen_url || null
     });
   }

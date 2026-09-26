@@ -19,35 +19,40 @@ const q = {
 };
 
 const CatalogoModel = {
-  async buscarMarcaPorNombre(nombre) {
-    const marcaNombre = String(nombre ?? '').trim();
-    if (!marcaNombre) return 1;
-
-    const [rows] = await conexion.query('SELECT id_marca FROM marcas WHERE nombre = ? LIMIT 1', [marcaNombre]);
-    return rows[0]?.id_marca ?? 1;
-  },
-
   async crearProducto(producto) {
     const nombre = String(producto.nombre ?? '').trim();
     const descripcion = producto.descripcion ? String(producto.descripcion).trim() : null;
     const activo = producto.activo === undefined ? true : Boolean(producto.activo);
     const descuento = Number(producto.descuento ?? 0);
-    const idMarca = Number(producto.id_marca ?? (await this.buscarMarcaPorNombre(producto.marca)) ?? 1);
+    const idMarca = Number(producto.id_marca);
 
-    const [resultado] = await conexion.query(
-      `INSERT INTO productos (id_marca, nombre, descripcion, activo, descuento, imagen_url)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [
-        idMarca,
-        nombre,
-        descripcion,
-        activo,
-        descuento,
-        producto.imagen_url || null
-      ]
-    );
-
-    return resultado;
+    const conexionTransaccion = await conexion.getConnection();
+    try {
+      await conexionTransaccion.beginTransaction();
+      const [resultado] = await conexionTransaccion.query(
+        `INSERT INTO productos (id_marca, nombre, descripcion, activo, descuento, imagen_url)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [
+          idMarca,
+          nombre,
+          descripcion,
+          activo,
+          descuento,
+          producto.imagen_url || null
+        ]
+      );
+      await conexionTransaccion.query(
+        'INSERT INTO productos_categorias (id_categoria, id_producto) VALUES (?, ?)',
+        [Number(producto.id_categoria), resultado.insertId]
+      );
+      await conexionTransaccion.commit();
+      return resultado;
+    } catch (error) {
+      await conexionTransaccion.rollback();
+      throw error;
+    } finally {
+      conexionTransaccion.release();
+    }
   }
 };
 
