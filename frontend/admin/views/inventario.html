@@ -50,13 +50,16 @@
         </div><button class="modal-close" type="button" data-modal-close aria-label="Cerrar">×</button>
       </div>
       <form data-admin-modal-form>
-        <div class="modal-fields"><label>Producto / variante<input data-modal-field name="producto"
-              required></label><label>Sucursal<input data-modal-field name="sucursal"></label><label>Stock actual<input
-              data-modal-field name="stockActual" type="number"></label><label>Stock mínimo<input data-modal-field
-              name="stockMinimo" type="number"></label><label>Estado<select data-modal-field name="estado">
-              <option>Correcto</option>
-              <option>Bajo</option>
-            </select></label></div>
+        <div class="modal-fields"><label>Producto / variante<input data-modal-field name="variante_busqueda"
+              list="stock-variantes" data-relation="variantes" data-relation-field="id_variante"
+              autocomplete="off" required><datalist id="stock-variantes"></datalist></label>
+          <input type="hidden" name="id_variante" data-relation-value="id_variante">
+          <label>Sucursal<input data-modal-field name="sucursal_busqueda" list="stock-sucursales"
+              data-relation="sucursales" data-relation-field="id_sucursal" autocomplete="off" required>
+            <datalist id="stock-sucursales"></datalist></label>
+          <input type="hidden" name="id_sucursal" data-relation-value="id_sucursal">
+          <label>Stock actual<input data-modal-field name="stock_actual" type="number" min="0" required></label>
+          <label>Stock mínimo<input data-modal-field name="stock_minimo" type="number" min="0"></label></div>
         <div class="modal-actions"><button class="btn btn-secondary" type="button"
             data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar stock</button></div>
       </form>
@@ -70,13 +73,13 @@
         </div><button class="modal-close" type="button" data-modal-close aria-label="Cerrar">×</button>
       </div>
       <form data-admin-modal-form>
-        <div class="modal-fields"><label>Nombre<input data-modal-field name="nombre"
-              required></label><label>Dirección<input data-modal-field name="direccion"></label><label>Localidad<input
-              data-modal-field name="localidad"></label><label>Horario<input data-modal-field
-              name="horario"></label><label>Estado<select data-modal-field name="estado">
-              <option>Activa</option>
-              <option>Inactiva</option>
-            </select></label></div>
+        <div class="modal-fields"><label>Nombre<input data-modal-field name="nombre" required></label>
+          <label>Dirección<input data-modal-field name="direccion"></label>
+          <label>Localidad<input data-modal-field name="localidad"></label>
+          <label>Teléfono<input data-modal-field name="telefono"></label>
+          <label>Horario<input data-modal-field name="horario"></label>
+          <label>Estado<select data-modal-field name="activo"><option value="true">Activa</option>
+              <option value="false">Inactiva</option></select></label></div>
         <div class="modal-actions"><button class="btn btn-secondary" type="button"
             data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar sucursal</button>
         </div>

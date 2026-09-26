@@ -37,6 +37,80 @@ const entityLabels = {
   roles: 'rol'
 };
 
+let opcionesRelaciones = null;
+let cargaOpcionesRelaciones = null;
+
+async function obtenerOpcionesRelaciones() {
+  if (opcionesRelaciones) return opcionesRelaciones;
+  if (!cargaOpcionesRelaciones) {
+    cargaOpcionesRelaciones = obtenerDatos('admin/opciones')
+      .then(opciones => {
+        opcionesRelaciones = opciones;
+        return opciones;
+      })
+      .catch(error => {
+        cargaOpcionesRelaciones = null;
+        throw error;
+      });
+  }
+  return cargaOpcionesRelaciones;
+}
+
+function invalidarOpcionesRelaciones() {
+  opcionesRelaciones = null;
+  cargaOpcionesRelaciones = null;
+}
+
+function relacionSeleccionada(input, opciones) {
+  const campoId = input.form.querySelector(`[data-relation-value="${input.dataset.relationField}"]`);
+  if (!campoId) return;
+  const registros = opciones[input.dataset.relation] || [];
+  const campoPadre = input.dataset.relationParent
+    ? input.form.querySelector(`[data-relation-value="${input.dataset.relationParent}"]`)
+    : null;
+  const registro = registros.find(opcion => opcion.etiqueta === input.value
+    && (!input.dataset.relationParent || String(opcion[input.dataset.relationParent]) === campoPadre?.value));
+  campoId.value = registro ? registro.id : '';
+  input.form.querySelectorAll(`[data-relation-parent="${input.dataset.relationField}"]`).forEach(dependiente => {
+    const opcionesDependiente = opciones[dependiente.dataset.relation] || [];
+    const lista = document.getElementById(dependiente.getAttribute('list'));
+    if (lista) {
+      lista.innerHTML = opcionesDependiente
+        .filter(opcion => !campoId.value || String(opcion[input.dataset.relationField]) === String(campoId.value))
+        .map(opcion => `<option value="${escaparHtml(opcion.etiqueta)}"></option>`)
+        .join('');
+    }
+    const idDependiente = input.form.querySelector(`[data-relation-value="${dependiente.dataset.relationField}"]`);
+    if (idDependiente && idDependiente.value
+      && !opcionesDependiente.some(opcion => String(opcion.id) === idDependiente.value
+        && String(opcion[input.dataset.relationField]) === String(campoId.value))) {
+      dependiente.value = '';
+      idDependiente.value = '';
+    }
+  });
+}
+
+async function prepararRelaciones(form) {
+  const campos = [...form.querySelectorAll('[data-relation]')];
+  if (!campos.length) return;
+  const opciones = await obtenerOpcionesRelaciones();
+  campos.forEach(input => {
+    const lista = document.getElementById(input.getAttribute('list'));
+    if (lista) {
+      let registros = opciones[input.dataset.relation] || [];
+      if (input.dataset.relationParent) {
+        const idPadre = form.querySelector(`[data-relation-value="${input.dataset.relationParent}"]`)?.value;
+        registros = registros.filter(registro => !idPadre
+          || String(registro[input.dataset.relationParent]) === String(idPadre));
+      }
+      lista.innerHTML = registros.map(opcion =>
+        `<option value="${escaparHtml(opcion.etiqueta)}"></option>`
+      ).join('');
+    }
+    relacionSeleccionada(input, opciones);
+  });
+}
+
 // Muestra un mensaje temporal en la parte inferior de la pantalla.
 function showToast(message) {
   // Cambiamos el texto del elemento visual.
@@ -221,6 +295,26 @@ function closeAdminModal() {
   document.querySelectorAll('[data-admin-modal].show').forEach(modal => modal.classList.remove('show'));
 }
 
+document.addEventListener('focusin', async event => {
+  const input = event.target.closest('[data-relation]');
+  if (!input) return;
+  try {
+    await prepararRelaciones(input.form);
+  } catch (error) {
+    informarErrorCarga('opciones de relaciones', error);
+  }
+});
+
+document.addEventListener('input', event => {
+  const input = event.target.closest('[data-relation]');
+  if (input && opcionesRelaciones) relacionSeleccionada(input, opcionesRelaciones);
+});
+
+document.addEventListener('change', event => {
+  const input = event.target.closest('[data-relation]');
+  if (input && opcionesRelaciones) relacionSeleccionada(input, opcionesRelaciones);
+});
+
 function cycleStatus(status) {
   const values = ['Activo', 'Pendiente', 'Inactivo'];
   const next = values[(values.indexOf(status.textContent.trim()) + 1) % values.length];
@@ -300,19 +394,73 @@ document.addEventListener('click', event => {
   if (event.target.closest('[data-modal-close]') || event.target.matches('[data-admin-modal]')) closeAdminModal();
 });
 
-document.addEventListener('submit', event => {
+document.addEventListener('submit', async event => {
   const form = event.target.closest('[data-admin-modal-form]');
   if (!form) return;
 
   const modal = form.closest('[data-admin-modal]');
 
-  if (modal?.dataset.entity === 'cliente' || modal?.dataset.entity === 'producto') return;
+  if (modal?.dataset.entity === 'cliente'
+    || modal?.dataset.entity === 'mascota') return;
 
   event.preventDefault();
 
   const entity = modal.dataset.entity;
-  closeAdminModal();
-  showToast(`${entity} guardado en modo demo; falta conectar la API`);
+  const entidades = {
+    'dirección': 'direccion',
+    'categoría': 'categoria',
+    'envío': 'envio',
+    'historial médico': 'historial',
+    'registro de stock': 'stock',
+    venta: 'pedido'
+  };
+  const nombreEntidad = entidades[entity] || entity;
+  try {
+    await prepararRelaciones(form);
+  } catch (error) {
+    informarErrorCarga('opciones de relaciones', error);
+    alert('No se pudieron cargar las opciones para relacionar los registros.');
+    return;
+  }
+  const relacionRequeridaSinSeleccion = [...form.querySelectorAll('[data-relation][required]')]
+    .find(input => !form.querySelector(`[data-relation-value="${input.dataset.relationField}"]`)?.value);
+  if (relacionRequeridaSinSeleccion) {
+    alert(`Selecciona ${relacionRequeridaSinSeleccion.closest('label')?.firstChild.textContent.trim() || 'una opción'} de la lista.`);
+    relacionRequeridaSinSeleccion.focus();
+    return;
+  }
+
+  const endpoint = nombreEntidad === 'producto'
+    ? 'catalogo/productos'
+    : `admin/${encodeURIComponent(nombreEntidad)}`;
+  const esProducto = nombreEntidad === 'producto';
+  const datos = esProducto ? new FormData(form) : Object.fromEntries(new FormData(form));
+
+  if (esProducto) {
+    datos.append('nombre', form.elements.namedItem('producto').value.trim());
+    datos.append('activo', form.elements.namedItem('estado').value === 'Activo' ? 'true' : 'false');
+    const archivo = form.querySelector('input[type="file"]')?.files?.[0];
+    if (archivo) datos.set('imagen', archivo);
+  }
+
+  fetch(`${API_BASE_URL}/${endpoint}`, {
+    method: 'POST',
+    ...(esProducto ? {} : { headers: { 'Content-Type': 'application/json' } }),
+    body: esProducto ? datos : JSON.stringify(datos)
+  })
+    .then(async respuesta => {
+      const resultado = await respuesta.json();
+      if (!respuesta.ok) throw new Error(resultado.mensaje || 'No se pudo guardar el registro');
+      form.reset();
+      invalidarOpcionesRelaciones();
+      closeAdminModal();
+      showToast(`${entity} guardado correctamente`);
+      cargarDatosDeVista();
+    })
+    .catch(error => {
+      console.error(`No se pudo guardar ${entity}:`, error);
+      alert(error.message || `No se pudo guardar ${entity}`);
+    });
 });
 
 // El cierre de sesión todavía es visual; aquí se conectará la autenticación real.

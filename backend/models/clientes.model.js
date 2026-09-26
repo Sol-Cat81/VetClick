@@ -31,10 +31,11 @@ const ClientesModel = {
   },
   crearCliente: async (cliente) => {
     const [resultado] = await conexion.query(`
-    INSERT INTO clientes(nombre, apellido , telefono , estado) VALUES (?,?,?,?)
+    INSERT INTO clientes(id_usuario, nombre, apellido, telefono, estado) VALUES (?,?,?,?,?)
     `,
       [
-        cliente.nombre,
+      cliente.id_usuario,
+      cliente.nombre,
         cliente.apellido,
         cliente.telefono,
         cliente.estado
@@ -44,15 +45,25 @@ const ClientesModel = {
     return resultado;
   },
   crearMascotas: async (mascota) => {
+    const [razas] = await conexion.query(
+      'SELECT id_especie FROM razas WHERE id_raza = ?',
+      [mascota.id_raza]
+    );
+    if (!razas.length || Number(razas[0].id_especie) !== Number(mascota.id_especie)) {
+      const error = new Error('La raza seleccionada no pertenece a la especie elegida');
+      error.status = 400;
+      throw error;
+    }
+
     const [resultado] = await conexion.query(`
       INSERT INTO mascota (id_cliente, nombre, id_especie, id_raza, sexo, fecha_nacimiento, peso, observaciones)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
       `,
       [
-        mascota.id_cliente ?? 1,
+        mascota.id_cliente,
         mascota.nombre,
-        mascota.id_especie ?? 1,
-        mascota.id_raza ?? 1,
+        mascota.id_especie,
+        mascota.id_raza,
         mascota.sexo ?? 'MACHO',
         mascota.fecha_nacimiento ?? new Date().toISOString().slice(0, 10),
         Number(mascota.peso ?? 0),

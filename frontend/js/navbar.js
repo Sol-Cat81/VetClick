@@ -370,7 +370,7 @@ window.addEventListener("load", async () => {
     const controlUsuario = document.getElementById("usarioSession");
     const offCanvas = document.querySelector(".navegacion");
 
-    const session = await confirmaSession.json();
+    const session = await leerRespuestaJson(confirmaSession);
 
     if (confirmaSession.ok) {
       console.log(session.usuario.usuario);
@@ -399,7 +399,7 @@ async function cerrarSession() {
     credentials: 'include'
   });
 
-  const cerrado = await cerrarSession.json();
+  const cerrado = await leerRespuestaJson(cerrarSession);
   if(cerrarSession.ok){
     mostrarToast(cerrado.mensaje || 'Session cerrada con exito.', 'exito');
   }else{
@@ -408,5 +408,17 @@ async function cerrarSession() {
   } catch (error) {
     console.error("Error de conexión:", error);
     mostrarToast('No se pudo conectar con el sevidor.', 'error');
+  }
+}
+
+async function leerRespuestaJson(respuesta) {
+  const contenido = await respuesta.text();
+
+  try {
+    return contenido ? JSON.parse(contenido) : {};
+  } catch {
+    throw new Error(
+      `El servidor devolvió una respuesta no válida (${respuesta.status})`,
+    );
   }
 }

@@ -190,7 +190,7 @@ formInicio.addEventListener("submit", async (evento) => {
       },
     );
 
-    const confirmBackend = await respuesta.json();
+    const confirmBackend = await leerRespuestaJson(respuesta);
 
     if (respuesta.ok) {
       mostrarToast(confirmBackend.mensaje || 'Inicio de session exitoso', 'exito');
@@ -257,7 +257,7 @@ formRegistro.addEventListener("submit", async (evento) => {
         },
       );
 
-      const confirmRegistro = await resgistrar.json();
+      const confirmRegistro = await leerRespuestaJson(resgistrar);
 
       if (resgistrar.ok) {
         mostrarToast(confirmRegistro.mensaje || 'Registro exitoso.', 'exito');
@@ -273,3 +273,15 @@ formRegistro.addEventListener("submit", async (evento) => {
     registroError.removeAttribute('hidden')
   }
 });
+
+async function leerRespuestaJson(respuesta) {
+  const contenido = await respuesta.text();
+
+  try {
+    return contenido ? JSON.parse(contenido) : {};
+  } catch {
+    throw new Error(
+      `El servidor devolvió una respuesta no válida (${respuesta.status})`,
+    );
+  }
+}

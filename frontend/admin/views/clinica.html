@@ -114,12 +114,27 @@
       <form data-admin-modal-form>
         <div class="modal-fields"><label>Fecha<input data-modal-field name="fecha" type="date"
               required></label><label>Hora<input data-modal-field name="hora" type="time"
-              required></label><label>Paciente<input data-modal-field name="paciente"
-              required></label><label>Servicio<input data-modal-field name="servicio"></label><label>Sucursal<input
-              data-modal-field name="sucursal"></label><label>Estado<select data-modal-field name="estado">
-              <option>Pendiente</option>
-              <option>Confirmado</option>
-              <option>Cancelado</option>
+              required></label>
+          <label>Mascota<input data-modal-field name="mascota_busqueda" list="turno-mascotas"
+              data-relation="mascotas" data-relation-field="id_mascota" autocomplete="off" required>
+            <datalist id="turno-mascotas"></datalist></label>
+          <input type="hidden" name="id_mascota" data-relation-value="id_mascota">
+          <label>Cliente<input data-modal-field name="cliente_busqueda" list="turno-clientes"
+              data-relation="clientes" data-relation-field="id_cliente" autocomplete="off">
+            <datalist id="turno-clientes"></datalist></label>
+          <input type="hidden" name="id_cliente" data-relation-value="id_cliente">
+          <label>Servicio<input data-modal-field name="servicio_busqueda" list="turno-servicios"
+              data-relation="servicios" data-relation-field="id_servicio" autocomplete="off" required>
+            <datalist id="turno-servicios"></datalist></label>
+          <input type="hidden" name="id_servicio" data-relation-value="id_servicio">
+          <label>Sucursal<input data-modal-field name="sucursal_busqueda" list="turno-sucursales"
+              data-relation="sucursales" data-relation-field="id_sucursal" autocomplete="off">
+            <datalist id="turno-sucursales"></datalist></label>
+          <input type="hidden" name="id_sucursal" data-relation-value="id_sucursal">
+          <label>Motivo<input data-modal-field name="motivo"></label><label>Estado<select data-modal-field name="estado">
+              <option value="PENDIENTE">Pendiente</option>
+              <option value="CONFIRMADO">Confirmado</option>
+              <option value="CANCELADO">Cancelado</option>
             </select></label></div>
         <div class="modal-actions"><button class="btn btn-secondary" type="button"
             data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar turno</button></div>
@@ -135,9 +150,15 @@
       </div>
       <form data-admin-modal-form>
         <div class="modal-fields"><label>Fecha<input data-modal-field name="fecha"
-              type="date"></label><label>Paciente<input data-modal-field name="paciente"
-              required></label><label>Veterinario<input data-modal-field
-              name="veterinario"></label><label>Motivo<textarea data-modal-field name="motivo"
+              type="date"></label><label>Paciente<input data-modal-field name="mascota_busqueda" list="historial-mascotas"
+              data-relation="mascotas" data-relation-field="id_mascota" autocomplete="off" required>
+            <datalist id="historial-mascotas"></datalist></label>
+          <input type="hidden" name="id_mascota" data-relation-value="id_mascota">
+          <label>Veterinario<input data-modal-field name="veterinario_busqueda" list="historial-veterinarios"
+              data-relation="veterinarios" data-relation-field="id_veterinario" autocomplete="off" required>
+            <datalist id="historial-veterinarios"></datalist></label>
+          <input type="hidden" name="id_veterinario" data-relation-value="id_veterinario">
+          <label>Motivo<textarea data-modal-field name="motivo"
               rows="2"></textarea></label><label>Diagnóstico<textarea data-modal-field name="diagnostico"
               rows="2"></textarea></label><label>Observación<textarea data-modal-field name="observacion"
               rows="2"></textarea></label></div>
@@ -155,8 +176,11 @@
         </div><button class="modal-close" type="button" data-modal-close aria-label="Cerrar">×</button>
       </div>
       <form data-admin-modal-form>
-        <div class="modal-fields"><label>Historial<input data-modal-field
-              name="historial"></label><label>Medicamento<input data-modal-field name="medicamento"
+        <div class="modal-fields"><label>Historial<input data-modal-field name="historial_busqueda"
+              list="tratamiento-historiales" data-relation="historiales" data-relation-field="id_historial"
+              autocomplete="off" required><datalist id="tratamiento-historiales"></datalist></label>
+          <input type="hidden" name="id_historial" data-relation-value="id_historial">
+          <label>Medicamento<input data-modal-field name="medicamento"
               required></label><label>Dosis<input data-modal-field name="dosis"></label><label>Frecuencia<input
               data-modal-field name="frecuencia"></label><label>Duración<input data-modal-field name="duracion"></label>
         </div>
@@ -174,11 +198,17 @@
         </div><button class="modal-close" type="button" data-modal-close aria-label="Cerrar">×</button>
       </div>
       <form data-admin-modal-form>
-        <div class="modal-fields"><label>Paciente<input data-modal-field name="paciente"
-              required></label><label>Vacuna<input data-modal-field name="vacuna"
+        <div class="modal-fields"><label>Paciente<input data-modal-field name="mascota_busqueda"
+              list="vacuna-mascotas" data-relation="mascotas" data-relation-field="id_mascota"
+              autocomplete="off" required><datalist id="vacuna-mascotas"></datalist></label>
+          <input type="hidden" name="id_mascota" data-relation-value="id_mascota">
+          <label>Vacuna<input data-modal-field name="nombre"
               required></label><label>Aplicación<input data-modal-field name="aplicacion"
-              type="date"></label><label>Próxima<input data-modal-field name="proxima"
-              type="date"></label><label>Veterinario<input data-modal-field name="veterinario"></label></div>
+              type="date"></label><label>Próxima<input data-modal-field name="fecha_proxima"
+              type="date"></label><label>Veterinario<input data-modal-field name="veterinario_busqueda"
+              list="vacuna-veterinarios" data-relation="veterinarios" data-relation-field="id_veterinario"
+              autocomplete="off"><datalist id="vacuna-veterinarios"></datalist></label>
+          <input type="hidden" name="id_veterinario" data-relation-value="id_veterinario"></div>
         <div class="modal-actions"><button class="btn btn-secondary" type="button"
             data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar vacuna</button>
         </div>
