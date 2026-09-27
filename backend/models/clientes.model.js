@@ -28,6 +28,49 @@ const ClientesModel = {
       ORDER BY d.id_direccion
     `);
     return rows;
+  },
+  crearCliente: async (cliente) => {
+    const [resultado] = await conexion.query(`
+    INSERT INTO clientes(id_usuario, nombre, apellido, telefono, estado) VALUES (?,?,?,?,?)
+    `,
+      [
+      cliente.id_usuario,
+      cliente.nombre,
+        cliente.apellido,
+        cliente.telefono,
+        cliente.estado
+      ]
+    );
+
+    return resultado;
+  },
+  crearMascotas: async (mascota) => {
+    const [razas] = await conexion.query(
+      'SELECT id_especie FROM razas WHERE id_raza = ?',
+      [mascota.id_raza]
+    );
+    if (!razas.length || Number(razas[0].id_especie) !== Number(mascota.id_especie)) {
+      const error = new Error('La raza seleccionada no pertenece a la especie elegida');
+      error.status = 400;
+      throw error;
+    }
+
+    const [resultado] = await conexion.query(`
+      INSERT INTO mascota (id_cliente, nombre, id_especie, id_raza, sexo, fecha_nacimiento, peso, observaciones)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `,
+      [
+        mascota.id_cliente,
+        mascota.nombre,
+        mascota.id_especie,
+        mascota.id_raza,
+        mascota.sexo ?? 'MACHO',
+        mascota.fecha_nacimiento ?? new Date().toISOString().slice(0, 10),
+        Number(mascota.peso ?? 0),
+        mascota.observaciones ?? ''
+      ]
+    );
+    return resultado;
   }
 };
 

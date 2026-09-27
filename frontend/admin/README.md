@@ -6,7 +6,7 @@ Primera etapa: diseño visual y navegación sin backend.
 - `index.html`: shell principal, sidebar, topbar y contenedor del contenido.
 - `views/`: vistas HTML de cada módulo.
 - `css/styles.css`: estilos globales.
-- `js/app.js`: navegación por hash, carga de vistas, subnavegación, filtros, acciones CRUD visuales y modales reutilizables.
+- `js/app.js`: navegación por hash, carga de vistas, subnavegación, filtros, acciones CRUD visuales y apertura/cierre de modales.
 
 ## Ejecutar
 Como las vistas se cargan con `fetch()`, abre el proyecto con un servidor local (por ejemplo VS Code + Live Server) y entra en `index.html`.
@@ -16,9 +16,10 @@ Las tablas muestran datos de demostración tomados del `bd.sql` proporcionado. N
 
 ## Acciones y modales
 Cada panel administrativo incorpora un botón para agregar registros y acciones de editar/eliminar. Los registros que muestran
-un estado también incluyen el botón para alternarlo. Los formularios se generan desde `js/app.js` leyendo los encabezados de
-la tabla activa, por lo que el modal de historial, mascotas, productos, pedidos, etc. muestra sus propios campos. Actualmente
-las acciones funcionan en modo demo y muestran confirmaciones, pero todavía deben persistirse mediante la API.
+un estado también incluyen el botón para alternarlo. Cada vista declara sus modales directamente en HTML mediante
+`data-admin-modal`, con sus etiquetas, campos y validaciones visibles en el archivo correspondiente. `js/app.js` solo localiza
+el modal, lo muestra, carga los valores de una fila al editar y procesa el evento de envío. Actualmente las acciones funcionan
+en modo demo y muestran confirmaciones, pero todavía deben persistirse mediante la API.
 
 ## Guía paso a paso para conectar una tabla con la API
 

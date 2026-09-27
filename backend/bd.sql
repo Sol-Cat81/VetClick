@@ -120,6 +120,7 @@ CREATE TABLE productos (
     descripcion TEXT,
     activo BOOLEAN DEFAULT TRUE,
     descuento INT DEFAULT 0,
+    imagen_url VARCHAR(255) DEFAULT NULL,
 
     FOREIGN KEY (id_marca)
         REFERENCES marcas(id_marca)

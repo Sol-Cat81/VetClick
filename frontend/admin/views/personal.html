@@ -75,12 +75,103 @@
       </div>
     </article>
     <p style="color:var(--muted);font-size:12px;margin:12px 0">Por seguridad, la interfaz no muestra
-      <code>password_hash</code>.</p>
+      <code>password_hash</code>.
+    </p>
   </div>
 
   <div data-panel="roles" hidden>
     <div class="detail-grid" id="roles-list">
-      
+
+    </div>
+  </div>
+
+  <div class="modal-backdrop" data-admin-modal="empleado">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="empleado-modal-title">
+      <div class="modal-head">
+        <div><span class="modal-kicker">Personal</span>
+          <h2 id="empleado-modal-title" data-modal-title>Agregar empleado</h2>
+        </div><button class="modal-close" type="button" data-modal-close aria-label="Cerrar">×</button>
+      </div>
+      <form data-admin-modal-form>
+        <div class="modal-fields"><label>Nombre<input data-modal-field name="nombre" required></label>
+          <label>Apellido<input data-modal-field name="apellido" required></label>
+          <label>Rol<input data-modal-field name="rol_busqueda" list="empleado-roles"
+              data-relation="rolesEmpleados" data-relation-field="id_rol_empleado" autocomplete="off" required>
+            <datalist id="empleado-roles"></datalist></label>
+          <input type="hidden" name="id_rol_empleado" data-relation-value="id_rol_empleado">
+          <label>Teléfono<input data-modal-field name="telefono"></label>
+          <label>Dirección<input data-modal-field name="direccion"></label>
+          <label>Sucursal<input data-modal-field name="sucursal_busqueda" list="empleado-sucursales"
+              data-relation="sucursales" data-relation-field="id_sucursal" autocomplete="off">
+            <datalist id="empleado-sucursales"></datalist></label>
+          <input type="hidden" name="id_sucursal" data-relation-value="id_sucursal">
+          <label>Usuario asociado<input data-modal-field name="usuario_busqueda" list="empleado-usuarios"
+              data-relation="usuarios" data-relation-field="id_usuario" autocomplete="off">
+            <datalist id="empleado-usuarios"></datalist></label>
+          <input type="hidden" name="id_usuario" data-relation-value="id_usuario">
+        </div>
+        <div class="modal-actions"><button class="btn btn-secondary" type="button"
+            data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar empleado</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="modal-backdrop" data-admin-modal="veterinario">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="veterinario-modal-title">
+      <div class="modal-head">
+        <div><span class="modal-kicker">Personal</span>
+          <h2 id="veterinario-modal-title" data-modal-title>Agregar veterinario</h2>
+        </div><button class="modal-close" type="button" data-modal-close aria-label="Cerrar">×</button>
+      </div>
+      <form data-admin-modal-form>
+        <div class="modal-fields"><label>Empleado<input data-modal-field name="empleado_busqueda"
+              list="veterinario-empleados" data-relation="empleados" data-relation-field="id_empleado"
+              autocomplete="off" required><datalist id="veterinario-empleados"></datalist></label>
+          <input type="hidden" name="id_empleado" data-relation-value="id_empleado">
+          <label>Especialidad<input data-modal-field name="especialidad"></label></div>
+        <div class="modal-actions"><button class="btn btn-secondary" type="button"
+            data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar veterinario</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="modal-backdrop" data-admin-modal="usuario">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="usuario-modal-title">
+      <div class="modal-head">
+        <div><span class="modal-kicker">Seguridad</span>
+          <h2 id="usuario-modal-title" data-modal-title>Agregar usuario</h2>
+        </div><button class="modal-close" type="button" data-modal-close aria-label="Cerrar">×</button>
+      </div>
+      <form data-admin-modal-form>
+        <div class="modal-fields"><label>Usuario<input data-modal-field name="username" required></label>
+          <label>Email<input data-modal-field name="email" type="email" required></label>
+          <label>Contraseña<input data-modal-field name="password" type="password" minlength="8" required></label>
+          <label>Rol<input data-modal-field name="rol_busqueda" list="usuario-roles"
+              data-relation="rolesUsuario" data-relation-field="id_rol_usuario" autocomplete="off" required>
+            <datalist id="usuario-roles"></datalist></label>
+          <input type="hidden" name="id_rol_usuario" data-relation-value="id_rol_usuario">
+          <label>Estado<select data-modal-field name="activo"><option value="true">Activo</option>
+              <option value="false">Inactivo</option></select></label></div>
+        <div class="modal-actions"><button class="btn btn-secondary" type="button"
+            data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar usuario</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="modal-backdrop" data-admin-modal="rol">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="rol-modal-title">
+      <div class="modal-head">
+        <div><span class="modal-kicker">Seguridad</span>
+          <h2 id="rol-modal-title" data-modal-title>Agregar rol</h2>
+        </div><button class="modal-close" type="button" data-modal-close aria-label="Cerrar">×</button>
+      </div>
+      <form data-admin-modal-form>
+        <div class="modal-fields"><label>Rol<input data-modal-field name="nombre"
+              required></label><label>Descripción<textarea data-modal-field name="descripcion"
+              rows="2"></textarea></label></div>
+        <div class="modal-actions"><button class="btn btn-secondary" type="button"
+            data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar rol</button></div>
+      </form>
     </div>
   </div>
 </section>
