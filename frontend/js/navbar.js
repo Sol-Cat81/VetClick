@@ -381,10 +381,6 @@ window.addEventListener("load", async () => {
 
       if (!refresh.ok) {
         mostrarToast('Sesion expirada.', 'error');
-
-        setTimeout(() =>{
-          window.location.href = `${ruta}login`
-        })
       }
 
       // Ya tenemos un nuevo access token.
@@ -420,7 +416,6 @@ async function cerrarSession() {
       credentials: 'include'
     });
 
-<<<<<<< HEAD
     const cerrado = await cerrarSession.json();
     if (cerrarSession.ok) {
       mostrarToast(cerrado.mensaje || 'Sesión cerrada con éxito.', 'exito');
@@ -432,14 +427,6 @@ async function cerrarSession() {
     } else {
       mostrarToast('No se pudo cerrar sesión.', 'error');
     }
-=======
-  const cerrado = await leerRespuestaJson(cerrarSession);
-  if(cerrarSession.ok){
-    mostrarToast(cerrado.mensaje || 'Session cerrada con exito.', 'exito');
-  }else{
-    mostrarToast('No se pudo cerrar session.', 'error');
-  }
->>>>>>> f260e51a2891da9248b2a746d8d25691443dbff2
   } catch (error) {
     console.error("Error de conexión:", error);
     mostrarToast('No se pudo conectar con el servidor.', 'error');

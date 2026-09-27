@@ -4,25 +4,22 @@ const solicitarProductosDestacados = async (req, res) => {
   try {
     const [destacados] = await db.query(`SELECT 
             p.id_producto,
-            p.nombre,
-            p.descripcion,
-            p.descuento,
-            v.id_variante,
-            va.id_valor_atributo,
-            av.nombre AS atributo,
-            v.precio,
-            v.stock,
-            p.imagen_url AS imagen_producto,
-            v.imagen AS imagen_variante
+	          p.nombre,
+	          p.descripcion,
+	          p.descuento,
+	          v.id_variante,
+	          v.id_valor_atributo,
+	          va.nombre AS atributo,
+	          v.precio,
+	          v.stock,
+	          p.imagen AS imagen_producto
             FROM productos AS p 
             INNER JOIN variantes AS v
             ON p.id_producto = v.id_producto 
-            LEFT JOIN variantes_atributos AS va
-            ON v.id_variante = va.id_variante
-            LEFT JOIN valores_atributo AS av
-            ON va.id_valor_atributo = av.id_valor
+            LEFT JOIN valores_atributo AS va
+            ON v.id_valor_atributo = va.id_valor
             WHERE p.activo = TRUE
-            ORDER BY p.id_producto, v.id_variante
+            ORDER BY p.id_producto, v.id_variante;
             `);
 
     const ordenarDest = {};
