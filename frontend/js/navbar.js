@@ -226,10 +226,8 @@ class MiNavbar extends HTMLElement {
           </form>
           
           <div class="header-icons">
-            <i class="ph-thin ph-shopping-cart"></i>
-            <div id="usarioSession">
-              <a href="${ruta}login.html"><i class="ph-thin ph-user"></i></a>
-            </div>
+            <a href="${ruta}carrito.html"><i class="ph-thin ph-shopping-cart"></i></a>
+            <a href="${ruta}login.html" id="usarioSession"><i class="ph-thin ph-user"></i></a>
           </div>
         </div>
       </header>
@@ -264,12 +262,13 @@ class MiNavbar extends HTMLElement {
         </div>
       </div>
 
-      <div class="toast align-items-center" role="alert" aria-live="assertive" aria-atomic="true">
-      <div class="d-flex">
-        <div class="toast-body">
-          Hello, world! This is a toast message.
-        </div>
-        <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      <div class="toast-container position-fixed botton-0 end-0 p-3" style="z-index: 2000;">
+        <div id="miToast" class="toast align-items-center border-0" role="alert" aria-live="assertive" aria-atomic="true">
+          <div class="d-flex">
+            <div class="toast-body" id="toast-mensaje">
+            </div>
+            <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
         </div>
       </div>
 
@@ -281,28 +280,28 @@ customElements.define("mi-navbar", MiNavbar);
 
 /* TOAST DE BOOSTRAP PARA REEMPLAZAR LOS ALERT */
 function mostrarToast(mensaje, tipo = 'exito') {
-    const toastElemento = document.getElementById('miToast');
-    const toastCuerpo = document.getElementById('toast-mensaje');
+  const toastElemento = document.getElementById('miToast');
+  const toastCuerpo = document.getElementById('toast-mensaje');
 
-    // 1. Limpiamos las clases de color previas
-    toastElemento.classList.remove('text-bg-success', 'text-bg-danger');
+  // 1. Limpiamos las clases de color previas
+  toastElemento.classList.remove('text-bg-success', 'text-bg-danger');
 
-    // 2. Asignamos el color dependiendo del tipo de mensaje
-    if (tipo === 'error') {
-        toastElemento.classList.add('text-bg-danger'); // Fondo rojo
-    } else {
-        toastElemento.classList.add('text-bg-success'); // Fondo verde
-    }
+  // 2. Asignamos el color dependiendo del tipo de mensaje
+  if (tipo === 'error') {
+    toastElemento.classList.add('text-bg-danger'); // Fondo rojo
+  } else {
+    toastElemento.classList.add('text-bg-success'); // Fondo verde
+  }
 
-    // 3. Insertamos el mensaje enviado
-    toastCuerpo.textContent = mensaje;
+  // 3. Insertamos el mensaje enviado
+  toastCuerpo.textContent = mensaje;
 
-    // 4. Usamos la API de Bootstrap para inicializar y mostrar el Toast
-    const toast = new bootstrap.Toast(toastElemento, {
-        delay: 3000 // Se ocultará solo después de 3 segundos (3000 ms)
-    });
-    
-    toast.show();
+  // 4. Usamos la API de Bootstrap para inicializar y mostrar el Toast
+  const toast = new bootstrap.Toast(toastElemento, {
+    delay: 3000 // Se ocultará solo después de 3 segundos (3000 ms)
+  });
+
+  toast.show();
 }
 
 window.addEventListener("load", async () => {
@@ -367,46 +366,73 @@ window.addEventListener("load", async () => {
         credentials: "include",
       },
     );
+
     const controlUsuario = document.getElementById("usarioSession");
     const offCanvas = document.querySelector(".navegacion");
 
-    const session = await confirmaSession.json();
+    if (confirmaSession.status === 401) {
+      const refresh = await fetch(
+        "http://127.0.0.1:3000/api/usuarios/refresh",
+        {
+          method: "POST",
+          credentials: "include"
+        }
+      );
 
-    if (confirmaSession.ok) {
-      console.log(session.usuario.usuario);
-      controlUsuario.innerHTML = ``;
-      offCanvas.innerHTML += `
+      if (!refresh.ok) {
+        mostrarToast('Sesion expirada.', 'error');
+
+        setTimeout(() =>{
+          window.location.href = `${ruta}login`
+        })
+      }
+
+      // Ya tenemos un nuevo access token.
+      confirmaSession = await fetch("http://127.0.0.1:3000/api/usuarios/verificarsession",{
+          credentials: "include"
+        })
+      }
+      const session = await confirmaSession.json();
+
+      if (confirmaSession.ok) {
+        controlUsuario.innerHTML = ``;
+        offCanvas.innerHTML += `
       <li><a href="#" class="ofcanvas-nav">Mi cuenta</a></li>
       <li onclick="cerrarSession()" class="ofcanvas-nav">Cerrar Sesion</li>
       `
-    } else {
-      console.log("no hay session");
-      return;
+      } else {
+        console.log("no hay session");
+        return;
+      }
+    } catch (error) {
+      console.error("Error de conexión:", error);
+      mostrarToast('No se pudo conectar con el sevidor.', 'error');
     }
-  } catch (error) {
-    console.error("Error de conexión:", error);
-    mostrarToast('No se pudo conectar con el sevidor.', 'error');
-  }
-});
+  });
 
 async function cerrarSession() {
   try {
-    const cerrarSession = await fetch('http://127.0.0.1:3000/api/usuarios/logout',{
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    credentials: 'include'
-  });
+    const cerrarSession = await fetch('http://127.0.0.1:3000/api/usuarios/logout', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include'
+    });
 
-  const cerrado = await cerrarSession.json();
-  if(cerrarSession.ok){
-    mostrarToast(cerrado.mensaje || 'Session cerrada con exito.', 'exito');
-  }else{
-    mostrarToast('No se pudo cerrar session.', 'error');
-  }
+    const cerrado = await cerrarSession.json();
+    if (cerrarSession.ok) {
+      mostrarToast(cerrado.mensaje || 'Sesión cerrada con éxito.', 'exito');
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
+
+    } else {
+      mostrarToast('No se pudo cerrar sesión.', 'error');
+    }
   } catch (error) {
     console.error("Error de conexión:", error);
-    mostrarToast('No se pudo conectar con el sevidor.', 'error');
+    mostrarToast('No se pudo conectar con el servidor.', 'error');
   }
 }

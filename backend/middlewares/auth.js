@@ -1,18 +1,34 @@
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 
-const verificarToken = (req, res, next) => {
-    const token = req.cookies.token_veterinaria;
+const authMiddleware = (req, res, next) => {
+  // Buscamos el access token en la cookie
+  const token = req.cookies.token_veterinaria;
 
-    if (!token) {
-        return res.status(401).json({ mensaje: "Acceso denegado. Inicia sesión." });
-    }
-    try {
-        const verificado = jwt.verify(token, process.env.SECRETO_JWT);
-        req.usuario = verificado;
-        next();
-    } catch (error) {
-        res.status(403).json({ mensaje: "La sesión ha expirado." });
-    }
+  // Si no existe, no está autenticado
+  if (!token) {
+    return res.status(401).json({
+      mensaje: "No estás autenticado",
+    });
+  }
+
+  try {
+    // Verificamos que el token sea válido
+    const decoded = jwt.verify(
+      token,
+      process.env.SECRETO_JWT_ACCESS
+    );
+
+    // Guardamos los datos del usuario dentro de req
+    req.usuario = decoded;
+
+    // Permitimos continuar hacia el controlador
+    next();
+
+  } catch (error) {
+    return res.status(401).json({
+      mensaje: "Token inválido o expirado",
+    });
+  }
 };
 
-module.exports = verificarToken;
+module.exports = { authMiddleware };

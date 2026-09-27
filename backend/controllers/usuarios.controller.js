@@ -33,20 +33,38 @@ const verificarUsuario = async (req, res) => {
           .json({ mensaje: "El email o la contraseña es incorrecto." });
       }
 
+      // ACCESS TOKEN Y REFRESH
       const token = jwt.sign(
         {
           id: usuarioEncontrado.id_usuario,
-          usuario:usuarioEncontrado.username,
+          usuario: usuarioEncontrado.username,
           rol: usuarioEncontrado.id_rol_usuario,
         },
-        process.env.SECRETO_JWT,
-        { expiresIn: "24h" },
+        process.env.SECRETO_JWT_ACCESS,
+        { expiresIn: "15m" },
       );
+      const refresh = jwt.sign(
+        {
+          id: usuarioEncontrado.id_usuario,
+        },
+        process.env.SECRETO_JWT_REFRESH,
+        {
+          expiresIn: "7d",
+        }
+      );
+
+      // GUARDAR TOKENS EN LAS COOKIES
       res.cookie("token_veterinaria", token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: process.env.NODE_ENV === "production", // Corrección aquí
         sameSite: "strict",
-        maxAge: 24 * 60 * 60 * 1000,
+        maxAge: 15 * 60 * 1000,
+      });
+      res.cookie("refresh_veterinaria", refresh, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production", // Corrección aquí
+        sameSite: "strict",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
       res.status(200).json({
@@ -125,8 +143,8 @@ const detectarsession = async (req, res) => {
   }
 
   try {
-    // 2. Verificar y decodificar el token usando tu clave secreta
-    const decoded = jwt.verify(token, process.env.SECRETO_JWT);
+    // 2. Verificar y decodificar el token usando la clave secreta
+    const decoded = jwt.verify(token, process.env.SECRETO_JWT_ACCESS);
 
     // 3. Acceder a la información guardada
     const id = decoded.id;
@@ -135,14 +153,58 @@ const detectarsession = async (req, res) => {
 
     res.json({ mensaje: "Acceso concedido", usuario: decoded });
   } catch (error) {
-    // Si el token expiró o fue alterado, jwt.verify lanzará un error
+    // Si el token expiró o fue alterado, lanzará un error
     res.status(401).json({ mensaje: "Token inválido o expirado" });
   }
 };
 
 const logout = async (req, res) => {
   res.clearCookie('token_veterinaria');
-  res.status(201).json({ mensaje: "Sesión cerrada correctamente" });
-}
+  res.clearCookie('refresh_veterinaria');
+  res.status(200).json({ mensaje: "Sesión cerrada correctamente" });
+};
 
-module.exports = { verificarUsuario, registrarUsuario, detectarsession, logout };
+const refreshToken = async (req, res) => {
+  const refresh = req.cookies.refresh_veterinaria;
+
+  if (!refresh) {
+    return res.status(401).json({
+      mensaje: "No hay refresh token",
+    });
+  }
+
+  try {
+    const decoded = jwt.verify(
+      refresh,
+      process.env.SECRETO_JWT_REFRESH
+    );
+
+    const nuevoAccessToken = jwt.sign(
+      {
+        id: decoded.id,
+      },
+      process.env.SECRETO_JWT_ACCESS,
+      {
+        expiresIn: "15m",
+      }
+    );
+
+    res.cookie("token_veterinaria", nuevoAccessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 15 * 60 * 1000,
+    });
+
+    return res.status(200).json({
+      mensaje: "Access token renovado",
+    });
+
+  } catch (error) {
+    return res.status(401).json({
+      mensaje: "Refresh token inválido o expirado",
+    });
+  }
+};
+
+module.exports = { verificarUsuario, registrarUsuario, detectarsession, logout, refreshToken };

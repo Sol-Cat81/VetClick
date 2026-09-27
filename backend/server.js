@@ -46,6 +46,12 @@ app.use('/api/ventas', ventasRoutes);
 const personalRoutes = require('./routes/personal.routes');
 app.use('/api/personal', personalRoutes);
 
+const usuariosRoutes = require('./routes/usuarios.routes');
+app.use('/api/usuarios', usuariosRoutes);
+
+const productosRoutes = require('./routes/productos.routes');
+app.use('/api/productos', productosRoutes);
+
 // Usamos el puerto configurado o 3000 durante el desarrollo.
 const puerto = process.env.PORT || 3000;
 

@@ -1,8 +1,8 @@
 // Router para login, registro y listado de usuarios.
 const express = require('express');
 const router = express.Router();
-const UsuarioService = require('../service/usuarios.service')
-const { verificarUsuario, registrarUsuario, detectarsession, logout } = require('./../controllers/usuarios.controller');
+const UsuarioService = require('../service/personal.service')
+const { verificarUsuario, registrarUsuario, detectarsession, logout, refreshToken } = require('./../controllers/usuarios.controller');
 
 // El controlador valida las credenciales recibidas en el cuerpo JSON.
 router.post('/iniciarsession', verificarUsuario);
@@ -16,5 +16,7 @@ router.get('/', UsuarioService.listarUsuarios);
 router.get('/verificarsession', detectarsession)
 
 router.get('/logout', logout)
+
+router.post("/refresh", refreshToken);
 
 module.exports = router;

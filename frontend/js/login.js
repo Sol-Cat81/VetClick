@@ -138,28 +138,28 @@ irALogin.addEventListener("click", function () {
 });
 /* TOAST DE BOOSTRAP PARA REEMPLAZAR LOS ALERT */
 function mostrarToast(mensaje, tipo = 'exito') {
-    const toastElemento = document.getElementById('miToast');
-    const toastCuerpo = document.getElementById('toast-mensaje');
+  const toastElemento = document.getElementById('miToast');
+  const toastCuerpo = document.getElementById('toast-mensaje');
 
-    // 1. Limpiamos las clases de color previas
-    toastElemento.classList.remove('text-bg-success', 'text-bg-danger');
+  // 1. Limpiamos las clases de color previas
+  toastElemento.classList.remove('text-bg-success', 'text-bg-danger');
 
-    // 2. Asignamos el color dependiendo del tipo de mensaje
-    if (tipo === 'error') {
-        toastElemento.classList.add('text-bg-danger'); // Fondo rojo
-    } else {
-        toastElemento.classList.add('text-bg-success'); // Fondo verde
-    }
+  // 2. Asignamos el color dependiendo del tipo de mensaje
+  if (tipo === 'error') {
+    toastElemento.classList.add('text-bg-danger'); // Fondo rojo
+  } else {
+    toastElemento.classList.add('text-bg-success'); // Fondo verde
+  }
 
-    // 3. Insertamos el mensaje enviado
-    toastCuerpo.textContent = mensaje;
+  // 3. Insertamos el mensaje enviado
+  toastCuerpo.textContent = mensaje;
 
-    // 4. Usamos la API de Bootstrap para inicializar y mostrar el Toast
-    const toast = new bootstrap.Toast(toastElemento, {
-        delay: 3000 // Se ocultará solo después de 3 segundos (3000 ms)
-    });
-    
-    toast.show();
+  // 4. Usamos la API de Bootstrap para inicializar y mostrar el Toast
+  const toast = new bootstrap.Toast(toastElemento, {
+    delay: 3000 // Se ocultará solo después de 3 segundos (3000 ms)
+  });
+
+  toast.show();
 }
 
 /* INICIAR SESSION */
@@ -197,11 +197,13 @@ formInicio.addEventListener("submit", async (evento) => {
 
       localStorage.setItem("usuario", JSON.stringify(confirmBackend.usuario));
 
-      if (Number(confirmBackend.usuario.rol) === 1) {
-        window.location.href = "./admin/index.html";
-      } else {
-        window.location.href = "./index.html";
-      }
+      setTimeout(() => {
+        if (Number(confirmBackend.usuario.rol) === 1) {
+          window.location.href = "./admin/index.html";
+        } else {
+          window.location.href = "./index.html";
+        }
+      }, 3000)
     } else {
       alerta.removeAttribute('hidden')
       alerta.innerHTML = confirmBackend.mensaje;
@@ -261,7 +263,9 @@ formRegistro.addEventListener("submit", async (evento) => {
 
       if (resgistrar.ok) {
         mostrarToast(confirmRegistro.mensaje || 'Registro exitoso.', 'exito');
-        window.location.reload();
+        setTimeout(() =>{
+          window.location.reload();
+        }, 3000)
       } else {
         mostrarToast(confirmRegistro.mensaje || 'Hubo un problema en el registro', 'error');
       }
@@ -269,7 +273,7 @@ formRegistro.addEventListener("submit", async (evento) => {
       console.error("Error de conexión:", error);
       mostrarToast('No se pudo conectar con el sevidor.', 'error');
     }
-  } else{
+  } else {
     registroError.removeAttribute('hidden')
   }
 });

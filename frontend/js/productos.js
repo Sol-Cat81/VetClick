@@ -116,6 +116,28 @@ function mostrarToast(mensaje, tipo = 'exito') {
     toast.show();
 }
 
+async function agregarAlCarrito(idProducto){
+  const productoSelect = document.querySelector(`#id-${idProducto}`)
+  const varianteSelect = productoSelect.querySelector('.elegido')
+  const variante = Number(varianteSelect.dataset.id)
+  let cantidad = 1
+
+  const enviar = await fetch('http://127.0.0.1:3000/api/productos/carrito/agregar',{
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({variante, cantidad})
+  })
+
+  const respuesta = enviar.json();
+
+  if(enviar.ok){
+    mostrarToast('Producto agreagado al carrito!', 'exito');
+  }else{
+    mostrarToast(respuesta.mensaje || 'No se pudo agregar al carrito :(', 'error')
+  }
+}
+
 /*==========================================
 
          = = = = = EVENTOS = = = = =
@@ -125,7 +147,7 @@ function mostrarToast(mensaje, tipo = 'exito') {
 window.addEventListener("load", async () => {
   try {
     const solicitarDestacados = await fetch(
-      "http://localhost:3000/api/productos/destacados",
+      "http://127.0.0.1:3000/api/productos/destacados",
     );
 
     const destacados = await solicitarDestacados.json();
@@ -148,7 +170,7 @@ window.addEventListener("load", async () => {
 
         contenedorProdDestacados.innerHTML += `
           <div class="swiper-slide">
-                <div class="card-productos mx-auto" data-producto-id="${prod.id}" data-descuento="${descuento}">
+                <div class="card-productos mx-auto" id="id-${prod.id}" data-descuento="${descuento}">
                   <img
                     src="${prod.imagen || imagen404}"
                     class="card-img-top"
@@ -167,7 +189,7 @@ window.addEventListener("load", async () => {
                       Number(primeraVariante.precio),
                       descuento,
                     )}</div>
-                    <button class="btn btn-comprar">Comprar</button>
+                    <button class="btn btn-comprar" onclick="agregarAlCarrito(${prod.id})">Comprar</button>
                   </div>
                 </div>
               </div>
