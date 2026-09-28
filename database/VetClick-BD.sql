@@ -137,16 +137,6 @@ CREATE TABLE valores_atributo (
         REFERENCES atributos(id_atributo)
 );
 
-CREATE TABLE carrito_items (
-    id_carrito INT AUTO_INCREMENT PRIMARY KEY,
-    id_usuario INT NOT NULL,
-    id_variante INT NOT NULL,
-    cantidad INT NOT NULL DEFAULT 1,
-    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
-    FOREIGN KEY (id_variante) REFERENCES variantes(id_variante) ON DELETE CASCADE,
-    UNIQUE KEY usuario_producto_unico (id_usuario, id_variante) -- Evita filas duplicadas para el mismo ítem
-);
-
 /* ====================================================
    3. TABLAS DE SEGUNDO NIVEL DE DEPENDENCIA
    ==================================================== */
@@ -202,6 +192,16 @@ CREATE TABLE variantes (
         
 	FOREIGN KEY (id_valor_atributo)
         REFERENCES valores_atributo(id_valor)
+);
+
+CREATE TABLE carrito_items (
+    id_carrito INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    id_variante INT NOT NULL,
+    cantidad INT NOT NULL DEFAULT 1,
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
+    FOREIGN KEY (id_variante) REFERENCES variantes(id_variante) ON DELETE CASCADE,
+    UNIQUE KEY usuario_producto_unico (id_usuario, id_variante)
 );
 
 /* ====================================================

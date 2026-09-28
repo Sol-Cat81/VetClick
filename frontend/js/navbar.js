@@ -226,7 +226,7 @@ class MiNavbar extends HTMLElement {
           </form>
           
           <div class="header-icons">
-            <a href="${ruta}carrito.html"><i class="ph-thin ph-shopping-cart"></i></a>
+            <a href="${ruta}pages/carrito.html" aria-label="Ver carrito"><i class="ph-thin ph-shopping-cart"></i></a>
             <a href="${ruta}login.html" id="usarioSession"><i class="ph-thin ph-user"></i></a>
           </div>
         </div>
@@ -356,7 +356,7 @@ window.addEventListener("load", async () => {
       });
     });
 
-    const confirmaSession = await fetch(
+    let confirmaSession = await fetch(
       "http://127.0.0.1:3000/api/usuarios/verificarsession",
       {
         method: "GET",
@@ -380,7 +380,7 @@ window.addEventListener("load", async () => {
       );
 
       if (!refresh.ok) {
-        mostrarToast('Sesion expirada.', 'error');
+        return;
       }
 
       // Ya tenemos un nuevo access token.

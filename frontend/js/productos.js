@@ -116,6 +116,7 @@ function mostrarToast(mensaje, tipo = 'exito') {
     toast.show();
 }
 
+// Envía al carrito la variante seleccionada y muestra el resultado de la API.
 async function agregarAlCarrito(idProducto){
   const productoSelect = document.querySelector(`#id-${idProducto}`)
   const varianteSelect = productoSelect.querySelector('.elegido')
@@ -129,7 +130,7 @@ async function agregarAlCarrito(idProducto){
     body: JSON.stringify({variante, cantidad})
   })
 
-  const respuesta = enviar.json();
+  const respuesta = await enviar.json();
 
   if(enviar.ok){
     mostrarToast('Producto agreagado al carrito!', 'exito');
