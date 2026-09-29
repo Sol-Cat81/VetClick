@@ -10,5 +10,7 @@ module.exports = {
   turnos: responder(service.listarTurnos),
   historial: responder(service.listarHistorial),
   tratamientos: responder(service.listarTratamientos),
-  vacunas: responder(service.listarVacunas)
+  vacunas: responder(service.listarVacunas),
+  servicios: responder(service.listarServicios),
+  categoriasServicio: responder(service.listarCategoriasServicio)
 };

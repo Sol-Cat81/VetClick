@@ -148,6 +148,7 @@ async function cargarMascotas(){
         <td>${escaparHtml(mascota.especie)}</td>
         <td>${escaparHtml(mascota.raza)}</td>
         <td>${escaparHtml(mascota.sexo)}</td>
+        <td>${escaparHtml(mascota.fecha_nacimiento || '—')}</td>
         <td>${escaparHtml(mascota.peso)} kg</td>
       </tr>
     `).join('');
@@ -186,7 +187,8 @@ document.addEventListener('submit', async (e)=>{
     id_raza: idRaza,
     sexo,
     fecha_nacimiento: formularioMascota.fecha_nacimiento?.value || null,
-    peso
+    peso,
+    observaciones: formularioMascota.observaciones?.value?.trim() || ''
   };
 
   try{
@@ -233,5 +235,79 @@ async function cargarDirecciones(){
     `).join('');
   }catch(error){
     informarErrorCarga('direcciones', error);
+  }
+}
+
+async function cargarEspecies(){
+  try{
+    const especies = await obtenerDatos('clientes/especies');
+    const tbody = document.querySelector('#especies-table tbody');
+    if(!tbody) return;
+    tbody.innerHTML = (especies || []).map(especie => `
+      <tr>
+        <td>${escaparHtml(especie.id_especie)}</td>
+        <td>${escaparHtml(especie.nombre)}</td>
+      </tr>
+    `).join('');
+  }catch(error){
+    informarErrorCarga('clientes/especies', error);
+  }
+}
+
+async function cargarRazas(){
+  try{
+    const razas = await obtenerDatos('clientes/razas');
+    const tbody = document.querySelector('#razas-table tbody');
+    if(!tbody) return;
+    tbody.innerHTML = (razas || []).map(raza => `
+      <tr>
+        <td>${escaparHtml(raza.id_raza)}</td>
+        <td>${escaparHtml(raza.nombre)}</td>
+        <td>${escaparHtml(raza.especie || '—')}</td>
+      </tr>
+    `).join('');
+  }catch(error){
+    informarErrorCarga('clientes/razas', error);
+  }
+}
+
+async function cargarMascotasAdopcion(){
+  try{
+    const mascotas = await obtenerDatos('clientes/mascotas-adopcion');
+    const tbody = document.querySelector('#mascotas-adopcion-table tbody');
+    if(!tbody) return;
+    tbody.innerHTML = (mascotas || []).map(mascota => `
+      <tr>
+        <td>${escaparHtml(mascota.id_mascota_adopcion)}</td>
+        <td>${escaparHtml(mascota.nombre)}</td>
+        <td>${escaparHtml(mascota.especie || '—')}</td>
+        <td>${escaparHtml(mascota.edad)}</td>
+        <td>${escaparHtml(mascota.sexo)}</td>
+        <td>${escaparHtml(mascota.descripcion)}</td>
+        <td><span class="status ${mascota.estado === 'ADOPTADO' ? 'success' : 'warning'}">${escaparHtml(mascota.estado)}</span></td>
+      </tr>
+    `).join('');
+  }catch(error){
+    informarErrorCarga('clientes/mascotas-adopcion', error);
+  }
+}
+
+async function cargarAdopciones(){
+  try{
+    const adopciones = await obtenerDatos('clientes/adopciones');
+    const tbody = document.querySelector('#adopciones-table tbody');
+    if(!tbody) return;
+    tbody.innerHTML = (adopciones || []).map(adopcion => `
+      <tr>
+        <td>${escaparHtml(adopcion.id_adopcion)}</td>
+        <td>${escaparHtml(adopcion.cliente)}</td>
+        <td>${escaparHtml(adopcion.mascota)}</td>
+        <td>${escaparHtml(adopcion.fecha)}</td>
+        <td>${escaparHtml(adopcion.estado)}</td>
+        <td>${escaparHtml(adopcion.observacion)}</td>
+      </tr>
+    `).join('');
+  }catch(error){
+    informarErrorCarga('clientes/adopciones', error);
   }
 }

@@ -79,6 +79,10 @@ module.exports = {
   clientes: responder(service.listarClientes),
   mascotas: responder(service.listarMascotas),
   direcciones: responder(service.listarDirecciones),
+  especies: responder(service.listarEspecies),
+  razas: responder(service.listarRazas),
+  mascotasAdopcion: responder(service.listarMascotasAdopcion),
+  adopciones: responder(service.listarAdopciones),
 
   crearCliente,
   crearMascotas

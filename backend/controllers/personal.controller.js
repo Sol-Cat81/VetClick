@@ -8,5 +8,7 @@ module.exports = {
   veterinarios: responder(service.listarVeterinarios),
   usuarios: responder(service.listarUsuarios),
   roles: responder(service.listarRoles),
-  permisos: responder(service.listarPermisos)
+  rolesUsuario: responder(service.listarRolesUsuario),
+  permisos: responder(service.listarPermisos),
+  rolPermisos: responder(service.listarRolPermisos)
 };

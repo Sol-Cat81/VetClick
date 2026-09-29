@@ -8,29 +8,29 @@ const responder = fn => async (req, res) => {
 
 const crearProducto = async (req, res) => {
   try {
-    let imagenUrl = req.body?.imagen_url || null;
+    let imagen = req.body?.imagen || null;
 
     if (req.file) {
       const result = await cloudinary.uploader.upload(
         `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`,
         {
-          folder: process.env.CLOUDINARY_FOLDER || 'VetClick',
+          folder: process.env.CLOUDINARY_FOLDER_PRODUCTO || 'VetClick\Productos',
           resource_type: 'image'
         }
       );
-      imagenUrl = result.secure_url;
+      imagen = result.secure_url;
     }
 
     const resultado = await service.crearProducto({
       ...req.body,
-      imagen_url: imagenUrl,
+      imagen,
       activo: req.body?.activo === 'true' || req.body?.activo === true || req.body?.estado === 'Activo'
     });
 
     res.status(201).json({
       mensaje: 'Producto creado correctamente',
       id: resultado.insertId,
-      imagen_url: imagenUrl
+      imagen
     });
   } catch (error) {
     console.error('Error al guardar producto:', error);
@@ -46,6 +46,8 @@ module.exports = {
   categorias: responder(service.listarCategorias),
   marcas: responder(service.listarMarcas),
   variantes: responder(service.listarVariantes),
+  atributos: responder(service.listarAtributos),
+  valoresAtributo: responder(service.listarValoresAtributo),
   crearProducto
 };
 

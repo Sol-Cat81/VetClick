@@ -9,7 +9,7 @@ module.exports = {
     return rows;
   },
   envios: async () => {
-    const [rows] = await conexion.query('SELECT id_envio,id_pedido,tipo_entrega,codigo_postal,fecha_estimada,estado FROM envios ORDER BY id_envio');
+    const [rows] = await conexion.query('SELECT id_envio,id_pedido,tipo_entrega,codigo_postal,fecha_estimada,fecha_entrega,estado FROM envios ORDER BY id_envio');
     return rows;
   }
 };

@@ -16,8 +16,16 @@ module.exports = {
     const [rows] = await conexion.query('SELECT id_rol_empleado,nombre FROM rol_empleados ORDER BY id_rol_empleado');
     return rows;
   },
+  rolesUsuario: async () => {
+    const [rows] = await conexion.query('SELECT id_rol_usuario,nombre FROM rol_usuario ORDER BY id_rol_usuario');
+    return rows;
+  },
   permisos: async () => {
     const [rows] = await conexion.query('SELECT id_permiso,nombre,descripcion FROM permisos ORDER BY id_permiso');
+    return rows;
+  },
+  rolPermisos: async () => {
+    const [rows] = await conexion.query(`SELECT rp.id_rol_usuario,rp.id_permiso,r.nombre AS rol,p.nombre AS permiso FROM rol_permiso rp JOIN rol_usuario r ON r.id_rol_usuario=rp.id_rol_usuario JOIN permisos p ON p.id_permiso=rp.id_permiso ORDER BY rp.id_rol_usuario,rp.id_permiso`);
     return rows;
   }
 };

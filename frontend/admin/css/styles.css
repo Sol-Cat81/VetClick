@@ -619,6 +619,38 @@ td small {
   font-size: 12px
 }
 
+/* ── Secciones con varias tablas (nuevas pestañas del panel) ─────────── */
+
+/* Menús con más pestañas: permiten pasar a segunda fila en pantallas angostas */
+.subnav {
+  flex-wrap: wrap
+}
+
+/* La barra se acomoda en dos filas en lugar de desbordar */
+.toolbar {
+  flex-wrap: wrap
+}
+
+/* Botones agrupados a la derecha cuando un panel tiene más de uno */
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-left: auto
+}
+
+/* Separación entre la primera y la segunda tabla del mismo panel */
+.table-card + .table-card {
+  margin-top: 18px
+}
+
+/* Tabla seguida de tarjetas informativas dentro del mismo panel */
+.table-card + .detail-grid {
+  margin-top: 18px
+}
+
 .detail-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -758,6 +790,68 @@ td small {
 
 .modal-fields label:has(textarea) {
   grid-column: 1 / -1
+}
+
+/* Lista de permisos dentro del modal de "Rol de usuario" */
+.permisos-fieldset {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 14px 14px;
+  margin-top: 4px
+}
+
+.permisos-fieldset legend {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 0 6px
+}
+
+.permisos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 8px
+}
+
+.permisos-grid:empty::after {
+  content: "Aún no hay permisos definidos. Créalos con el botón «＋ Permiso».";
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600
+}
+
+/* Cada casilla es una etiqueta propia: anula .modal label y .modal input */
+.modal label.permiso-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0;
+  padding: 9px 10px;
+  background: #f7f9fa;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: #567084;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer
+}
+
+.modal label.permiso-check input {
+  display: inline-block;
+  width: auto;
+  margin: 1px 0 0;
+  padding: 0;
+  border: 0;
+  accent-color: var(--blue);
+  cursor: pointer
+}
+
+.modal label.permiso-check small {
+  display: block;
+  color: var(--muted);
+  font-weight: 600;
+  margin-top: 2px
 }
 
 .modal-actions {

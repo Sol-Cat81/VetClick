@@ -5,5 +5,7 @@ router.get('/empleados', controller.empleados);
 router.get('/veterinarios', controller.veterinarios);
 router.get('/usuarios', controller.usuarios);
 router.get('/roles', controller.roles);
+router.get('/rolesusuario', controller.rolesUsuario);
 router.get('/permisos', controller.permisos);
+router.get('/rolpermiso', controller.rolPermisos);
 module.exports = router;

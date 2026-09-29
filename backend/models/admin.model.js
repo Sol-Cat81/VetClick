@@ -83,11 +83,6 @@ const inserciones = {
     campos: ['id_categoria', 'id_producto'],
     requeridos: ['id_categoria', 'id_producto']
   },
-  varianteAtributo: {
-    tabla: 'variantes_atributos',
-    campos: ['id_variante', 'id_valor_atributo'],
-    requeridos: ['id_variante', 'id_valor_atributo']
-  },
   detallePedido: {
     tabla: 'detalle_pedidos',
     campos: ['id_pedido', 'id_variante', 'cantidad', 'precio_unitario', 'subtotal'],
@@ -135,9 +130,8 @@ const inserciones = {
   },
   variante: {
     tabla: 'variantes',
-    campos: ['id_producto', 'precio', 'stock'],
-    requeridos: ['id_producto', 'precio'],
-    atributo: true
+    campos: ['id_producto', 'precio', 'id_valor_atributo'],
+    requeridos: ['id_producto', 'precio']
   },
   pedido: {
     tabla: 'pedidos',
@@ -152,7 +146,7 @@ const inserciones = {
   },
   envio: {
     tabla: 'envios',
-    campos: ['id_pedido', 'tipo_entrega', 'id_direccion', 'codigo_postal', 'fecha_estimada', 'estado'],
+    campos: ['id_pedido', 'tipo_entrega', 'id_direccion', 'codigo_postal', 'fecha_estimada', 'fecha_entrega', 'estado'],
     requeridos: ['id_pedido', 'tipo_entrega']
   },
   empleado: {
@@ -229,7 +223,6 @@ const AdminModel = {
 
     const valoresPorDefecto = {
       turno: { estado: 'PENDIENTE' },
-      variante: { stock: 0 },
       pedido: { estado: 'PENDIENTE', costo_envio: 0 },
       pago: { estado_pago: 'PENDIENTE' },
       envio: { estado: 'EN_CAMINO' },
@@ -294,16 +287,6 @@ const AdminModel = {
       if (datos[campo]) datos[campo] = String(datos[campo]).toUpperCase();
     }
 
-    if (configuracion.atributo && datos.id_valor_atributo) {
-      const idValor = Number(datos.id_valor_atributo);
-      if (!Number.isInteger(idValor) || idValor <= 0) {
-        const error = new Error('El atributo seleccionado no es válido');
-        error.status = 400;
-        throw error;
-      }
-      datos.id_valor_atributo = idValor;
-    }
-
     const valores = configuracion.campos.map(campo => {
       const valor = datos[campo];
       if (valor === undefined || valor === '') return null;
@@ -335,15 +318,7 @@ const AdminModel = {
     const columnas = configuracion.campos.map(campo => `\`${campo}\``).join(', ');
     const placeholders = configuracion.campos.map(() => '?').join(', ');
 
-    if (!configuracion.atributo && !configuracion.detalle) {
-      const [resultado] = await conexion.query(
-        `INSERT INTO \`${configuracion.tabla}\` (${columnas}) VALUES (${placeholders})`,
-        valores
-      );
-      return resultado;
-    }
-
-    if (configuracion.atributo && !datos.id_valor_atributo) {
+    if (!configuracion.detalle) {
       const [resultado] = await conexion.query(
         `INSERT INTO \`${configuracion.tabla}\` (${columnas}) VALUES (${placeholders})`,
         valores
@@ -355,56 +330,44 @@ const AdminModel = {
     try {
       await conexionTransaccion.beginTransaction();
       let resultado;
-      if (configuracion.detalle) {
-        const idVariante = Number(datos.id_variante);
-        if (!Number.isInteger(idVariante) || idVariante <= 0) {
-          const error = new Error('Debe seleccionar una variante válida para el pedido');
-          error.status = 400;
-          throw error;
-        }
-        const [variantes] = await conexionTransaccion.query(
-          'SELECT precio FROM variantes WHERE id_variante = ?',
-          [idVariante]
-        );
-        if (!variantes.length) {
-          const error = new Error('La variante seleccionada no existe');
-          error.status = 400;
-          throw error;
-        }
-        const cantidad = Number(datos.cantidad);
-        if (!Number.isInteger(cantidad) || cantidad <= 0) {
-          const error = new Error('La cantidad del pedido debe ser un entero mayor que cero');
-          error.status = 400;
-          throw error;
-        }
-        const precio = Number(variantes[0].precio);
-        const subtotal = precio * cantidad;
-        const indiceSubtotal = configuracion.campos.indexOf('subtotal');
-        const indiceTotal = configuracion.campos.indexOf('total');
-        const costoEnvio = Number(datos.costo_envio || 0);
-        valores[indiceSubtotal] = subtotal;
-        valores[indiceTotal] = subtotal + costoEnvio;
-        const [pedido] = await conexionTransaccion.query(
-          `INSERT INTO \`${configuracion.tabla}\` (${columnas}) VALUES (${placeholders})`,
-          valores
-        );
-        resultado = pedido;
-        await conexionTransaccion.query(
-          `INSERT INTO detalle_pedidos (id_pedido, id_variante, cantidad, precio_unitario, subtotal)
-           VALUES (?, ?, ?, ?, ?)`,
-          [pedido.insertId, idVariante, cantidad, precio, subtotal]
-        );
-      } else {
-        const [variante] = await conexionTransaccion.query(
-          `INSERT INTO \`${configuracion.tabla}\` (${columnas}) VALUES (${placeholders})`,
-          valores
-        );
-        resultado = variante;
-        await conexionTransaccion.query(
-          'INSERT INTO variantes_atributos (id_variante, id_valor_atributo) VALUES (?, ?)',
-          [variante.insertId, Number(datos.id_valor_atributo)]
-        );
+      const idVariante = Number(datos.id_variante);
+      if (!Number.isInteger(idVariante) || idVariante <= 0) {
+        const error = new Error('Debe seleccionar una variante válida para el pedido');
+        error.status = 400;
+        throw error;
       }
+      const [variantes] = await conexionTransaccion.query(
+        'SELECT precio FROM variantes WHERE id_variante = ?',
+        [idVariante]
+      );
+      if (!variantes.length) {
+        const error = new Error('La variante seleccionada no existe');
+        error.status = 400;
+        throw error;
+      }
+      const cantidad = Number(datos.cantidad);
+      if (!Number.isInteger(cantidad) || cantidad <= 0) {
+        const error = new Error('La cantidad del pedido debe ser un entero mayor que cero');
+        error.status = 400;
+        throw error;
+      }
+      const precio = Number(variantes[0].precio);
+      const subtotal = precio * cantidad;
+      const indiceSubtotal = configuracion.campos.indexOf('subtotal');
+      const indiceTotal = configuracion.campos.indexOf('total');
+      const costoEnvio = Number(datos.costo_envio || 0);
+      valores[indiceSubtotal] = subtotal;
+      valores[indiceTotal] = subtotal + costoEnvio;
+      const [pedido] = await conexionTransaccion.query(
+        `INSERT INTO \`${configuracion.tabla}\` (${columnas}) VALUES (${placeholders})`,
+        valores
+      );
+      resultado = pedido;
+      await conexionTransaccion.query(
+        `INSERT INTO detalle_pedidos (id_pedido, id_variante, cantidad, precio_unitario, subtotal)
+         VALUES (?, ?, ?, ?, ?)`,
+        [pedido.insertId, idVariante, cantidad, precio, subtotal]
+      );
       await conexionTransaccion.commit();
       return resultado;
     } catch (error) {

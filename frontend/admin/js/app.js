@@ -18,14 +18,19 @@ const entityLabels = {
   clientes: 'cliente',
   mascotas: 'mascota',
   direcciones: 'dirección',
+  especies: 'especie',
+  razas: 'raza',
+  adopciones: 'adopción',
   turnos: 'turno',
   historial: 'historial médico',
   tratamientos: 'tratamiento',
   vacunas: 'vacuna',
+  servicios: 'servicio',
   productos: 'producto',
   categorias: 'categoría',
   marcas: 'marca',
   variantes: 'variante',
+  atributos: 'atributo',
   stock: 'registro de stock',
   sucursales: 'sucursal',
   pedidos: 'pedido',
@@ -34,7 +39,8 @@ const entityLabels = {
   empleados: 'empleado',
   veterinarios: 'veterinario',
   usuarios: 'usuario',
-  roles: 'rol'
+  roles: 'rol',
+  permisos: 'permiso'
 };
 
 let opcionesRelaciones = null;
@@ -219,9 +225,11 @@ function enhanceAdminPanels() {
     const existingButton = panel.querySelector('.toolbar .btn');
 
     if (existingButton) {
-      existingButton.dataset.modalAction = 'create';
-      existingButton.dataset.modalEntity = entity;
-      existingButton.dataset.modalPanel = panel.dataset.panel;
+      // Un panel puede declarar varios botones de entidades distintas en el HTML:
+      // solo completamos los atributos que falten y respetamos los ya escritos.
+      if (!existingButton.dataset.modalAction) existingButton.dataset.modalAction = 'create';
+      if (!existingButton.dataset.modalEntity) existingButton.dataset.modalEntity = entity;
+      if (!existingButton.dataset.modalPanel) existingButton.dataset.modalPanel = panel.dataset.panel;
       existingButton.removeAttribute('data-toast');
     } else if (!panel.querySelector('.toolbar') && panel.querySelector('table, .detail-grid')) {
       const toolbar = document.createElement('div');
@@ -231,39 +239,42 @@ function enhanceAdminPanels() {
       panel.prepend(toolbar);
     }
 
-    panel.querySelectorAll('table').forEach(table => {
-      const head = table.tHead && table.tHead.rows[0];
-      if (!head) return;
-      const hasActions = [...head.cells].some(cell => cell.textContent.trim().toLowerCase() === 'acciones');
-      if (!hasActions) {
-        const th = document.createElement('th');
-        th.textContent = 'Acciones';
-        head.appendChild(th);
+    panel.querySelectorAll('table, .info-card').forEach(item => {
+      // Cada tabla puede declarar su propia entidad cuando un panel agrupa varias.
+      const entidadItem = item.dataset.modalEntity || entity;
+      if (item.tagName === 'TABLE') {
+        const head = item.tHead && item.tHead.rows[0];
+        if (!head) return;
+        const hasActions = [...head.cells].some(cell => cell.textContent.trim().toLowerCase() === 'acciones');
+        if (!hasActions) {
+          const th = document.createElement('th');
+          th.textContent = 'Acciones';
+          head.appendChild(th);
+        }
+        item.tBodies[0]?.querySelectorAll('tr').forEach(row => {
+          if (row.querySelector('[data-row-action]')) return;
+          const id = row.cells[0]?.textContent.trim() || '';
+          const hasStatus = row.querySelector('.status');
+          const hasActionColumn = head.cells[head.cells.length - 1]?.textContent.trim().toLowerCase() === 'acciones';
+          const actions = hasActionColumn && row.cells.length === head.cells.length
+            ? row.cells[row.cells.length - 1]
+            : document.createElement('td');
+          actions.className = 'row-actions';
+          actions.innerHTML = `<button class="btn btn-secondary btn-small" type="button" data-row-action="edit" data-entity="${entidadItem}" data-id="${id}" data-modal-panel="${panel.dataset.panel}">Editar</button>
+            <button class="btn btn-danger btn-small" type="button" data-row-action="delete" data-entity="${entidadItem}" data-id="${id}">Eliminar</button>
+            ${hasStatus ? `<button class="btn btn-secondary btn-small" type="button" data-row-action="status" data-entity="${entidadItem}" data-id="${id}">Cambiar estado</button>` : ''}`;
+          if (actions.parentElement !== row) row.appendChild(actions);
+        });
+        return;
       }
-      table.tBodies[0]?.querySelectorAll('tr').forEach(row => {
-        if (row.querySelector('[data-row-action]')) return;
-        const id = row.cells[0]?.textContent.trim() || '';
-        const hasStatus = row.querySelector('.status');
-        const hasActionColumn = head.cells[head.cells.length - 1]?.textContent.trim().toLowerCase() === 'acciones';
-        const actions = hasActionColumn && row.cells.length === head.cells.length
-          ? row.cells[row.cells.length - 1]
-          : document.createElement('td');
-        actions.className = 'row-actions';
-        actions.innerHTML = `<button class="btn btn-secondary btn-small" type="button" data-row-action="edit" data-entity="${entity}" data-id="${id}" data-modal-panel="${panel.dataset.panel}">Editar</button>
-          <button class="btn btn-danger btn-small" type="button" data-row-action="delete" data-entity="${entity}" data-id="${id}">Eliminar</button>
-          ${hasStatus ? `<button class="btn btn-secondary btn-small" type="button" data-row-action="status" data-entity="${entity}" data-id="${id}">Cambiar estado</button>` : ''}`;
-        if (actions.parentElement !== row) row.appendChild(actions);
-      });
-    });
 
-    panel.querySelectorAll('.info-card').forEach(card => {
-      if (card.querySelector('[data-row-action]')) return;
+      if (item.querySelector('[data-row-action]')) return;
       const actions = document.createElement('div');
       actions.className = 'card-actions';
-      actions.innerHTML = `<button class="btn btn-secondary btn-small" type="button" data-row-action="edit" data-entity="${entity}">Editar</button>
-        <button class="btn btn-danger btn-small" type="button" data-row-action="delete" data-entity="${entity}">Eliminar</button>
-        ${card.querySelector('.status') ? `<button class="btn btn-secondary btn-small" type="button" data-row-action="status" data-entity="${entity}">Cambiar estado</button>` : ''}`;
-      card.appendChild(actions);
+      actions.innerHTML = `<button class="btn btn-secondary btn-small" type="button" data-row-action="edit" data-entity="${entidadItem}">Editar</button>
+        <button class="btn btn-danger btn-small" type="button" data-row-action="delete" data-entity="${entidadItem}">Eliminar</button>
+        ${item.querySelector('.status') ? `<button class="btn btn-secondary btn-small" type="button" data-row-action="status" data-entity="${entidadItem}">Cambiar estado</button>` : ''}`;
+      item.appendChild(actions);
     });
   });
 }
@@ -281,14 +292,45 @@ function openAdminModal(action, entity, row, panel) {
   modal.dataset.action = action;
 
   if (row) {
-    const values = [...row.cells].map(cell => cell.textContent.trim());
-    modal.querySelectorAll('[data-modal-field]').forEach((field, index) => {
-      const value = values[index + 1] || '';
-      field.value = value;
+    // Las tablas traen una fila con celdas; las tarjetas (.info-card) no tienen cells.
+    const values = row.cells ? [...row.cells].map(cell => cell.textContent.trim()) : [];
+    const campos = modal.querySelectorAll('[data-modal-field]');
+    campos.forEach((field, index) => {
+      field.value = values[index + 1] || '';
     });
+    // En tarjetas el nombre principal se lee del título h3.
+    if (!values.length) {
+      const nombre = row.querySelector('h3')?.textContent.trim();
+      campos.forEach(field => {
+        if (field.name === 'nombre' && nombre) field.value = nombre;
+      });
+    }
   }
+
+  precargarPermisosDeRol(entity, action, row);
+
   modal.classList.add('show');
   modal.querySelector('input, textarea, select')?.focus();
+}
+
+// Marca los permisos ya asignados cuando se abre el modal de un rol de usuario.
+function precargarPermisosDeRol(entity, action, row) {
+  const contenedor = document.getElementById('rol-usuario-permisos');
+  if (!contenedor || entity !== 'rol de usuario') return;
+  const casillas = [...contenedor.querySelectorAll('input[data-permiso-check]')];
+  casillas.forEach(casilla => { casilla.checked = false; });
+  const idRol = row?.dataset?.id;
+  if (action !== 'edit' || !idRol) return;
+  obtenerDatos('personal/rolpermiso')
+    .then(asignaciones => {
+      asignaciones
+        .filter(asignacion => String(asignacion.id_rol_usuario) === String(idRol))
+        .forEach(asignacion => {
+          const casilla = casillas.find(item => String(item.value) === String(asignacion.id_permiso));
+          if (casilla) casilla.checked = true;
+        });
+    })
+    .catch(error => console.warn('No se pudieron cargar los permisos del rol:', error));
 }
 
 function closeAdminModal() {
@@ -330,10 +372,20 @@ function cargarDatosDeVista() {
     cargarMascotas();
     cargarDirecciones();
   }
+  if (document.querySelector('[data-panel="especies"]')) {
+    cargarEspecies();
+    cargarRazas();
+  }
+  if (document.querySelector('[data-panel="adopciones"]')) {
+    cargarAdopciones();
+    cargarMascotasAdopcion();
+  }
   if (document.querySelector('[data-panel="productos"]')) cargarCatalogo();
+  if (document.querySelector('[data-panel="atributos"]')) cargarAtributos();
   if (document.querySelector('[data-panel="stock"]')) cargarInventario();
   if (document.querySelector('[data-panel="pedidos"]')) cargarVentas();
   if (document.querySelector('[data-panel="empleados"]')) cargarPersonal();
+  if (document.querySelector('[data-panel="servicios"]')) cargarServicios();
   if (document.querySelector('[data-panel="turnos"]')) {
     cargarTurnos();
     cargarHistorialMedico();
@@ -394,6 +446,31 @@ document.addEventListener('click', event => {
   if (event.target.closest('[data-modal-close]') || event.target.matches('[data-admin-modal]')) closeAdminModal();
 });
 
+// Algunos formularios declaran registros hijos con casillas (p. ej. los permisos
+// que recibirá un rol de usuario). Tras crear el registro padre se envían aquí.
+async function asignarRegistrosRelacionados(form, resultado) {
+  const entidadHija = form.dataset.assignEntity;
+  if (!entidadHija || !resultado?.id) return 0;
+  const campoPadre = form.dataset.assignParent || 'id';
+  const campoHijo = form.dataset.assignField || 'id';
+  const marcados = [...form.querySelectorAll('[data-permiso-check]:checked')].map(casilla => casilla.value);
+  let fallidas = 0;
+  for (const valor of marcados) {
+    try {
+      const respuesta = await fetch(`${API_BASE_URL}/admin/${encodeURIComponent(entidadHija)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ [campoPadre]: resultado.id, [campoHijo]: valor })
+      });
+      if (!respuesta.ok) fallidas += 1;
+    } catch (error) {
+      console.error(`No se pudo guardar la asignación de ${entidadHija}:`, error);
+      fallidas += 1;
+    }
+  }
+  return fallidas;
+}
+
 document.addEventListener('submit', async event => {
   const form = event.target.closest('[data-admin-modal-form]');
   if (!form) return;
@@ -409,6 +486,11 @@ document.addEventListener('submit', async event => {
   const entidades = {
     'dirección': 'direccion',
     'categoría': 'categoria',
+    'categoría de servicio': 'categoriaServicio',
+    'valor de atributo': 'valorAtributo',
+    'adopción': 'adopcion',
+    'mascota en adopción': 'mascotaAdopcion',
+    'rol de usuario': 'rolUsuario',
     'envío': 'envio',
     'historial médico': 'historial',
     'registro de stock': 'stock',
@@ -451,10 +533,13 @@ document.addEventListener('submit', async event => {
     .then(async respuesta => {
       const resultado = await respuesta.json();
       if (!respuesta.ok) throw new Error(resultado.mensaje || 'No se pudo guardar el registro');
+      const asignacionesFallidas = await asignarRegistrosRelacionados(form, resultado);
       form.reset();
       invalidarOpcionesRelaciones();
       closeAdminModal();
-      showToast(`${entity} guardado correctamente`);
+      showToast(asignacionesFallidas
+        ? `${entity} guardado, pero ${asignacionesFallidas} permiso(s) no se pudieron asignar`
+        : `${entity} guardado correctamente`);
       cargarDatosDeVista();
     })
     .catch(error => {

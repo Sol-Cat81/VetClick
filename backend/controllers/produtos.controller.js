@@ -11,7 +11,11 @@ const solicitarProductosDestacados = async (req, res) => {
 	          v.id_valor_atributo,
 	          va.nombre AS atributo,
 	          v.precio,
-	          v.stock,
+	          COALESCE((
+	            SELECT SUM(i.stock_actual)
+	            FROM inventario AS i
+	            WHERE i.id_variante = v.id_variante
+	          ), 0) AS stock,
 	          p.imagen AS imagen_producto
             FROM productos AS p 
             INNER JOIN variantes AS v

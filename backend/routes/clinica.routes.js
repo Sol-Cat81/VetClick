@@ -5,4 +5,6 @@ router.get('/turnos', controller.turnos);
 router.get('/historial', controller.historial);
 router.get('/tratamientos', controller.tratamientos);
 router.get('/vacunas', controller.vacunas);
+router.get('/servicios', controller.servicios);
+router.get('/categorias-servicios', controller.categoriasServicio);
 module.exports = router;
