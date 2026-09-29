@@ -62,7 +62,7 @@ class MiNavbar extends HTMLElement {
             display: flex;
             align-items: center;
             width: 500px;
-            max-width: 100%; /* Importante para que no se desborde */
+            max-width: 100%;
             background: var(--secundario-fondo);
             border-radius: 5px;
             overflow: hidden;
@@ -191,7 +191,30 @@ class MiNavbar extends HTMLElement {
         .offcanvas-correo {
             margin-top: 10px;
             }
+            .contenedor-carrito {
+              position: relative;
+              display: inline-flex;
+              align-items: center;
+          }
+        .badge-carrito {
+              position: absolute;
+              top: -6px;
+              right: -10px;
+              background-color: var(--secundario-fondo);
+              color: var(--elem-importantes);
+              font-size: 11px;
+              font-weight: bold;
+              border-radius: 50%;
+              padding: 2px;
+              line-height: 1;
+              letter-spacing: 1px;
+              width: fit-content;
+              text-align: center;
+          }
 
+          .d-none {
+              display: none !important;
+          }
         /* =========================================
            MEDIA QUERIES
            ========================================= */
@@ -226,7 +249,10 @@ class MiNavbar extends HTMLElement {
           </form>
           
           <div class="header-icons">
-            <a href="${ruta}carrito.html"><i class="ph-thin ph-shopping-cart"></i></a>
+            <a href="${ruta}pages/carrito.html" aria-label="Ver carrito" class="contenedor-carrito">
+            <i class="ph-thin ph-shopping-cart"></i>
+            <span id="contador-carrito" class="badge-carrito d-none">0</span>
+            </a>
             <a href="${ruta}login.html" id="usarioSession"><i class="ph-thin ph-user"></i></a>
           </div>
         </div>
@@ -356,7 +382,7 @@ window.addEventListener("load", async () => {
       });
     });
 
-    const confirmaSession = await fetch(
+    let confirmaSession = await fetch(
       "http://127.0.0.1:3000/api/usuarios/verificarsession",
       {
         method: "GET",
@@ -380,31 +406,32 @@ window.addEventListener("load", async () => {
       );
 
       if (!refresh.ok) {
-        mostrarToast('Sesion expirada.', 'error');
+        return;
       }
 
       // Ya tenemos un nuevo access token.
-      confirmaSession = await fetch("http://127.0.0.1:3000/api/usuarios/verificarsession",{
-          credentials: "include"
-        })
-      }
-      const session = await confirmaSession.json();
+      confirmaSession = await fetch("http://127.0.0.1:3000/api/usuarios/verificarsession", {
+        credentials: "include"
+      })
+    }
+    const session = await confirmaSession.json();
 
-      if (confirmaSession.ok) {
-        controlUsuario.innerHTML = ``;
-        offCanvas.innerHTML += `
+    if (confirmaSession.ok) {
+      controlUsuario.innerHTML = ``;
+      offCanvas.innerHTML += `
       <li><a href="#" class="ofcanvas-nav">Mi cuenta</a></li>
       <li onclick="cerrarSession()" class="ofcanvas-nav">Cerrar Sesion</li>
       `
-      } else {
-        console.log("no hay session");
-        return;
-      }
-    } catch (error) {
-      console.error("Error de conexión:", error);
-      mostrarToast('No se pudo conectar con el sevidor.', 'error');
+      actualizarContadorCarrito();
+    } else {
+      console.log("no hay session");
+      return;
     }
-  });
+  } catch (error) {
+    console.error("Error de conexión:", error);
+    mostrarToast('No se pudo conectar con el sevidor.', 'error');
+  }
+});
 
 async function cerrarSession() {
   try {
@@ -444,3 +471,36 @@ async function leerRespuestaJson(respuesta) {
     );
   }
 }
+
+// Función global para actualizar el número del carrito desde cualquier parte
+async function actualizarContadorCarrito() {
+  const contador = document.getElementById("contador-carrito");
+  if (!contador) return;
+
+  try {
+    const response = await fetch("http://127.0.0.1:3000/api/productos/carrito/cargar", {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      const total = Number(data.cant) || 0;
+
+      if (total > 0) {
+        contador.textContent = total;
+        contador.classList.remove("d-none");
+      } else {
+        contador.classList.add("d-none");
+      }
+    } else {
+      contador.classList.add("d-none");
+    }
+  } catch (error) {
+    console.error("Error al obtener cantidad del carrito:", error);
+    contador.classList.add("d-none");
+  }
+}
+
+window.actualizarContadorCarrito = actualizarContadorCarrito;

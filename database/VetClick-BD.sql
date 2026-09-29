@@ -198,6 +198,16 @@ CREATE TABLE empleados (
 );
 
 
+CREATE TABLE carrito_items (
+    id_carrito INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    id_variante INT NOT NULL,
+    cantidad INT NOT NULL DEFAULT 1,
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
+    FOREIGN KEY (id_variante) REFERENCES variantes(id_variante) ON DELETE CASCADE,
+    UNIQUE KEY usuario_producto_unico (id_usuario, id_variante)
+);
+
 /* ====================================================
    4. TABLAS DE TERCER NIVEL DE DEPENDENCIA
    ==================================================== */

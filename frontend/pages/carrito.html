@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="shortcut icon" href="../assets/icons/ChatGPT-Image-Logo.png" type="image/x-icon" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous" />
+    <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2"></script>
+    <link rel="stylesheet" href="../css/carrito.css" />
+    <title>VetClick - Tu carrito</title>
+</head>
+<body>
+    <mi-navbar ruta-base="../" pagina-actual="carrito"></mi-navbar>
+
+    <main class="carrito-main">
+        <section class="carrito-hero">
+            <h1>Carrito de compras</h1>
+            <p>Revisá tus productos y completá los datos para el envío.</p>
+        </section>
+
+        <div class="carrito-layout">
+            <section class="lista-panel" aria-labelledby="titulo-lista">
+                <div class="lista-heading">
+                    <div>
+                        <h2 id="titulo-lista">Productos <span id="cantidad-items">(0)</span></h2>
+                    </div>
+                    <a class="seguir-comprando" href="productos.html">
+                        <i class="ph ph-arrow-left" aria-hidden="true"></i> Seguir comprando
+                    </a>
+                </div>
+
+                <div class="productos-columnas" aria-hidden="true">
+                    <span>Producto</span><span>Cantidad</span><span>Precio</span><span>Subtotal</span>
+                </div>
+                <div id="lista-productos" class="lista-productos" aria-live="polite">
+                    <p class="estado-carga">Cargando tu carrito...</p>
+                </div>
+                <div id="carrito-vacio" class="carrito-vacio" hidden>
+                    <i class="ph ph-basket" aria-hidden="true"></i>
+                    <h3>Tu carrito está vacío</h3>
+                    <p>Encontrá algo para hacerle el día a tu mascota.</p>
+                    <a class="boton-primario" href="productos.html">Ver productos</a>
+                </div>
+            </section>
+
+            <aside class="compra-panel" aria-labelledby="titulo-compra">
+                <div class="compra-heading">
+                    <h2 id="titulo-compra">Detalles de compra</h2>
+                </div>
+
+                <form id="form-compra">
+                    <fieldset class="grupo-formulario">
+                        <legend><i class="ph ph-truck" aria-hidden="true"></i> Datos de envío</legend>
+                        <label class="campo">
+                            Nombre y apellido
+                            <input name="nombre" autocomplete="name" required />
+                        </label>
+                        <label class="campo">
+                            Correo electrónico
+                            <input type="email" name="correo" autocomplete="email" required />
+                        </label>
+                        <label class="campo">
+                            Teléfono
+                            <input type="tel" name="telefono" autocomplete="tel" required />
+                        </label>
+                        <label class="campo">
+                            Dirección
+                            <input name="direccion" autocomplete="street-address" required />
+                        </label>
+                        <div class="campos-pareja">
+                            <label class="campo">
+                                Ciudad
+                                <input name="ciudad" autocomplete="address-level2" required />
+                            </label>
+                            <label class="campo">
+                                Provincia
+                                <input name="provincia" autocomplete="address-level1" required />
+                            </label>
+                        </div>
+                        <label class="campo">
+                            Código postal
+                            <input name="codigoPostal" autocomplete="postal-code" required />
+                        </label>
+                        <label class="campo">
+                            Entrega
+                            <select name="entrega" id="tipo-entrega">
+                                <option value="domicilio">Envío a domicilio</option>
+                                <option value="retiro">Retiro en sucursal</option>
+                            </select>
+                        </label>
+                    </fieldset>
+
+                    <fieldset class="grupo-formulario pago-forma">
+                        <legend><i class="ph ph-credit-card" aria-hidden="true"></i> Forma de pago</legend>
+                        <label class="opcion-pago">
+                            <input type="radio" name="pago" value="tarjeta" checked />
+                            <span><i class="ph ph-credit-card" aria-hidden="true"></i> Tarjeta de crédito o
+                                débito</span>
+                        </label>
+                        <label class="opcion-pago">
+                            <input type="radio" name="pago" value="transferencia" />
+                            <span><i class="ph ph-bank" aria-hidden="true"></i> Transferencia bancaria</span>
+                        </label>
+                        <label class="opcion-pago">
+                            <input type="radio" name="pago" value="efectivo" />
+                            <span><i class="ph ph-money" aria-hidden="true"></i> Efectivo al retirar</span>
+                        </label>
+                    </fieldset>
+
+                    <div class="resumen-compra" aria-live="polite">
+                        <div>
+                            <span>Productos</span>
+                            <strong id="subtotal-compra">$0</strong>
+                        </div>
+                        <div>
+                            <span>Envío</span>
+                            <strong id="costo-envio">$0</strong>
+                        </div>
+                        <div class="total-compra">
+                            <span>Total</span>
+                            <strong id="total-compra">$0</strong>
+                        </div>
+                    </div>
+                    <p class="nota-envio">El costo de envío se calcula según el destino.</p>
+                    <button class="boton-primario boton-confirmar" type="submit" id="confirmar-compra" disabled>
+                        Continuar con la compra <i class="ph ph-arrow-right" aria-hidden="true"></i>
+                    </button>
+                    <p id="mensaje-compra" class="mensaje-compra" role="status"></p>
+                    <p class="nota-seguridad"><i class="ph ph-lock-key" aria-hidden="true"></i> Tus datos se utilizan
+                        únicamente para gestionar esta compra.</p>
+                </form>
+            </aside>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+    <script src="../js/navbar.js" defer></script>
+    <script src="../js/carrito.js" defer></script>
+</body>
+
+</html>
