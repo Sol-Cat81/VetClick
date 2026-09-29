@@ -28,4 +28,8 @@ async function agregarItem(datos) {
     return Carrito.agregar(idUsuario, Number(idVariante), Number(cantidad))
 }
 
-module.exports = { traerCarrito, eliminarItem, agregarItem, cambiarCantidad}
+async function cantidadCargada(dato) {
+    return Carrito.cantidadCargada(dato)
+}
+
+module.exports = { traerCarrito, eliminarItem, agregarItem, cambiarCantidad, cantidadCargada }

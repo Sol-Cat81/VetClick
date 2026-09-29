@@ -182,6 +182,9 @@ async function modificarCarrito(accion, idVariante) {
         }
         mensajeCompra.textContent = "";
         await cargarCarrito();
+        if (typeof window.actualizarContadorCarrito === 'function') {
+            window.actualizarContadorCarrito();
+        }
     } catch (error) {
         mensajeCompra.textContent = error.message;
     }

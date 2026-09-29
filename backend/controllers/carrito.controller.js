@@ -1,5 +1,5 @@
 // El controlador recibe HTTP y aplica las reglas de login/registro.
-const { traerCarrito, eliminarItem, agregarItem, cambiarCantidad } = require('./../service/productos.service')
+const { traerCarrito, eliminarItem, agregarItem, cambiarCantidad, cantidadCargada } = require('./../service/productos.service')
 
 // Devuelve los artículos del usuario autenticado, o una lista vacía.
 const solicitarCarrito = async(req, res) =>{
@@ -71,4 +71,14 @@ const realizarCompra = async(req, res) =>{
     
 }
 
-module.exports = {solicitarCarrito, agregarCarrito, eliminarItemCarrito, actualizarCantidadCarrito, realizarCompra}
+const traerCantidad = async(req, res) =>{
+    try {
+        const cant = await cantidadCargada(req.usuario.id)
+        return res.status(200).json({cant})
+    } catch (error) {
+        console.error(error)
+        return res.status(500).json({mensaje: 'Error interno'})
+    }
+}
+
+module.exports = {solicitarCarrito, agregarCarrito, eliminarItemCarrito, actualizarCantidadCarrito, realizarCompra, traerCantidad}

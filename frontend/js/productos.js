@@ -134,6 +134,9 @@ async function agregarAlCarrito(idProducto){
 
   if(enviar.ok){
     mostrarToast('Producto agreagado al carrito!', 'exito');
+    if (typeof window.actualizarContadorCarrito === 'function') {
+    window.actualizarContadorCarrito();
+  }
   }else{
     mostrarToast(respuesta.mensaje || 'No se pudo agregar al carrito :(', 'error')
   }
