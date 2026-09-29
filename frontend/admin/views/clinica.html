@@ -9,7 +9,7 @@
   <div class="subnav">
     <button class="active" data-section="turnos">Turnos</button><button data-section="historial">Historial
       médico</button><button data-section="tratamientos">Tratamientos</button><button
-      data-section="vacunas">Vacunas</button>
+      data-section="vacunas">Vacunas</button><button data-section="servicios">Servicios</button>
   </div>
 
   <div data-panel="turnos">
@@ -26,8 +26,10 @@
               <th>Fecha</th>
               <th>Hora</th>
               <th>Paciente</th>
+              <th>Cliente</th>
               <th>Servicio</th>
               <th>Sucursal</th>
+              <th>Motivo</th>
               <th>Estado</th>
             </tr>
           </thead>
@@ -104,6 +106,56 @@
     </article>
   </div>
 
+  <div data-panel="servicios" hidden>
+    <div class="toolbar">
+      <div class="filter-box">⌕ <input data-table-filter="#servicios-table" placeholder="Buscar servicio..."></div>
+      <div class="toolbar-actions">
+        <button class="btn btn-primary" type="button" data-modal-action="create" data-modal-entity="servicio"
+          data-modal-panel="servicios">＋ Añadir servicio</button>
+        <button class="btn btn-secondary" type="button" data-modal-action="create"
+          data-modal-entity="categoría de servicio" data-modal-panel="servicios">＋ Añadir categoría</button>
+      </div>
+    </div>
+    <article class="card table-card">
+      <div class="card-head">
+        <h2>Servicios</h2><span>Prestaciones de la clínica</span>
+      </div>
+      <div class="table-wrap">
+        <table id="servicios-table" data-modal-entity="servicio">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Servicio</th>
+              <th>Categoría</th>
+              <th>Precio</th>
+              <th>Descripción</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+      </div>
+    </article>
+    <article class="card table-card">
+      <div class="card-head">
+        <h2>Categorías de servicio</h2><span>Agrupaciones de servicios</span>
+      </div>
+      <div class="table-wrap">
+        <table id="categorias-servicio-table" data-modal-entity="categoría de servicio">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Categoría de servicio</th>
+            </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+      </div>
+    </article>
+  </div>
+
   <div class="modal-backdrop" data-admin-modal="turno">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="turno-modal-title">
       <div class="modal-head">
@@ -135,7 +187,9 @@
               <option value="PENDIENTE">Pendiente</option>
               <option value="CONFIRMADO">Confirmado</option>
               <option value="CANCELADO">Cancelado</option>
-            </select></label></div>
+              <option value="FINALIZADO">Finalizado</option>
+            </select></label><label>Observaciones<textarea data-modal-field name="observaciones"
+              rows="2"></textarea></label></div>
         <div class="modal-actions"><button class="btn btn-secondary" type="button"
             data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar turno</button></div>
       </form>
@@ -203,7 +257,7 @@
               autocomplete="off" required><datalist id="vacuna-mascotas"></datalist></label>
           <input type="hidden" name="id_mascota" data-relation-value="id_mascota">
           <label>Vacuna<input data-modal-field name="nombre"
-              required></label><label>Aplicación<input data-modal-field name="aplicacion"
+              required></label><label>Aplicación<input data-modal-field name="fecha_aplicacion"
               type="date"></label><label>Próxima<input data-modal-field name="fecha_proxima"
               type="date"></label><label>Veterinario<input data-modal-field name="veterinario_busqueda"
               list="vacuna-veterinarios" data-relation="veterinarios" data-relation-field="id_veterinario"
@@ -211,6 +265,50 @@
           <input type="hidden" name="id_veterinario" data-relation-value="id_veterinario"></div>
         <div class="modal-actions"><button class="btn btn-secondary" type="button"
             data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar vacuna</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="modal-backdrop" data-admin-modal="servicio">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="servicio-modal-title">
+      <div class="modal-head">
+        <div><span class="modal-kicker">Servicios</span>
+          <h2 id="servicio-modal-title" data-modal-title>Agregar servicio</h2>
+        </div><button class="modal-close" type="button" data-modal-close aria-label="Cerrar">×</button>
+      </div>
+      <form data-admin-modal-form>
+        <div class="modal-fields">
+          <label>Servicio<input data-modal-field name="nombre" required></label>
+          <label>Categoría<input data-modal-field name="categoria_servicio_busqueda" list="servicio-categorias"
+              data-relation="categoriasServicios" data-relation-field="id_categoria_servicio" autocomplete="off">
+            <datalist id="servicio-categorias"></datalist></label>
+          <input type="hidden" name="id_categoria_servicio" data-relation-value="id_categoria_servicio">
+          <label>Precio<input data-modal-field name="precio" type="number" step="0.01" min="0"></label>
+          <label>Descripción<textarea data-modal-field name="descripcion" rows="2"></textarea></label>
+          <label>Estado<select data-modal-field name="activo">
+              <option value="true">Activo</option>
+              <option value="false">Inactivo</option>
+            </select></label>
+        </div>
+        <div class="modal-actions"><button class="btn btn-secondary" type="button"
+            data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar servicio</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="modal-backdrop" data-admin-modal="categoría de servicio">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="categoria-servicio-modal-title">
+      <div class="modal-head">
+        <div><span class="modal-kicker">Servicios</span>
+          <h2 id="categoria-servicio-modal-title" data-modal-title>Agregar categoría de servicio</h2>
+        </div><button class="modal-close" type="button" data-modal-close aria-label="Cerrar">×</button>
+      </div>
+      <form data-admin-modal-form>
+        <div class="modal-fields">
+          <label>Categoría de servicio<input data-modal-field name="nombre" required></label>
+        </div>
+        <div class="modal-actions"><button class="btn btn-secondary" type="button"
+            data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar categoría</button>
         </div>
       </form>
     </div>

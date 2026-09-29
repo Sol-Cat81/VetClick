@@ -7,6 +7,6 @@ async function cargarInventario(){
   try{
     const sucursales = await obtenerDatos('inventario/sucursales');
     const container = document.querySelector('#sucursales-list');
-    if(container) container.innerHTML = sucursales.map(row => `<article class="card info-card"><h3>${escaparHtml(row.nombre)}</h3><div class="info-row"><span>Dirección</span><b>${escaparHtml(row.direccion)}</b></div><div class="info-row"><span>Localidad</span><b>${escaparHtml(row.localidad)}</b></div><div class="info-row"><span>Horario</span><b>${escaparHtml(row.horario)}</b></div><div class="info-row"><span>Estado</span><span class="status ${row.activo ? 'success' : 'warning'}">${row.activo ? 'Activa' : 'Inactiva'}</span></div></article>`).join('');
+    if(container) container.innerHTML = sucursales.map(row => `<article class="card info-card"><h3>${escaparHtml(row.nombre)}</h3><div class="info-row"><span>Dirección</span><b>${escaparHtml(row.direccion)}</b></div><div class="info-row"><span>Teléfono</span><b>${escaparHtml(row.telefono || '—')}</b></div><div class="info-row"><span>Localidad</span><b>${escaparHtml(row.localidad)}</b></div><div class="info-row"><span>Horario</span><b>${escaparHtml(row.horario)}</b></div><div class="info-row"><span>Estado</span><span class="status ${row.activo ? 'success' : 'warning'}">${row.activo ? 'Activa' : 'Inactiva'}</span></div></article>`).join('');
   }catch(error){ informarErrorCarga('inventario/sucursales', error); }
 }

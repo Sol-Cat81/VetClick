@@ -5,6 +5,8 @@ module.exports = {
   listarCategorias: () => CatalogoModel.categorias(),
   listarMarcas: () => CatalogoModel.marcas(),
   listarVariantes: () => CatalogoModel.variantes(),
+  listarAtributos: () => CatalogoModel.atributos(),
+  listarValoresAtributo: () => CatalogoModel.valoresAtributo(),
 
   crearProducto: async (producto) => {
     const nombre = String(producto?.nombre ?? '').trim();
@@ -42,7 +44,7 @@ module.exports = {
       id_categoria: categoria,
       activo: producto?.activo === undefined ? true : Boolean(producto.activo),
       descuento,
-      imagen_url: producto?.imagen_url || null
+      imagen: producto?.imagen || null
     });
   }
 };

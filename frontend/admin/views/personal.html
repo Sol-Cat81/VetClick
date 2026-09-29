@@ -12,8 +12,12 @@
 
   <div data-panel="empleados">
     <div class="toolbar">
-      <div class="filter-box">⌕ <input placeholder="Buscar empleado..."></div><button class="btn btn-primary"
-        data-toast="Formulario de empleado listo para conectar">＋ Añadir empleado</button>
+      <div class="filter-box">⌕ <input placeholder="Buscar empleado..."></div>
+      <div class="toolbar-actions">
+        <button class="btn btn-primary" data-toast="Formulario de empleado listo para conectar">＋ Añadir empleado</button>
+        <button class="btn btn-secondary" type="button" data-modal-action="create" data-modal-entity="rol"
+          data-modal-panel="empleados">＋ Rol de empleado</button>
+      </div>
     </div>
     <article class="card table-card">
       <div class="table-wrap">
@@ -33,6 +37,7 @@
         </table>
       </div>
     </article>
+    <div class="detail-grid" id="roles-empleados-list"></div>
   </div>
 
   <div data-panel="veterinarios" hidden>
@@ -80,6 +85,15 @@
   </div>
 
   <div data-panel="roles" hidden>
+    <div class="toolbar">
+      <div class="filter-box">⌕ <input placeholder="Buscar en roles y permisos..."></div>
+      <div class="toolbar-actions">
+        <button class="btn btn-primary" type="button" data-modal-action="create"
+          data-modal-entity="rol de usuario" data-modal-panel="roles">＋ Rol de usuario</button>
+        <button class="btn btn-secondary" type="button" data-modal-action="create" data-modal-entity="permiso"
+          data-modal-panel="roles">＋ Permiso</button>
+      </div>
+    </div>
     <div class="detail-grid" id="roles-list">
 
     </div>
@@ -167,10 +181,49 @@
       </div>
       <form data-admin-modal-form>
         <div class="modal-fields"><label>Rol<input data-modal-field name="nombre"
-              required></label><label>Descripción<textarea data-modal-field name="descripcion"
-              rows="2"></textarea></label></div>
+              required></label></div>
         <div class="modal-actions"><button class="btn btn-secondary" type="button"
             data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar rol</button></div>
+      </form>
+    </div>
+  </div>
+  <div class="modal-backdrop" data-admin-modal="permiso">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="permiso-modal-title">
+      <div class="modal-head">
+        <div><span class="modal-kicker">Seguridad</span>
+          <h2 id="permiso-modal-title" data-modal-title>Agregar permiso</h2>
+        </div><button class="modal-close" type="button" data-modal-close aria-label="Cerrar">×</button>
+      </div>
+      <form data-admin-modal-form>
+        <div class="modal-fields">
+          <label>Permiso<input data-modal-field name="nombre" required></label>
+          <label>Descripción<textarea data-modal-field name="descripcion" rows="2" maxlength="100"></textarea></label>
+        </div>
+        <div class="modal-actions"><button class="btn btn-secondary" type="button"
+            data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar permiso</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="modal-backdrop" data-admin-modal="rol de usuario">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="rol-usuario-modal-title">
+      <div class="modal-head">
+        <div><span class="modal-kicker">Seguridad</span>
+          <h2 id="rol-usuario-modal-title" data-modal-title>Agregar rol de usuario</h2>
+        </div><button class="modal-close" type="button" data-modal-close aria-label="Cerrar">×</button>
+      </div>
+      <form data-admin-modal-form data-assign-entity="rolPermiso" data-assign-parent="id_rol_usuario"
+        data-assign-field="id_permiso">
+        <div class="modal-fields">
+          <label>Rol de usuario<input data-modal-field name="nombre" required></label>
+        </div>
+        <fieldset class="permisos-fieldset">
+          <legend>Permisos que tendrá este rol</legend>
+          <div class="permisos-grid" id="rol-usuario-permisos"></div>
+        </fieldset>
+        <div class="modal-actions"><button class="btn btn-secondary" type="button"
+            data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar rol</button>
+        </div>
       </form>
     </div>
   </div>

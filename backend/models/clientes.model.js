@@ -29,6 +29,44 @@ const ClientesModel = {
     `);
     return rows;
   },
+  obtenerEspecies: async () => {
+    const [rows] = await conexion.query(
+      'SELECT id_especie, nombre FROM especies ORDER BY id_especie'
+    );
+    return rows;
+  },
+  obtenerRazas: async () => {
+    const [rows] = await conexion.query(`
+      SELECT r.id_raza, r.nombre, r.id_especie, e.nombre AS especie
+      FROM razas r
+      LEFT JOIN especies e ON e.id_especie = r.id_especie
+      ORDER BY r.id_raza
+    `);
+    return rows;
+  },
+  obtenerMascotasAdopcion: async () => {
+    const [rows] = await conexion.query(`
+      SELECT m.id_mascota_adopcion, m.nombre, m.id_especie, e.nombre AS especie,
+             m.edad, m.sexo, m.descripcion, m.estado
+      FROM mascotas_adopcion m
+      LEFT JOIN especies e ON e.id_especie = m.id_especie
+      ORDER BY m.id_mascota_adopcion
+    `);
+    return rows;
+  },
+  obtenerAdopciones: async () => {
+    const [rows] = await conexion.query(`
+      SELECT a.id_adopcion, a.id_cliente,
+             CONCAT(c.nombre, ' ', c.apellido) AS cliente,
+             a.id_mascota_adopcion, ma.nombre AS mascota,
+             a.fecha, a.estado, a.observacion
+      FROM adopciones a
+      LEFT JOIN clientes c ON c.id_cliente = a.id_cliente
+      LEFT JOIN mascotas_adopcion ma ON ma.id_mascota_adopcion = a.id_mascota_adopcion
+      ORDER BY a.id_adopcion
+    `);
+    return rows;
+  },
   crearCliente: async (cliente) => {
     const [resultado] = await conexion.query(`
     INSERT INTO clientes(id_usuario, nombre, apellido, telefono, estado) VALUES (?,?,?,?,?)

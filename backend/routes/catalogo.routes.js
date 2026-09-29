@@ -21,5 +21,7 @@ router.post('/productos', upload.single('imagen'), controller.crearProducto);
 router.get('/categorias', controller.categorias);
 router.get('/marcas', controller.marcas);
 router.get('/variantes', controller.variantes);
+router.get('/atributos', controller.atributos);
+router.get('/valores-atributo', controller.valoresAtributo);
 
 module.exports = router;

@@ -1,7 +1,7 @@
 const conexion = require('../config/database');
 
 const q = {
-  productos: `SELECT p.id_producto, p.nombre, m.nombre AS marca, p.descripcion, p.descuento, p.activo, p.imagen_url
+  productos: `SELECT p.id_producto, p.nombre, m.nombre AS marca, p.descripcion, p.descuento, p.activo, p.imagen
               FROM productos p
               JOIN marcas m ON m.id_marca = p.id_marca
               ORDER BY p.id_producto`,
@@ -9,13 +9,17 @@ const q = {
                FROM categorias c
                LEFT JOIN categorias p ON p.id_categoria = c.categoria_padre
                ORDER BY c.id_categoria`,
-  marcas: 'SELECT id_marca, nombre FROM marcas ORDER BY id_marca',
-  variantes: `SELECT v.id_variante, p.nombre AS producto, v.precio, v.stock, va.nombre AS atributo
+  marcas: 'SELECT id_marca, nombre ,imagen_marca FROM marcas ORDER BY id_marca',
+  variantes: `SELECT v.id_variante, p.nombre AS producto, v.precio, va.nombre AS atributo
               FROM variantes v
               JOIN productos p ON p.id_producto = v.id_producto
-              LEFT JOIN variantes_atributos vap ON vap.id_variante = v.id_variante
-              LEFT JOIN valores_atributo va ON va.id_valor = vap.id_valor_atributo
-              ORDER BY v.id_variante`
+              LEFT JOIN valores_atributo va ON va.id_valor = v.id_valor_atributo
+              ORDER BY v.id_variante`,
+  atributos: 'SELECT id_atributo, nombre FROM atributos ORDER BY id_atributo',
+  valoresAtributo: `SELECT va.id_valor, va.id_atributo, a.nombre AS atributo, va.nombre
+                    FROM valores_atributo va
+                    LEFT JOIN atributos a ON a.id_atributo = va.id_atributo
+                    ORDER BY va.id_valor`
 };
 
 const CatalogoModel = {
@@ -30,7 +34,7 @@ const CatalogoModel = {
     try {
       await conexionTransaccion.beginTransaction();
       const [resultado] = await conexionTransaccion.query(
-        `INSERT INTO productos (id_marca, nombre, descripcion, activo, descuento, imagen_url)
+        `INSERT INTO productos (id_marca, nombre, descripcion, activo, descuento, imagen)
          VALUES (?, ?, ?, ?, ?, ?)`,
         [
           idMarca,
@@ -38,7 +42,7 @@ const CatalogoModel = {
           descripcion,
           activo,
           descuento,
-          producto.imagen_url || null
+          producto.imagen || null
         ]
       );
       await conexionTransaccion.query(

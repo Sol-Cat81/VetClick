@@ -19,8 +19,10 @@ async function cargarTurnos() {
                 <td>${escaparHtml(turno.fecha)}</td>
                 <td>${escaparHtml(turno.hora)}</td>
                 <td>${escaparHtml(turno.mascota)}</td>
+                <td>${escaparHtml(turno.cliente)}</td>
                 <td>${escaparHtml(turno.servicio)}</td>
                 <td>${escaparHtml(turno.sucursal)}</td>
+                <td>${escaparHtml(turno.motivo)}</td>
                 <td><span class = "status ${claseEstado}">${estado}</span></td>
                 <td><button class="btn btn-secondary" data-toast="Editar turno #${escaparHtml(turno.id_turno)}">Editar</button> </td>
             </tr>
@@ -88,4 +90,36 @@ async function cargarVacunas(){
             </tr>
         `).join('');
     }catch(error){ informarErrorCarga('clinica/vacunas', error); }
+}
+
+async function cargarServicios(){
+    try{
+        const servicios = await obtenerDatos('clinica/servicios');
+        const tbody = document.querySelector('#servicios-table tbody');
+        if(!tbody) return;
+        tbody.innerHTML = (servicios || []).map(servicio => `
+            <tr>
+                <td>${escaparHtml(servicio.id_servicio)}</td>
+                <td>${escaparHtml(servicio.nombre)}</td>
+                <td>${escaparHtml(servicio.categoria || '—')}</td>
+                <td>$${escaparHtml(servicio.precio)}</td>
+                <td>${escaparHtml(servicio.descripcion)}</td>
+                <td><span class="status ${servicio.activo ? 'success' : 'warning'}">${servicio.activo ? 'Activo' : 'Inactivo'}</span></td>
+            </tr>
+        `).join('');
+    }catch(error){ informarErrorCarga('clinica/servicios', error); }
+}
+
+async function cargarCategoriasServicio(){
+    try{
+        const categorias = await obtenerDatos('clinica/categorias-servicios');
+        const tbody = document.querySelector('#categorias-servicio-table tbody');
+        if(!tbody) return;
+        tbody.innerHTML = (categorias || []).map(categoria => `
+            <tr>
+                <td>${escaparHtml(categoria.id_categoria_servicio)}</td>
+                <td>${escaparHtml(categoria.nombre)}</td>
+            </tr>
+        `).join('');
+    }catch(error){ informarErrorCarga('clinica/categorias-servicios', error); }
 }

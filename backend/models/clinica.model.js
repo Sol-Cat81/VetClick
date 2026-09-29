@@ -3,9 +3,11 @@ const ClinicaModel = {
   obtenerTurnos: async () => {
     const [rows] = await conexion.query(`
       SELECT t.id_turno, t.fecha, t.hora, m.nombre AS mascota,
-             s.nombre AS servicio, su.nombre AS sucursal, t.estado
+             CONCAT(c.nombre, ' ', c.apellido) AS cliente,
+             s.nombre AS servicio, su.nombre AS sucursal, t.motivo, t.estado
       FROM turnos t JOIN mascota m ON m.id_mascota = t.id_mascota
       JOIN servicios s ON s.id_servicio = t.id_servicio
+      LEFT JOIN clientes c ON c.id_cliente = t.id_cliente
       LEFT JOIN sucursales su ON su.id_sucursal = t.id_sucursal
       ORDER BY t.fecha, t.hora`);
     return rows;
@@ -36,6 +38,21 @@ const ClinicaModel = {
       LEFT JOIN veterinarios vet ON vet.id_veterinario = v.id_veterinario
       LEFT JOIN empleados e ON e.id_empleado = vet.id_empleado
       ORDER BY v.id_vacuna`);
+    return rows;
+  },
+  obtenerServicios: async () => {
+    const [rows] = await conexion.query(`
+      SELECT s.id_servicio, s.nombre, s.descripcion, s.id_categoria_servicio,
+             c.nombre AS categoria, s.precio, s.activo
+      FROM servicios s
+      LEFT JOIN categorias_servicios c ON c.id_categoria_servicio = s.id_categoria_servicio
+      ORDER BY s.id_servicio`);
+    return rows;
+  },
+  obtenerCategoriasServicio: async () => {
+    const [rows] = await conexion.query(
+      'SELECT id_categoria_servicio, nombre FROM categorias_servicios ORDER BY id_categoria_servicio'
+    );
     return rows;
   }
 };

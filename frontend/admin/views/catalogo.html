@@ -9,7 +9,7 @@
   <div class="subnav">
     <button class="active" data-section="productos">Productos</button><button
       data-section="categorias">Categorías</button><button data-section="marcas">Marcas</button><button
-      data-section="variantes">Variantes</button>
+      data-section="variantes">Variantes</button><button data-section="atributos">Atributos</button>
   </div>
 
   <div data-panel="productos">
@@ -66,6 +66,7 @@
             <tr>
               <th>ID</th>
               <th>Marca</th>
+              <th>Imagen</th>
             </tr>
           </thead>
           <tbody>
@@ -85,12 +86,58 @@
               <th>ID</th>
               <th>Producto</th>
               <th>Precio</th>
-              <th>Stock base</th>
               <th>Atributo</th>
             </tr>
           </thead>
           <tbody>
 
+          </tbody>
+        </table>
+      </div>
+    </article>
+  </div>
+
+  <div data-panel="atributos" hidden>
+    <div class="toolbar">
+      <div class="filter-box">⌕ <input data-table-filter="#atributos-table" placeholder="Buscar atributo..."></div>
+      <div class="toolbar-actions">
+        <button class="btn btn-primary" type="button" data-modal-action="create" data-modal-entity="atributo"
+          data-modal-panel="atributos">＋ Añadir atributo</button>
+        <button class="btn btn-secondary" type="button" data-modal-action="create"
+          data-modal-entity="valor de atributo" data-modal-panel="atributos">＋ Añadir valor</button>
+      </div>
+    </div>
+    <article class="card table-card">
+      <div class="card-head">
+        <h2>Atributos</h2><span>Características de las variantes</span>
+      </div>
+      <div class="table-wrap">
+        <table id="atributos-table" data-modal-entity="atributo">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Atributo</th>
+            </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+      </div>
+    </article>
+    <article class="card table-card">
+      <div class="card-head">
+        <h2>Valores de atributo</h2><span>Opciones de cada atributo</span>
+      </div>
+      <div class="table-wrap">
+        <table id="valores-atributo-table" data-modal-entity="valor de atributo">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Atributo</th>
+              <th>Valor</th>
+            </tr>
+          </thead>
+          <tbody>
           </tbody>
         </table>
       </div>
@@ -172,13 +219,50 @@
               autocomplete="off" required><datalist id="variante-productos"></datalist></label>
           <input type="hidden" name="id_producto" data-relation-value="id_producto">
           <label>Precio<input data-modal-field name="precio" type="number" step="0.01" required></label>
-          <label>Stock base<input data-modal-field name="stock" type="number"></label>
           <label>Atributo<input data-modal-field name="atributo_busqueda" list="variante-atributos"
               data-relation="valoresAtributo" data-relation-field="id_valor_atributo" autocomplete="off">
             <datalist id="variante-atributos"></datalist></label>
           <input type="hidden" name="id_valor_atributo" data-relation-value="id_valor_atributo"></div>
         <div class="modal-actions"><button class="btn btn-secondary" type="button"
             data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar variante</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="modal-backdrop" data-admin-modal="atributo">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="atributo-modal-title">
+      <div class="modal-head">
+        <div><span class="modal-kicker">Atributos de variantes</span>
+          <h2 id="atributo-modal-title" data-modal-title>Agregar atributo</h2>
+        </div><button class="modal-close" type="button" data-modal-close aria-label="Cerrar">×</button>
+      </div>
+      <form data-admin-modal-form>
+        <div class="modal-fields">
+          <label>Atributo<input data-modal-field name="nombre" maxlength="20" required></label>
+        </div>
+        <div class="modal-actions"><button class="btn btn-secondary" type="button"
+            data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar atributo</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="modal-backdrop" data-admin-modal="valor de atributo">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="valor-atributo-modal-title">
+      <div class="modal-head">
+        <div><span class="modal-kicker">Atributos de variantes</span>
+          <h2 id="valor-atributo-modal-title" data-modal-title>Agregar valor de atributo</h2>
+        </div><button class="modal-close" type="button" data-modal-close aria-label="Cerrar">×</button>
+      </div>
+      <form data-admin-modal-form>
+        <div class="modal-fields">
+          <label>Atributo<input data-modal-field name="atributo_busqueda" list="valor-atributo-atributos"
+              data-relation="atributos" data-relation-field="id_atributo" autocomplete="off" required>
+            <datalist id="valor-atributo-atributos"></datalist></label>
+          <input type="hidden" name="id_atributo" data-relation-value="id_atributo">
+          <label>Valor<input data-modal-field name="nombre" maxlength="20" required></label>
+        </div>
+        <div class="modal-actions"><button class="btn btn-secondary" type="button"
+            data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar valor</button>
         </div>
       </form>
     </div>
