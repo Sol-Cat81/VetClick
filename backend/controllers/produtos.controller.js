@@ -98,7 +98,7 @@ const solicitarCategorias = async (req, res) => {
 
 const traerProductos = async (req, res) => {
   try {
-    const productos = await traerProductos();
+    const productos = await traerTodosProductos();
     res.status(200).json(productos)
   } catch (error) {
     console.log(error)

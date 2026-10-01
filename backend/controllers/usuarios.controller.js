@@ -123,7 +123,7 @@ const registrarUsuario = async (req, res) => {
     // Insertamos usando parámetros para evitar inyección SQL.
     const [nuevoUsuario] = await db.query(
       "INSERT INTO usuarios(username, email, password_hash, id_rol_usuario) VALUES (?, ?, ?, ?)",
-      [usuario, gmail, hashPassword, 2],
+      [usuario, gmail, hashPassword, 3],
     );
 
     res.status(201).json({ mensaje: "Registro exitoso, puede iniciar sesion" });

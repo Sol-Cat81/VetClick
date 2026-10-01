@@ -33,7 +33,51 @@ async function cantidadCargada(dato) {
 }
 
 async function traerTodosProductos() {
-    return Productos.traerTodosProductos()
+    const productos = await Productos.traer()
+    const ordenarProd = {};
+
+    productos.forEach((producto) => {
+      if (!ordenarProd[producto.id_producto]) {
+        ordenarProd[producto.id_producto] = {
+          id: producto.id_producto,
+            id_marca: producto.id_marca,
+            marca: producto.marca,
+          nombre: producto.nombre,
+          descripcion: producto.descripcion,
+          descuento: producto.descuento,
+          imagen: producto.imagen_producto || producto.imagen_variante,
+            categorias: [],
+          variantes: [],
+        };
+      }
+
+      const productoAgrupado = ordenarProd[producto.id_producto];
+
+      if (producto.id_categoria && !productoAgrupado.categorias.some(
+        (categoria) => categoria.id === producto.id_categoria
+      )) {
+        productoAgrupado.categorias.push({
+          id: producto.id_categoria,
+          nombre: producto.categoria,
+          categoria_padre: producto.categoria_padre,
+        });
+      }
+
+      if (!productoAgrupado.variantes.some(
+        (variante) => variante.id === producto.id_variante
+      )) {
+        productoAgrupado.variantes.push({
+          id: producto.id_variante,
+          id_atributo: producto.id_valor_atributo,
+          precio: producto.precio,
+          stock: producto.stock,
+          atributo: producto.atributo || "Disponible",
+          imagen: producto.imagen_variante,
+        });
+      }
+    });
+
+    return ordenarProd
 }
 
 module.exports = { traerCarrito, eliminarItem, agregarItem, cambiarCantidad, cantidadCargada, traerTodosProductos }

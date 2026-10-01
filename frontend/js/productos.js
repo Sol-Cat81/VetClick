@@ -74,8 +74,7 @@ const formatearNumero = (numero) => {
   }).format(numero);
 };
 
-const calcularPrecioConDescuento = (precio, descuento) =>
-  precio * (1 - descuento / 100);
+const calcularPrecioConDescuento = (precio, descuento) => precio * (1 - descuento / 100);
 
 const renderizarPrecio = (precio, descuento) => {
   const precioFinal = calcularPrecioConDescuento(precio, descuento);

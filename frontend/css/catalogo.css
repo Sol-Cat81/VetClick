@@ -198,6 +198,54 @@ input[type="range"]::-moz-range-thumb {
     transform: rotate(90deg);
 }
 
+/* Presenta las categorías y marcas como listas compactas y anidadas. */
+.lista-filtros{
+    list-style: none;
+    margin: 6px 0;
+    padding-left: 14px;
+}
+
+/* Mantiene cada opción alineada y fácil de seleccionar. */
+.opcion-filtro{
+    color: var(--texto);
+    font-size: 0.95rem;
+    font-weight: normal;
+    letter-spacing: 0;
+    padding: 4px 0;
+    text-transform: none;
+}
+
+/* Alinea la casilla con el nombre de la opción. */
+.opcion-filtro label{
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    gap: 8px;
+}
+
+/* Usa el color principal de la tienda en los controles marcados. */
+.opcion-filtro input{
+    accent-color: var(--elem-importantes);
+}
+
+/* Indenta visualmente los niveles de subcategorías. */
+.opcion-filtro ul{
+    list-style: none;
+    padding-left: 16px;
+}
+
+/* Reserva una fila completa para la navegación de páginas. */
+#paginacion{
+    width: 100%;
+}
+
+/* Centra el mensaje cuando no hay resultados para los filtros actuales. */
+.sin-resultados{
+    grid-column: 1 / -1;
+    padding: 24px;
+    text-align: center;
+}
+
 /* --- PRODUCTOS --- */
 
 .contenedor{
@@ -322,6 +370,32 @@ input[type="range"]::-moz-range-thumb {
     border-radius: 10px 0px 10px 0px;
 }
 
+/* = = = = PIE DE PAGINA = = = = */
+footer{
+    background-color: var(--elem-importantes);
+    color: var(--secundario-fondo);
+    padding: 30px 20px;
+}
+footer .col{
+    padding: 0px 15px;
+}
+footer img{
+    width: 80%;
+    margin: 10px auto;
+    justify-self: center;
+    align-self: center;
+}
+footer .list-group li{
+    background-color: var(--elem-importantes);
+    color: var(--secundario-fondo);
+}
+.social{
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 15px;
+    font-size: 2rem;
+}
+
 @media (max-width: 1024px){
     .filtros{
         display: none;
@@ -338,6 +412,15 @@ input[type="range"]::-moz-range-thumb {
     }
     .menu-filtros{
         display: block;
+    }
+}
+@media (max-width: 768px){
+
+    footer .col-md-4:nth-child(1){
+        text-align: center;
+    }
+    footer .col-md-4:nth-child(1)img{
+        width: 60%;
     }
 }
 @media (max-width: 563px){

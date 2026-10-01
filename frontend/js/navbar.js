@@ -65,7 +65,7 @@ class MiNavbar extends HTMLElement {
             max-width: 100%;
             background: var(--secundario-fondo);
             border-radius: 5px;
-            overflow: hidden;
+          position: relative;
             /* Le damos un orden por defecto */
             order: 2; 
         }
@@ -94,6 +94,57 @@ class MiNavbar extends HTMLElement {
             background: var(--elem-secun);
             color: var(--secundario-fondo);
             border: 1px solid var(--elem-secun);
+        }
+
+        .search-suggestions {
+          position: absolute;
+          top: calc(100% + 4px);
+          left: 0;
+          right: 0;
+          z-index: 1200;
+          max-height: 280px;
+          overflow-y: auto;
+          background: var(--secundario-fondo);
+          border: 1px solid #d4dddd;
+          border-radius: 5px;
+          box-shadow: 0 6px 16px #0002;
+        }
+
+        .search-suggestions[hidden] { display: none; }
+
+        .search-suggestion {
+          display: block;
+          padding: 10px 12px;
+          color: var(--texto, #263238);
+          text-decoration: none;
+          letter-spacing: 0;
+        }
+
+        .search-suggestion:hover,
+        .search-suggestion[aria-selected="true"] {
+          background: #e8f3f2;
+          color: var(--elem-importantes);
+        }
+
+        .search-suggestions-empty {
+          padding: 10px 12px;
+          color: #5f6b6b;
+        }
+
+        .categoriasPadre .categoria-link {
+          display: block;
+          padding: 7px 10px;
+          color: var(--secundario-fondo);
+          text-decoration: none;
+        }
+
+        .categoriasPadre .categoria-link:hover {
+          color: var(--elem-secun);
+          background: #60a5ba49;
+        }
+
+        .categoriasPadre ul {
+          padding-left: 14px;
         }
         
         .header-icons {
@@ -227,12 +278,23 @@ class MiNavbar extends HTMLElement {
             .search-bar {
                 order: 4; 
                 width: 100%; 
-                margin-top: 5px; /* Separación de los iconos de arriba */
             }
             /* 2. Aseguramos que los iconos se queden arriba a la derecha */
             .header-icons {
                 order: 2; 
             }
+            .logo {
+            font-size: 2rem;
+        }
+            .search-bar input {
+            padding: 2px 10px;
+            font-size: 12px;
+        }
+            .search-bar button {
+            padding: 2px 10px;
+            font-size: 15px;
+            aling-items: center;
+        }
         }
       </style>
 
@@ -243,9 +305,10 @@ class MiNavbar extends HTMLElement {
             <a href="${ruta}index.html" class="logo">VetClick</a>
           </div>
           
-          <form class="search-bar">
-            <input type="text" placeholder="Buscar..." name="search" />
-            <button type="submit"><i class="ph-bold ph-magnifying-glass"></i></button>
+          <form class="search-bar" role="search" autocomplete="off">
+            <input type="search" placeholder="Buscar productos..." name="search" aria-label="Buscar productos" aria-autocomplete="list" aria-controls="search-suggestions" aria-expanded="false" />
+            <button type="submit" aria-label="Buscar"><i class="ph-bold ph-magnifying-glass"></i></button>
+            <div class="search-suggestions" id="search-suggestions" role="listbox" hidden></div>
           </form>
           
           <div class="header-icons">
@@ -299,6 +362,115 @@ class MiNavbar extends HTMLElement {
       </div>
 
     `;
+
+    const formularioBusqueda = this.querySelector(".search-bar");
+    const entradaBusqueda = formularioBusqueda.querySelector('input[name="search"]');
+    const sugerenciasBusqueda = formularioBusqueda.querySelector(".search-suggestions");
+    let solicitudProductos;
+    let indiceSugerenciaActiva = -1;
+
+    const crearRutaCatalogo = (parametros) => {
+      const consulta = new URLSearchParams(parametros);
+      return `${ruta}pages/catalogo.html?${consulta.toString()}`;
+    };
+
+    const normalizarTexto = (texto) => texto
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLocaleLowerCase("es");
+
+    const obtenerProductosBusqueda = () => {
+      solicitudProductos ||= fetch("http://127.0.0.1:3000/api/productos")
+        .then((respuesta) => {
+          if (!respuesta.ok) throw new Error("No se pudieron cargar las sugerencias.");
+          return respuesta.json();
+        })
+        .then((productos) => Array.isArray(productos) ? productos : Object.values(productos || {}));
+      return solicitudProductos;
+    };
+
+    const ocultarSugerencias = () => {
+      sugerenciasBusqueda.hidden = true;
+      sugerenciasBusqueda.replaceChildren();
+      entradaBusqueda.setAttribute("aria-expanded", "false");
+      indiceSugerenciaActiva = -1;
+    };
+
+    const mostrarSugerencias = async () => {
+      const termino = entradaBusqueda.value.trim();
+      if (!termino) {
+        ocultarSugerencias();
+        return;
+      }
+
+      try {
+        const productos = await obtenerProductosBusqueda();
+        if (entradaBusqueda.value.trim() !== termino) return;
+        const consulta = normalizarTexto(termino);
+        const coincidencias = productos
+          .filter((producto) => normalizarTexto(`${producto.nombre} ${producto.descripcion || ""}`).includes(consulta))
+          .slice(0, 6);
+
+        sugerenciasBusqueda.replaceChildren();
+        if (!coincidencias.length) {
+          const mensaje = document.createElement("div");
+          mensaje.className = "search-suggestions-empty";
+          mensaje.textContent = "Sin sugerencias";
+          sugerenciasBusqueda.append(mensaje);
+        } else {
+          coincidencias.forEach((producto) => {
+            const sugerencia = document.createElement("a");
+            sugerencia.className = "search-suggestion";
+            sugerencia.setAttribute("role", "option");
+            sugerencia.setAttribute("aria-selected", "false");
+            sugerencia.href = crearRutaCatalogo({ q: producto.nombre });
+            sugerencia.textContent = producto.nombre;
+            sugerenciasBusqueda.append(sugerencia);
+          });
+        }
+
+        sugerenciasBusqueda.hidden = false;
+        entradaBusqueda.setAttribute("aria-expanded", "true");
+        indiceSugerenciaActiva = -1;
+      } catch (error) {
+        console.error("Error al cargar sugerencias:", error);
+        ocultarSugerencias();
+      }
+    };
+
+    formularioBusqueda.addEventListener("submit", (evento) => {
+      evento.preventDefault();
+      const termino = entradaBusqueda.value.trim();
+      if (!termino) return;
+      window.location.href = crearRutaCatalogo({ q: termino });
+    });
+
+    entradaBusqueda.addEventListener("input", mostrarSugerencias);
+    entradaBusqueda.addEventListener("focus", mostrarSugerencias);
+    entradaBusqueda.addEventListener("keydown", (evento) => {
+      const opciones = Array.from(sugerenciasBusqueda.querySelectorAll(".search-suggestion"));
+      if (evento.key === "Escape") {
+        ocultarSugerencias();
+        return;
+      }
+      if (!opciones.length) return;
+
+      if (evento.key === "ArrowDown" || evento.key === "ArrowUp") {
+        evento.preventDefault();
+        const direccion = evento.key === "ArrowDown" ? 1 : -1;
+        indiceSugerenciaActiva = indiceSugerenciaActiva < 0 && direccion < 0
+          ? opciones.length - 1
+          : (indiceSugerenciaActiva + direccion + opciones.length) % opciones.length;
+        opciones.forEach((opcion, indice) => opcion.setAttribute("aria-selected", String(indice === indiceSugerenciaActiva)));
+      } else if (evento.key === "Enter" && indiceSugerenciaActiva >= 0) {
+        evento.preventDefault();
+        window.location.href = opciones[indiceSugerenciaActiva].href;
+      }
+    });
+
+    document.addEventListener("click", (evento) => {
+      if (!this.contains(evento.target)) ocultarSugerencias();
+    });
   }
 }
 
@@ -344,42 +516,28 @@ window.addEventListener("load", async () => {
     const categorias = data.categorias;
     const contenedores = document.querySelectorAll(".categoriasPadre");
 
+    const rutaBaseCatalogo = document.querySelector("mi-navbar")?.getAttribute("ruta-base") || "";
+
+    const crearElementoCategoria = (categoria) => {
+      const elemento = document.createElement("li");
+      const enlace = document.createElement("a");
+      const parametros = new URLSearchParams({ categoria: categoria.id_categoria });
+      enlace.className = "categoria-link";
+      enlace.href = `${rutaBaseCatalogo}pages/catalogo.html?${parametros.toString()}`;
+      enlace.textContent = categoria.nombre;
+      elemento.append(enlace);
+
+      if (categoria.subcategorias?.length) {
+        const hijas = document.createElement("ul");
+        categoria.subcategorias.forEach((hija) => hijas.append(crearElementoCategoria(hija)));
+        elemento.append(hijas);
+      }
+
+      return elemento;
+    };
+
     contenedores.forEach((contenedor) => {
-      contenedor.innerHTML = "";
-
-      categorias.forEach((categoriaPadre) => {
-        if (categoriaPadre.subcategorias.length > 0) {
-          let subCategorias = "";
-
-          categoriaPadre.subcategorias.forEach((subCat) => {
-            subCategorias += `
-              <li class="subCategoria" data-id="${subCat.id_categoria}" data-padre="${subCat.categoria_padre}">
-                ${subCat.nombre}
-              </li>
-            `;
-          });
-
-          contenedor.innerHTML += `
-            <li>
-              <details class="categoria-offcanvas">
-                <summary data-id="${categoriaPadre.id_categoria}">
-                  ${categoriaPadre.nombre}
-                  <span class="sub-flecha"><i class="ph-thin ph-caret-down"></i></span>
-                </summary>
-                <ul>
-                  ${subCategorias}
-                </ul>
-              </details>
-            </li>
-          `;
-        } else {
-          contenedor.innerHTML += `
-            <li data-id="${categoriaPadre.id_categoria}">
-              ${categoriaPadre.nombre}
-            </li>
-          `;
-        }
-      });
+      contenedor.replaceChildren(...categorias.map(crearElementoCategoria));
     });
 
     let confirmaSession = await fetch(
@@ -504,3 +662,4 @@ async function actualizarContadorCarrito() {
 }
 
 window.actualizarContadorCarrito = actualizarContadorCarrito;
+// tipo como q no me funciona los botos de acciones del admin

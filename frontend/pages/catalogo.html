@@ -12,8 +12,8 @@
     <title>VetClick - Catalogo</title>
 </head>
 
-<body><!--
-    <mi-navbar ruta-base="../" pagina-actual="carrito"></mi-navbar>-->
+<body>
+    <mi-navbar ruta-base="../" pagina-actual="carrito"></mi-navbar>
 
     <main class="container-xl">
         <section id="catalogo-hero">
@@ -49,25 +49,21 @@
                             Categorias
                             <i class="ph-bold ph-caret-right"></i>
                         </summary>
+                        <ul id="lista-categorias" class="lista-filtros"></ul>
                     </details>
                     <details>
                         <summary>
                             Marcas
                             <i class="ph-bold ph-caret-right"></i>
                         </summary>
-                        <ul>
-                            <li></li>
-                            <li></li>
-                            <li></li>
-                            <li></li>
-                        </ul>
+                        <ul id="lista-marcas" class="lista-filtros"></ul>
                     </details>
                 </div>
             </aside>
             <div class="contenedor">
                 <section class="barra">
                     <div class="contador">
-                        (<span>100</span>)productos
+                        (<span id="contador-productos">0</span>) productos
                     </div>
                     <button class="btn menu-filtros">
                         <i class="ph-bold ph-faders"></i>
@@ -75,150 +71,52 @@
                     </button>
                 </section>
                 <section class="productos">
-                    <div class="card mx-auto" id="id-${prod.id}" data-descuento="${descuento}">
-                        <div class="imagen">
-                            <img src="https://miro.medium.com/v2/resize:fit:1400/1*3zyfXTjeTP-dQpS4wzhFvQ.png"
-                                class="card-img-top" onerror="" alt="" />
-                            <div class="desc">50%</div>
-                        </div>
-                        <div  class="cuerpo">
-                            <div class="card-body">
-                                <div class="card-title"><b>Alimento</b></div>
-                                <div class="card-text">
-                                    <button type="button" class="opcion" data-id="" data-atributo="" data-precio=""
-                                        data-stock="" data-imagen="">3kg</button>
-                                </div>
-                            </div>
-                            <div class="card-pie">
-                                <div class="precio">
-                                    <span class="precio-nuevo">$50000</span>
-                                    <span class="precio-anterior">$6000</span>
-                                </div>
-                                <button class="btn btn-comprar" onclick="agregarAlCarrito()">Comprar</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card mx-auto" id="id-${prod.id}" data-descuento="${descuento}">
-                        <div class="imagen">
-                            <img src="https://miro.medium.com/v2/resize:fit:1400/1*3zyfXTjeTP-dQpS4wzhFvQ.png"
-                                class="card-img-top" onerror="" alt="" />
-                            <div class="desc">50%</div>
-                        </div>
-                        <div  class="cuerpo">
-                            <div class="card-body">
-                                <div class="card-title"><b>Alimento</b></div>
-                                <div class="card-text">
-                                    <button type="button" class="opcion" data-id="" data-atributo="" data-precio=""
-                                        data-stock="" data-imagen="">3kg</button>
-                                </div>
-                            </div>
-                            <div class="card-pie">
-                                <div class="precio">
-                                    <span class="precio-nuevo">$50000</span>
-                                    <span class="precio-anterior">$6000</span>
-                                </div>
-                                <button class="btn btn-comprar" onclick="agregarAlCarrito()">Comprar</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card mx-auto" id="id-${prod.id}" data-descuento="${descuento}">
-                        <div class="imagen">
-                            <img src="https://miro.medium.com/v2/resize:fit:1400/1*3zyfXTjeTP-dQpS4wzhFvQ.png"
-                                class="card-img-top" onerror="" alt="" />
-                            <div class="desc">50%</div>
-                        </div>
-                        <div  class="cuerpo">
-                            <div class="card-body">
-                                <div class="card-title"><b>Alimento</b></div>
-                                <div class="card-text">
-                                    <button type="button" class="opcion" data-id="" data-atributo="" data-precio=""
-                                        data-stock="" data-imagen="">3kg</button>
-                                </div>
-                            </div>
-                            <div class="card-pie">
-                                <div class="precio">
-                                    <span class="precio-nuevo">$50000</span>
-                                    <span class="precio-anterior">$6000</span>
-                                </div>
-                                <button class="btn btn-comprar" onclick="agregarAlCarrito()">Comprar</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card mx-auto" id="id-${prod.id}" data-descuento="${descuento}">
-                        <div class="imagen">
-                            <img src="https://miro.medium.com/v2/resize:fit:1400/1*3zyfXTjeTP-dQpS4wzhFvQ.png"
-                                class="card-img-top" onerror="" alt="" />
-                            <div class="desc">50%</div>
-                        </div>
-                        <div  class="cuerpo">
-                            <div class="card-body">
-                                <div class="card-title"><b>Alimento</b></div>
-                                <div class="card-text">
-                                    <button type="button" class="opcion" data-id="" data-atributo="" data-precio=""
-                                        data-stock="" data-imagen="">3kg</button>
-                                </div>
-                            </div>
-                            <div class="card-pie">
-                                <div class="precio">
-                                    <span class="precio-nuevo">$50000</span>
-                                    <span class="precio-anterior">$6000</span>
-                                </div>
-                                <button class="btn btn-comprar" onclick="agregarAlCarrito()">Comprar</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card mx-auto" id="id-${prod.id}" data-descuento="${descuento}">
-                        <div class="imagen">
-                            <img src="https://miro.medium.com/v2/resize:fit:1400/1*3zyfXTjeTP-dQpS4wzhFvQ.png"
-                                class="card-img-top" onerror="" alt="" />
-                            <div class="desc">50%</div>
-                        </div>
-                        <div  class="cuerpo">
-                            <div class="card-body">
-                                <div class="card-title"><b>Alimento</b></div>
-                                <div class="card-text">
-                                    <button type="button" class="opcion" data-id="" data-atributo="" data-precio=""
-                                        data-stock="" data-imagen="">3kg</button>
-                                </div>
-                            </div>
-                            <div class="card-pie">
-                                <div class="precio">
-                                    <span class="precio-nuevo">$50000</span>
-                                    <span class="precio-anterior">$6000</span>
-                                </div>
-                                <button class="btn btn-comprar" onclick="agregarAlCarrito()">Comprar</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card mx-auto" id="id-${prod.id}" data-descuento="${descuento}">
-                        <div class="imagen">
-                            <img src="https://miro.medium.com/v2/resize:fit:1400/1*3zyfXTjeTP-dQpS4wzhFvQ.png"
-                                class="card-img-top" onerror="" alt="" />
-                            <div class="desc">50%</div>
-                        </div>
-                        <div  class="cuerpo">
-                            <div class="card-body">
-                                <div class="card-title"><b>Alimento</b></div>
-                                <div class="card-text">
-                                    <button type="button" class="opcion" data-id="" data-atributo="" data-precio=""
-                                        data-stock="" data-imagen="">3kg</button>
-                                </div>
-                            </div>
-                            <div class="card-pie">
-                                <div class="precio">
-                                    <span class="precio-nuevo">$50000</span>
-                                    <span class="precio-anterior">$6000</span>
-                                </div>
-                                <button class="btn btn-comprar" onclick="agregarAlCarrito()">Comprar</button>
-                            </div>
-                        </div>
-                    </div>
                 </section>
+                <nav id="paginacion" aria-label="Paginación de productos"></nav>
+            </div>
+        </div>
+        <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1055">
+            <div id="miToast" class="toast align-items-center text-bg-success border-0" role="alert"
+                aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body" id="toast-mensaje">¡Operación exitosa!</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                        aria-label="Close"></button>
+                </div>
             </div>
         </div>
     </main>
-    <!--
-    <script src="../js/navbar.js" defer></script>-->
+
+    <!-- PIE DE PAGINA -->
+    <footer>
+        <div class="container-fluid">
+            <div class="row justify-content-center">
+                <div class="col-md-4 justify-content-center">
+                    <img src="../assets/icons/ChatGPT-Image-Logo.png" alt="" />
+                </div>
+                <div class="col-md-4">
+                    <h3>Nosotros</h3>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">Nosotros</li>
+                        <li class="list-group-item">Contacto</li>
+                        <li class="list-group-item">Sucursales</li>
+                        <li class="list-group-item">Politicas de privacidad</li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h3>Social</h3>
+                    <div class="social">
+                        <i class="ph ph-linkedin-logo"></i>
+                        <i class="ph ph-instagram-logo"></i>
+                        <i class="ph ph-facebook-logo"></i>
+                        <i class="ph ph-x-logo"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../js/navbar.js" defer></script>
     <script src="../js/catalogo.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
