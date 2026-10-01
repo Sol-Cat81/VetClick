@@ -14,7 +14,7 @@ const crearProducto = async (req, res) => {
       const result = await cloudinary.uploader.upload(
         `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`,
         {
-          folder: process.env.CLOUDINARY_FOLDER_PRODUCTO || 'VetClick\Productos',
+          folder: process.env.CLOUDINARY_FOLDER_PRODUCTO || 'VetClick/Productos',
           resource_type: 'image'
         }
       );
@@ -41,6 +41,24 @@ const crearProducto = async (req, res) => {
   }
 };
 
+const crearMarca = async (req , res)=>{
+  try {
+    let imagen = req.body ?.imagen_marca || null;//si se manda una URL en text
+    if (req.file){
+    const result = await cloudinary.uploader.upload(
+      `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`,
+      {folder: process.env.CLOUDINARY_FOLDER_MARCA || 'VetClick/Marcas', resource_type:'image'}
+    );
+    imagen = result.secure_url; //la direccion que se guardara en la base de datos
+    }
+    const resultado = await service.crearMarca({nombre: req.body?.nombre ,imagen});
+    res.status(201).json({mensaje: 'marca creada correctamente', id: resultado.insertId, imagen});
+  }catch (error){
+    console.error ('Error al guardar marca:', error);
+    res.status(error.status || 500).json({mensaje: error.mensaje || 'error al guardar marca'});
+  }
+}
+
 module.exports = {
   productos: responder(service.listarProductos),
   categorias: responder(service.listarCategorias),
@@ -48,7 +66,8 @@ module.exports = {
   variantes: responder(service.listarVariantes),
   atributos: responder(service.listarAtributos),
   valoresAtributo: responder(service.listarValoresAtributo),
-  crearProducto
+  crearProducto,
+  crearMarca
 };
 
 

@@ -46,5 +46,13 @@ module.exports = {
       descuento,
       imagen: producto?.imagen || null
     });
-  }
+  },
+
+  crearMarca: async (marca)=>{
+    const nombre = String(marca?.nombre ?? '').trim();
+    if(!nombre){
+      const e = new Error('el nombre de la marca es obligatorio'); e.status = 400; throw e;
+    }
+      return CatalogoModel.crearMarca({nombre, imagen: marca?.imagen || null}); 
+  },
 };

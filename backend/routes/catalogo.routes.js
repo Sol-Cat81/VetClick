@@ -15,7 +15,7 @@ const upload = multer({
     cb(null, true);
   }
 });
-
+router.post('/marcas', upload.single('imagen_marca'), controller.crearMarca);
 router.get('/productos', controller.productos);
 router.post('/productos', upload.single('imagen'), controller.crearProducto);
 router.get('/categorias', controller.categorias);

@@ -6,13 +6,13 @@ async function cargarCatalogo() {
         <td>${escaparHtml(row.nombre)}</td>
         <td>${escaparHtml(row.marca)}</td>
         <td>${escaparHtml(row.descripcion)}</td>
-        <td>${escaparHtml(row.descuento)}%</td>
+        <td>${escaparHtml((row.descuento))}%</td>
         <td><span class="status ${row.activo ? 'success' : 'warning'}">${row.activo ? 'Activo' : 'Inactivo'}</span></td>
-        <td>${escaparHtml(row.imagen || 'Sin imagen')}</td>
+        <td>${escaparHtml(truncarTexto(row.imagen || 'Sin imagen',18))}</td>
       </tr>
     `],
     ['categorias', 'catalogo/categorias', row => `<tr><td>${escaparHtml(row.id_categoria)}</td><td>${escaparHtml(row.nombre)}</td><td>${escaparHtml(row.categoria_padre || '—')}</td></tr>`],
-    ['marcas', 'catalogo/marcas', row => `<tr><td>${escaparHtml(row.id_marca)}</td><td>${escaparHtml(row.nombre)}</td><td>${escaparHtml(row.imagen_marca)}</td></tr>`],
+    ['marcas', 'catalogo/marcas', row => `<tr><td>${escaparHtml(row.id_marca)}</td><td>${escaparHtml(row.nombre)}</td><td>${escaparHtml(truncarTexto(row.imagen_marca || 'sin imagen', 18))}</td></tr>`],
     ['variantes', 'catalogo/variantes', row => `<tr><td>${escaparHtml(row.id_variante)}</td><td>${escaparHtml(row.producto)}</td><td>$${escaparHtml(row.precio)}</td><td>${escaparHtml(row.atributo || '—')}</td></tr>`]
   ];
 
