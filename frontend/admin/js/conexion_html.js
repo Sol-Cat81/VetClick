@@ -10,6 +10,12 @@ function escaparHtml(valor){
     .replace(/'/g, '&#039;');
 }
 
+
+function truncarTexto (valor, max=40){
+  const t = String (valor ?? '');
+  return t.length > max ? t.slice(0,max)+'...':t;
+};
+
 async function obtenerDatos(endpoint){
   const respuesta = await fetch(`${API_BASE_URL}/${endpoint}`);
   if(!respuesta.ok) throw new Error(`Error HTTP ${respuesta.status} en /${endpoint}`);

@@ -385,7 +385,7 @@ function cargarDatosDeVista() {
   if (document.querySelector('[data-panel="stock"]')) cargarInventario();
   if (document.querySelector('[data-panel="pedidos"]')) cargarVentas();
   if (document.querySelector('[data-panel="empleados"]')) cargarPersonal();
-  if (document.querySelector('[data-panel="servicios"]')) cargarServicios();
+  if (document.querySelector('[data-panel="servicios"]')) {cargarServicios(); cargarCategoriasServicio();};
   if (document.querySelector('[data-panel="turnos"]')) {
     cargarTurnos();
     cargarHistorialMedico();
@@ -511,12 +511,15 @@ document.addEventListener('submit', async event => {
     relacionRequeridaSinSeleccion.focus();
     return;
   }
-
-  const endpoint = nombreEntidad === 'producto'
-    ? 'catalogo/productos'
-    : `admin/${encodeURIComponent(nombreEntidad)}`;
   const esProducto = nombreEntidad === 'producto';
-  const datos = esProducto ? new FormData(form) : Object.fromEntries(new FormData(form));
+  const esMarca = nombreEntidad === 'marca'
+  const endpoint = esProducto
+    ? 'catalogo/productos'
+    :esMarca
+    ?'catalogo/marcas'
+    : `admin/${encodeURIComponent(nombreEntidad)}`;
+  const esArchivo = esProducto || esMarca;
+  const datos = esArchivo ? new FormData(form) : Object.fromEntries(new FormData(form));
 
   if (esProducto) {
     datos.append('nombre', form.elements.namedItem('producto').value.trim());
@@ -527,8 +530,8 @@ document.addEventListener('submit', async event => {
 
   fetch(`${API_BASE_URL}/${endpoint}`, {
     method: 'POST',
-    ...(esProducto ? {} : { headers: { 'Content-Type': 'application/json' } }),
-    body: esProducto ? datos : JSON.stringify(datos)
+    ...(esArchivo ? {} : { headers: { 'Content-Type': 'application/json' } }),
+    body: esArchivo ? datos : JSON.stringify(datos)
   })
     .then(async respuesta => {
       const resultado = await respuesta.json();

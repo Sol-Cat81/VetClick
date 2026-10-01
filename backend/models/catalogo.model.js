@@ -57,7 +57,14 @@ const CatalogoModel = {
     } finally {
       conexionTransaccion.release();
     }
-  }
+  },
+  async crearMarca(marca){
+  const [resultado] = await conexion.query(
+    'INSERT INTO marcas (nombre , imagen_marca) VALUES (?,?)',
+    [marca.nombre , marca.imagen]
+  );
+  return resultado;
+},
 };
 
 Object.keys(q).forEach((key) => {
@@ -66,5 +73,6 @@ Object.keys(q).forEach((key) => {
     return rows;
   };
 });
+
 
 module.exports = CatalogoModel;
