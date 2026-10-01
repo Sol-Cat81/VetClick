@@ -1,4 +1,4 @@
-const { Carrito } = require('./../models/productos.model')
+const { Carrito, Productos } = require('./../models/productos.model')
 
 // Obtiene el contenido; una lista vacía representa un carrito sin artículos.
 async function traerCarrito(idUsuario) {
@@ -32,8 +32,8 @@ async function cantidadCargada(dato) {
     return Carrito.cantidadCargada(dato)
 }
 
-async function traerTodosProductos(params) {
-    
+async function traerTodosProductos() {
+    return Productos.traerTodosProductos()
 }
 
 module.exports = { traerCarrito, eliminarItem, agregarItem, cambiarCantidad, cantidadCargada, traerTodosProductos }

@@ -1,4 +1,5 @@
 const db = require("./../config/database");
+const { traerTodosProductos } = require('./../service/productos.service')
 
 const solicitarProductosDestacados = async (req, res) => {
   try {
@@ -96,7 +97,13 @@ const solicitarCategorias = async (req, res) => {
 };
 
 const traerProductos = async (req, res) => {
-
+  try {
+    const productos = await traerProductos();
+    res.status(200).json(productos)
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({mensaje:"Hubo un problema al consultar los productos"})
+  }
 }
 
 module.exports = { solicitarProductosDestacados, solicitarCategorias, traerProductos };

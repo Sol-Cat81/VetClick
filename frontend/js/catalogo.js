@@ -11,3 +11,18 @@ const cerrarMenu = document.querySelector('.cerrar')
 
 btnFiltros.addEventListener("click", () => {menuFiltros.classList.toggle('filtro-activo')});
 cerrarMenu.addEventListener("click", () => {menuFiltros.classList.remove('filtro-activo')});
+
+async function traerProductos() {
+    const solicitar = await fetch(api)
+
+    if(solicitar.ok){
+        const productos = await solicitar.json()
+        console.log(productos.productos)
+    }else{
+        console.log(solicitar.mensaje)
+    }
+}
+
+window.addEventListener('load', async() =>{
+    traerProductos()
+})

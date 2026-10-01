@@ -113,7 +113,26 @@ class Productos{
         return resultado
         }
     static async traer(){
-        const query = ""
+        const query = `
+            SELECT p.id_producto,
+	          p.nombre,
+	          p.descripcion,
+	          p.descuento,
+	          v.id_variante,
+	          v.id_valor_atributo,
+	          va.nombre AS atributo,
+	          v.precio,
+	          v.stock,
+	          p.imagen AS imagen_producto
+            FROM productos AS p 
+            INNER JOIN variantes AS v
+            ON p.id_producto = v.id_producto 
+            LEFT JOIN valores_atributo AS va
+            ON v.id_valor_atributo = va.id_valor
+            WHERE p.activo = TRUE
+            ORDER BY p.id_producto, v.id_variante;`
+        const [ resultado ] = await db.execute(query)
+        return resultado
     }
 }
 
