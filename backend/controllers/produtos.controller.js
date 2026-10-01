@@ -95,4 +95,8 @@ const solicitarCategorias = async (req, res) => {
   }
 };
 
-module.exports = { solicitarProductosDestacados, solicitarCategorias };
+const traerProductos = async (req, res) => {
+
+}
+
+module.exports = { solicitarProductosDestacados, solicitarCategorias, traerProductos };

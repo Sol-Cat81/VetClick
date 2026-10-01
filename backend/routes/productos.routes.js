@@ -1,11 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const { solicitarProductosDestacados, solicitarCategorias } = require('./../controllers/produtos.controller')
+const { solicitarProductosDestacados, solicitarCategorias, traerProductos } = require('./../controllers/produtos.controller')
 const {solicitarCarrito, agregarCarrito, eliminarItemCarrito, actualizarCantidadCarrito, realizarCompra, traerCantidad} = require('./../controllers/carrito.controller')
 const { authMiddleware } = require('./../middlewares/auth')
 
 router.get('/destacados', solicitarProductosDestacados)
 router.get('/categorias', solicitarCategorias)
+router.get('/', traerProductos)
 
 router.get('/carrito', authMiddleware, solicitarCarrito)
 router.post('/carrito/agregar', authMiddleware, agregarCarrito)

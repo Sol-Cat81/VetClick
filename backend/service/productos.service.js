@@ -32,4 +32,8 @@ async function cantidadCargada(dato) {
     return Carrito.cantidadCargada(dato)
 }
 
-module.exports = { traerCarrito, eliminarItem, agregarItem, cambiarCantidad, cantidadCargada }
+async function traerTodosProductos(params) {
+    
+}
+
+module.exports = { traerCarrito, eliminarItem, agregarItem, cambiarCantidad, cantidadCargada, traerTodosProductos }
