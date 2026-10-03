@@ -295,16 +295,37 @@ function openAdminModal(action, entity, row, panel) {
     // Las tablas traen una fila con celdas; las tarjetas (.info-card) no tienen cells.
     const values = row.cells ? [...row.cells].map(cell => cell.textContent.trim()) : [];
     const campos = modal.querySelectorAll('[data-modal-field]');
-    campos.forEach((field, index) => {
-      field.value = values[index + 1] || '';
-    });
-    // En tarjetas el nombre principal se lee del título h3.
-    if (!values.length) {
+    if (values.length) {
+      // Mapeo por nombre de campo para no depender del orden de columnas.
+      // Reutiliza el mismo modal de insertar, solo lo muestra (sin actualizar).
+      const porNombre = {};
+      if (entity === 'producto') {
+        porNombre.producto = values[1] || '';
+        porNombre.marca_busqueda = values[2] || '';
+        porNombre.descripcion = values[3] || '';
+        porNombre.descuento = (values[4] || '').replace('%', '');
+        porNombre.estado = values[5] || '';
+      } else if (entity === 'marca') {
+        porNombre.nombre = values[1] || '';
+      } else {
+        campos.forEach((field, index) => { field.value = values[index + 1] || ''; });
+      }
+      campos.forEach(field => {
+        if (porNombre[field.name] !== undefined) field.value = porNombre[field.name];
+      });
+    } else {
+      // En tarjetas el nombre principal se lee del título h3.
       const nombre = row.querySelector('h3')?.textContent.trim();
+      const descripcion = row.querySelector('small')?.textContent.trim();
       campos.forEach(field => {
         if (field.name === 'nombre' && nombre) field.value = nombre;
+        if (field.name === 'descripcion' && descripcion) field.value = descripcion;
       });
     }
+    // Solo visualización: no se permite actualizar desde este modal.
+    modal.dataset.readonly = 'true';
+  } else {
+    delete modal.dataset.readonly;
   }
 
   precargarPermisosDeRol(entity, action, row);
@@ -479,6 +500,14 @@ document.addEventListener('submit', async event => {
 
   if (modal?.dataset.entity === 'cliente'
     || modal?.dataset.entity === 'mascota') return;
+
+  // En modo edición solo se muestra el modal (reutilizado del insertar);
+  // no se actualiza ni se envía nada al backend.
+  if (modal?.dataset.action === 'edit' || modal?.dataset.readonly === 'true') {
+    event.preventDefault();
+    closeAdminModal();
+    return;
+  }
 
   event.preventDefault();
 

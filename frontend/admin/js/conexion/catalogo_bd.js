@@ -1,7 +1,7 @@
 async function cargarCatalogo() {
   const paneles = [
     ['productos', 'catalogo/productos', row => `
-      <tr>
+      <tr data-id="${escaparHtml(row.id_producto)}">
         <td>${escaparHtml(row.id_producto)}</td>
         <td>${escaparHtml(row.nombre)}</td>
         <td>${escaparHtml(row.marca)}</td>
@@ -12,7 +12,7 @@ async function cargarCatalogo() {
       </tr>
     `],
     ['categorias', 'catalogo/categorias', row => `<tr><td>${escaparHtml(row.id_categoria)}</td><td>${escaparHtml(row.nombre)}</td><td>${escaparHtml(row.categoria_padre || '—')}</td></tr>`],
-    ['marcas', 'catalogo/marcas', row => `<tr><td>${escaparHtml(row.id_marca)}</td><td>${escaparHtml(row.nombre)}</td><td>${escaparHtml(truncarTexto(row.imagen_marca || 'sin imagen', 18))}</td></tr>`],
+    ['marcas', 'catalogo/marcas', row => `<tr data-id="${escaparHtml(row.id_marca)}"><td>${escaparHtml(row.id_marca)}</td><td>${escaparHtml(row.nombre)}</td><td>${escaparHtml(truncarTexto(row.imagen_marca || 'sin imagen', 18))}</td></tr>`],
     ['variantes', 'catalogo/variantes', row => `<tr><td>${escaparHtml(row.id_variante)}</td><td>${escaparHtml(row.producto)}</td><td>$${escaparHtml(row.precio)}</td><td>${escaparHtml(row.atributo || '—')}</td></tr>`]
   ];
 
@@ -26,6 +26,9 @@ async function cargarCatalogo() {
       informarErrorCarga(endpoint, error);
     }
   }
+  // Los botones Editar los genera enhanceAdminPanels al mutar el tbody.
+  // Se invoca de forma explícita para no depender solo del MutationObserver.
+  if (typeof enhanceAdminPanels === 'function') enhanceAdminPanels();
 }
 
 async function cargarAtributos() {
