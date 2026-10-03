@@ -23,8 +23,10 @@ async function cargarPersonal() {
     const container = document.querySelector('#roles-list');
     if (container) {
       const tarjetasRoles = rolesUsuario.map(rol => `<article class="card info-card" data-modal-entity="rol de usuario" data-id="${escaparHtml(rol.id_rol_usuario)}"><h3>${escaparHtml(rol.nombre)}</h3><div class="info-row"><span>ID del rol</span><b>${escaparHtml(rol.id_rol_usuario)}</b></div></article>`).join('');
-      const tarjetaPermisos = `<article class="card info-card" data-modal-entity="permiso"><h3>Permisos definidos</h3>${permisos.map(permiso => `<div class="info-row"><span>${escaparHtml(permiso.id_permiso)}</span><b>${escaparHtml(permiso.nombre)}</b><small>${escaparHtml(permiso.descripcion || '')}</small></div>`).join('')}</article>`;
-      container.innerHTML = tarjetasRoles + tarjetaPermisos;
+      // Un permiso por tarjeta para que cada uno tenga su propio botón Editar
+      // reutilizando el mismo modal de insertar (data-admin-modal="permiso").
+      const tarjetasPermisos = (permisos || []).map(permiso => `<article class="card info-card" data-modal-entity="permiso" data-id="${escaparHtml(permiso.id_permiso)}"><h3>${escaparHtml(permiso.nombre)}</h3><div class="info-row"><span>ID del permiso</span><b>${escaparHtml(permiso.id_permiso)}</b><small>${escaparHtml(permiso.descripcion || '')}</small></div></article>`).join('');
+      container.innerHTML = tarjetasRoles + tarjetasPermisos;
     }
     // Rellena las casillas del modal de rol con los permisos disponibles.
     const casillas = document.getElementById('rol-usuario-permisos');
@@ -32,4 +34,5 @@ async function cargarPersonal() {
       casillas.innerHTML = permisos.map(permiso => `<label class="permiso-check"><input type="checkbox" data-permiso-check value="${escaparHtml(permiso.id_permiso)}"><span>${escaparHtml(permiso.nombre)}<small>${escaparHtml(permiso.descripcion || '')}</small></span></label>`).join('');
     }
   } catch (error) { informarErrorCarga('personal/rolesusuario', error); }
+  if (typeof enhanceAdminPanels === 'function') enhanceAdminPanels();
 }
