@@ -52,9 +52,10 @@ const swiperProductos = new Swiper(".swiper-productos", {
   },
 });
 
-const contenedorProdDestacados = document.querySelector(
-  ".productos-destacados",
-);
+const contenedorProdDestacados = document.querySelector(".productos-destacados",);
+const contenedorCategorias = document.querySelector(".contenedor-categorias");
+const contenedorMarcas = document.querySelector(".contenedor-marcas");
+const categorias404 = "../assets/icons/bookmark.svg";
 const imagen404 =
   "https://assets.hellovector.com/product-images/b_5023.jpg";
 
@@ -141,6 +142,40 @@ async function agregarAlCarrito(idProducto){
   }
 }
 
+function cargarCategorias(categorias){
+  categorias.forEach((categoria) => {
+    const parametros = new URLSearchParams({ categoria: categoria.id_categoria });
+    const cardCategoria = document.createElement("div");
+    cardCategoria.classList.add("col");
+    cardCategoria.innerHTML = `
+      <div class="card-categorias mx-auto" data-id="${categoria.id_categoria}" onclick="window.location.href='catalogo.html?${parametros.toString()}'">
+        <img src="${categoria.imagen || categorias404}" alt="..." />
+        <div class="card-body">
+          <div class="card-title">${categoria.nombre}</div>
+        </div>
+      </div>
+    `;
+    contenedorCategorias.appendChild(cardCategoria);
+  });
+}
+
+function cargarMarcas(marcas){
+  marcas.forEach((marca) => {
+    const cardMarca = document.createElement("div");
+    const parametros = new URLSearchParams({ categoria: marca.id_marca });
+    cardMarca.classList.add("col");
+    cardMarca.innerHTML = `
+      <div class="card-marcas mx-auto" onclick="window.location.href='catalogo.html?${parametros.toString()}'">
+        <img src="${marca.imagen || imagen404}" alt="..." />
+        <div class="card-body">
+          <div class="card-title">${marca.nombre}</div>
+        </div>
+      </div>
+    `;
+    contenedorMarcas.appendChild(cardMarca);
+  });
+}
+
 /*==========================================
 
          = = = = = EVENTOS = = = = =
@@ -148,6 +183,30 @@ async function agregarAlCarrito(idProducto){
 ============================================*/
 
 window.addEventListener("load", async () => {
+  try {
+    const solicitarCategorias = await fetch(
+      "http://127.0.0.1:3000/api/productos/categoriasPadre"
+    );
+    const categorias = await solicitarCategorias.json();
+
+    cargarCategorias(categorias);
+  } catch (error) {
+    console.error("Error al obtener categorías:", error);
+    mostrarToast('No se pudo conectar con el sevidor.', 'error');
+  }
+  
+  try {
+    const solicitarMarcas = await fetch(
+      "http://127.0.0.1:3000/api/productos/marcas"
+    );
+    const marcas = await solicitarMarcas.json();
+
+    cargarMarcas(marcas);
+  } catch (error) {
+    console.error("Error al obtener marcas:", error);
+    mostrarToast('No se pudo conectar con el sevidor.', 'error');
+  }
+
   try {
     const solicitarDestacados = await fetch(
       "http://127.0.0.1:3000/api/productos/destacados",
@@ -173,7 +232,7 @@ window.addEventListener("load", async () => {
             (variante, indice) =>
               `<button type="button" class="opcion${
                 indice === 0 ? " elegido" : ""
-              }" data-id="${variante.id}" data-atributo="${variante.id_atributo ?? ""}" data-precio="${variante.precio}" data-stock="${variante.stock}" data-imagen="${variante.imagen || ""}">${variante.atributo || "Disponible"}</button>`,
+              }" data-id="${variante.id}" data-atributo="${variante.id_atributo ?? ""}" data-precio="${variante.precio}" data-stock="${variante.stock}">${variante.atributo || "Disponible"}</button>`,
           )
           .join("");
 
@@ -181,7 +240,7 @@ window.addEventListener("load", async () => {
           <div class="swiper-slide">
                 <div class="card-productos mx-auto" id="id-${prod.id}" data-descuento="${descuento}">
                   <img
-                    src="${prod.imagen || primeraVariante.imagen || imagen404}"
+                    src="${prod.imagen || imagen404}"
                     class="card-img-top"
                     onerror="this.onerror=null; this.src='${imagen404}';" 
                     alt="${prod.nombre}"
@@ -221,12 +280,6 @@ window.addEventListener("load", async () => {
             Number(tarjeta.dataset.descuento) || 0,
           );
 
-          const imagen = tarjeta.querySelector(".card-img-top");
-          imagen.onerror = () => {
-            imagen.onerror = null;
-            imagen.src = imagen404;
-          };
-          imagen.src = opcion.dataset.imagen || prod.imagen || imagen404;
         });
     });
 

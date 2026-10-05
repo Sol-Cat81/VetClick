@@ -1,5 +1,11 @@
 const db = require("./../config/database");
-const { traerTodosProductos } = require('./../service/productos.service')
+const { 
+  traerTodosProductos, 
+  buscarProductosCatalogo, 
+  obtenerRangoPrecios,
+  obtenerCategoriasPadre,
+  obtenerMarcas
+} = require('./../service/productos.service')
 
 const solicitarProductosDestacados = async (req, res) => {
   try {
@@ -36,7 +42,7 @@ const solicitarProductosDestacados = async (req, res) => {
           nombre: producto.nombre,
           descripcion: producto.descripcion,
           descuento: producto.descuento,
-          imagen: producto.imagen_producto || producto.imagen_variante,
+          imagen: producto.imagen_producto,
           variantes: [],
         };
       }
@@ -47,7 +53,6 @@ const solicitarProductosDestacados = async (req, res) => {
         precio: producto.precio,
         stock: producto.stock,
         atributo: producto.atributo || "Disponible",
-        imagen: producto.imagen_variante,
       });
     });
 
@@ -89,7 +94,7 @@ const solicitarCategorias = async (req, res) => {
 
     const arbolCategorias = construirArbolCategorias(categorias)
 
-    res.status(201).json({categorias: arbolCategorias});
+    res.status(201).json({ categorias: arbolCategorias });
   } catch (error) {
     console.error("Error al consultar categorias: ", error);
     res.status(500).json({ mensaje: "Hubo un error en el servidor" });
@@ -102,8 +107,61 @@ const traerProductos = async (req, res) => {
     res.status(200).json(productos)
   } catch (error) {
     console.log(error)
-    res.status(500).json({mensaje:"Hubo un problema al consultar los productos"})
+    res.status(500).json({ mensaje: "Hubo un problema al consultar los productos" })
   }
 }
 
-module.exports = { solicitarProductosDestacados, solicitarCategorias, traerProductos };
+// GET /api/productos/buscar?q=&categorias=&marcas=&precioMin=&precioMax=&page=&limit=
+// Aplica filtros + paginación en SQL y devuelve { data, total, pagina, porPagina,
+// totalPaginas }. El frontend solo renderiza esta página, no filtra en memoria.
+const buscarProductos = async (req, res) => {
+  try {
+    const resultado = await buscarProductosCatalogo(req.query);
+    res.status(200).json(resultado);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ mensaje: "Hubo un problema al buscar productos" });
+  }
+}
+
+// GET /api/productos/rango-precios -> { minimo, maximo } con precios finales.
+// El frontend calibra los sliders con esto, sin descargar el catálogo.
+const rangoPrecios = async (req, res) => {
+  try {
+    const rango = await obtenerRangoPrecios();
+    res.status(200).json(rango);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ mensaje: "Hubo un problema al calcular el rango de precios" });
+  }
+}
+
+const CategoriasPadre = async (req, res) => {
+  try {
+    const categorias = await obtenerCategoriasPadre();
+    res.status(200).json(categorias);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ mensaje: "Hubo un problema al obtener las categorías padre" });
+  }
+}
+
+const Marcas = async (req, res) => {
+  try {
+    const marcas = await obtenerMarcas();
+    res.status(200).json(marcas);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ mensaje: "Hubo un problema al obtener las marcas" });
+  }
+};
+
+module.exports = { 
+  solicitarProductosDestacados, 
+  solicitarCategorias, 
+  traerProductos, 
+  buscarProductos, 
+  rangoPrecios, 
+  CategoriasPadre, 
+  Marcas 
+};
