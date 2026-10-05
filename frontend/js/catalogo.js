@@ -3,8 +3,14 @@ const minRange = document.getElementById("minRange");
 // Obtiene el slider que controla el precio máximo.
 const maxRange = document.getElementById("maxRange");
 
-// Define el endpoint que devuelve productos agrupados con sus variantes.
+// Endpoint base (se mantiene para agregar al carrito) y árbol de categorías.
 const apiProductos = "http://127.0.0.1:3000/api/productos";
+// Nuevo: endpoint que filtra y pagina en SQL. Recibe ?q=&categorias=&marcas=
+// &precioMin=&precioMax=&page=&limit= y devuelve {data,total,pagina,totalPaginas}.
+const apiBuscar = "http://127.0.0.1:3000/api/productos/buscar";
+// Nuevo: endpoint que devuelve {minimo,maximo} con precios finales (con
+// descuento) para calibrar los sliders sin descargar el catálogo.
+const apiRango = "http://127.0.0.1:3000/api/productos/rango-precios";
 // Define el endpoint que devuelve el árbol de categorías.
 const apiCategorias = "http://127.0.0.1:3000/api/productos/categorias";
 // Define el endpoint que devuelve las marcas disponibles.
@@ -32,41 +38,50 @@ const contadorProductos = document.getElementById("contador-productos");
 // Define una imagen alternativa cuando no hay una imagen válida.
 const imagen404 = "https://assets.hellovector.com/product-images/b_5023.jpg";
 
-// Conserva los datos y el estado de navegación del catálogo.
+// Estado de navegación: YA NO guarda todos los productos en memoria.
+// Solo conserva la página actual, el total que informó el servidor y el rango
+// global de precios. Cada cambio de filtro pide una página nueva al backend.
 const estado = {
-    productos: [],
-    filtrados: [],
-    categorias: [],
+    productosPagina: [], // Solo los 8 productos de la página actual.
+    total: 0,            // Total de coincidencias (COUNT DISTINCT en SQL).
+    totalPaginas: 1,     // Para dibujar los botones Anterior/1..N/Siguiente.
     pagina: 1,
     porPagina: 8,
-    minimo: 0,
-    maximo: 0,
-    busqueda: ""
+    minimo: 0,           // Mínimo global (endpoint /rango-precios).
+    maximo: 0,           // Máximo global (endpoint /rango-precios).
+    busqueda: "",        // Texto ?q= normalizado que llegó por URL.
+    cargando: false
 };
+
+// Controla la petición en curso para cancelar la anterior si el usuario mueve
+// filtros rápido (evita que una respuesta vieja pise a la nueva).
+let controladorActual = null;
+// Temporizador del debounce: espera que el usuario deje de mover el slider.
+let temporizadorFiltros = null;
 
 /* TOAST DE BOOSTRAP PARA REEMPLAZAR LOS ALERT */
 function mostrarToast(mensaje, tipo = 'exito') {
-  const toastElemento = document.getElementById('miToast');
-  const toastCuerpo = document.getElementById('toast-mensaje');
+    const toastElemento = document.getElementById('miToast');
+    const toastCuerpo = document.getElementById('toast-mensaje');
 
-  // 1. Limpiamos las clases de color previas
-  toastElemento.classList.remove('text-bg-success', 'text-bg-danger');
+    // 1. Limpiamos las clases de color previas
+    toastElemento.classList.remove('text-bg-success', 'text-bg-danger');
 
-  // 2. Asignamos el color dependiendo del tipo de mensaje
-  if (tipo === 'error') {
-    toastElemento.classList.add('text-bg-danger'); // Fondo rojo
-  } else {
-    toastElemento.classList.add('text-bg-success'); // Fondo verde
-  }
+    // 2. Asignamos el color dependiendo del tipo de mensaje
+    if (tipo === 'error') {
+        toastElemento.classList.add('text-bg-danger'); // Fondo rojo
+    } else {
+        toastElemento.classList.add('text-bg-success'); // Fondo verde
+    }
 
-  // 3. Insertamos el mensaje enviado
-  toastCuerpo.textContent = mensaje;
+    // 3. Insertamos el mensaje enviado
+    toastCuerpo.textContent = mensaje;
 
-  // 4. Usamos la API de Bootstrap para inicializar y mostrar el Toast
-  const toast = new bootstrap.Toast(toastElemento, {
-    delay: 3000 // Se ocultará solo después de 3 segundos (3000 ms)
-  });
-  toast.show();
+    // 4. Usamos la API de Bootstrap para inicializar y mostrar el Toast
+    const toast = new bootstrap.Toast(toastElemento, {
+        delay: 3000 // Se ocultará solo después de 3 segundos (3000 ms)
+    });
+    toast.show();
 }
 
 // Convierte contenido recibido desde la API en texto seguro para HTML.
@@ -152,157 +167,129 @@ function renderizarMarcas(marcas) {
     </li>`).join("");
 }
 
-// Configura los límites iniciales usando precios reales de las variantes.
-function configurarPrecios() {
-
-    // Calcula el precio final de cada variante disponible.
-    const precios = estado.productos.flatMap((producto) => producto.variantes.map((variante) => precioFinal(variante.precio, producto.descuento))).filter(Number.isFinite);
-
-    // Usa cero si todavía no hay precios cargados.
-    estado.minimo = precios.length ? Math.floor(Math.min(...precios)) : 0;
-
-    // Determina el máximo real y lo conserva para los filtros.
-    estado.maximo = precios.length ? Math.ceil(Math.max(...precios)) : 0;
-
-    // Establece el límite mínimo del slider inferior.
-    minRange.min = String(estado.minimo);
-
-    // Establece el límite máximo del slider inferior.
-    minRange.max = String(estado.maximo);
-
-    // Establece el límite mínimo del slider superior.
-    maxRange.min = String(estado.minimo);
-
-    // Establece el límite máximo del slider superior.
-    maxRange.max = String(estado.maximo);
-
-    // Ajusta los sliders a importes enteros.
-    minRange.step = "1";
-
-    // Ajusta los sliders a importes enteros.
-    maxRange.step = "1";
-
-    // Inicializa el campo mínimo con el menor precio del catálogo.
-    inputMinimo.value = String(estado.minimo);
-
-    // Inicializa el campo máximo con el mayor precio del catálogo.
-    inputMaximo.value = String(estado.maximo);
-
-    // Inicializa el slider inferior en su valor mínimo.
-    minRange.value = String(estado.minimo);
-
-    // Inicializa el slider superior en su valor máximo.
-    maxRange.value = String(estado.maximo);
-
-    // Limita el campo numérico mínimo a precios existentes.
-    inputMinimo.min = String(estado.minimo);
-
-    // Limita el máximo que puede escribirse como precio mínimo.
-    inputMinimo.max = String(estado.maximo);
-
-    // Limita el mínimo que puede escribirse como precio máximo.
-    inputMaximo.min = String(estado.minimo);
-
-    // Limita el campo numérico máximo a precios existentes.
-    inputMaximo.max = String(estado.maximo);
-
+// Lee los filtros visibles (checkboxes + rango + búsqueda) y los devuelve
+// en el formato que espera el endpoint /buscar.
+function leerFiltros() {
+    // Categorías y marcas tildadas: se mandan como "1,2,3".
+    // Las subcategorías hijas las expande el SQL (CTE recursivo), acá no hace falta.
+    const categorias = Array.from(document.querySelectorAll(".filtro-categoria:checked"), (c) => c.value);
+    const marcas = Array.from(document.querySelectorAll(".filtro-marca:checked"), (c) => c.value);
+    return {
+        q: estado.busqueda || "",
+        categorias: categorias.join(","),
+        marcas: marcas.join(","),
+        precioMin: inputMinimo.value,
+        precioMax: inputMaximo.value
+    };
 }
 
-// Actualiza el estado de filtros cuando cambia un rango de precio.
+// Arma la URL de búsqueda con filtros + paginación (?page=&limit=).
+function construirQuery(pagina) {
+    const f = leerFiltros();
+    const params = new URLSearchParams();
+    if (f.q) params.set("q", f.q);
+    if (f.categorias) params.set("categorias", f.categorias);
+    if (f.marcas) params.set("marcas", f.marcas);
+    // Solo se envía el rango si el usuario lo achicó respecto al global;
+    // si está en los extremos equivale a "sin filtro de precio".
+    if (f.precioMin !== "" && Number(f.precioMin) > estado.minimo) params.set("precioMin", f.precioMin);
+    if (f.precioMax !== "" && Number(f.precioMax) < estado.maximo) params.set("precioMax", f.precioMax);
+    params.set("page", String(pagina));
+    params.set("limit", String(estado.porPagina));
+    return `${apiBuscar}?${params.toString()}`;
+}
+
+// Pide UNA página filtrada al backend y la dibuja.
+// Usa AbortController: si llega otro pedido antes, cancela el anterior.
+async function cargarPagina(pagina) {
+    // Cancela la petición anterior que aún no respondió.
+    if (controladorActual) controladorActual.abort();
+    controladorActual = new AbortController();
+
+    estado.cargando = true;
+    estado.pagina = pagina;
+    // Aviso de carga para que no parezca que la página se congeló.
+    contenedorProductos.innerHTML = '<p class="sin-resultados">Cargando productos…</p>';
+
+    try {
+        const respuesta = await fetch(construirQuery(pagina), { signal: controladorActual.signal });
+        if (!respuesta.ok) throw new Error("No se pudieron cargar los productos.");
+        // El servidor ya aplicó WHERE + LIMIT/OFFSET y calculó el total.
+        const { data, total, totalPaginas } = await respuesta.json();
+        // Normaliza por si algún producto llega sin arrays (compatibilidad).
+        estado.productosPagina = (Array.isArray(data) ? data : []).map((p) => ({
+            ...p, categorias: p.categorias || [], variantes: p.variantes || []
+        }));
+        estado.total = Number(total || 0);
+        estado.totalPaginas = Math.max(1, Number(totalPaginas || 1));
+        renderizarPagina();
+    } catch (error) {
+        // AbortError es normal (filtro movido rápido): no se muestra como error.
+        if (error?.name === "AbortError") return;
+        console.error(error);
+        contenedorProductos.innerHTML = '<p class="sin-resultados">No se pudo cargar el catálogo. Intenta nuevamente más tarde.</p>';
+        contenedorPaginacion.innerHTML = "";
+    } finally {
+        estado.cargando = false;
+    }
+}
+
+// Vuelve a la página 1 cada vez que cambia un filtro (categoría, marca,
+// precio o búsqueda) y pide esa primera página al servidor.
+function aplicarFiltros() {
+    cargarPagina(1);
+}
+
+// Pide los filtros con debounce: espera 350ms sin cambios antes de consultar,
+// así mover el slider no dispara decenas de peticiones SQL seguidas.
+function aplicarFiltrosDebounced() {
+    clearTimeout(temporizadorFiltros);
+    temporizadorFiltros = setTimeout(() => aplicarFiltros(), 350);
+}
+
+// Configura los sliders con el rango GLOBAL que calcula SQL (MIN/MAX del
+// precio final). Ya no se deduce de descargar todos los productos.
+function configurarControlesRango(minimo, maximo) {
+    estado.minimo = Number(minimo || 0);
+    estado.maximo = Number(maximo || 0);
+    // Si no hay productos, evita sliders rotos con max < min.
+    if (estado.maximo <= estado.minimo) estado.maximo = estado.minimo + 1;
+
+    for (const [control, valor] of [[minRange, estado.minimo], [maxRange, estado.maximo]]) {
+        control.min = String(estado.minimo);
+        control.max = String(estado.maximo);
+        control.step = "1";
+        control.value = String(valor);
+    }
+    for (const [control, valor] of [[inputMinimo, estado.minimo], [inputMaximo, estado.maximo]]) {
+        control.min = String(estado.minimo);
+        control.max = String(estado.maximo);
+        control.value = String(valor);
+    }
+}
+
+// Mantiene mínimo <= máximo y los valores dentro del rango global.
+// No filtra directo: delega con debounce para no saturar al backend.
 function sincronizarPrecios(origen) {
-
-    // Lee el precio mínimo actual o su límite inicial.
+    // Lee el precio mínimo/máximo actual o su límite global.
     let minimo = Number(inputMinimo.value || estado.minimo);
-
-    // Lee el precio máximo actual o su límite inicial.
     let maximo = Number(inputMaximo.value || estado.maximo);
 
     // Evita que el valor mínimo quede por encima del máximo.
     if (minimo > maximo) origen === "minimo" ? maximo = minimo : minimo = maximo;
 
-    // Mantiene el mínimo dentro del intervalo posible.
+    // Mantiene ambos dentro del intervalo posible.
     minimo = Math.max(estado.minimo, Math.min(minimo, estado.maximo));
-
-    // Mantiene el máximo dentro del intervalo posible.
     maximo = Math.max(estado.minimo, Math.min(maximo, estado.maximo));
 
-    // Sincroniza el campo de texto con el mínimo corregido.
+    // Sincroniza campos numéricos y sliders con los valores corregidos.
     inputMinimo.value = String(minimo);
-
-    // Sincroniza el campo de texto con el máximo corregido.
     inputMaximo.value = String(maximo);
-
-    // Sincroniza el slider inferior con el mínimo corregido.
     minRange.value = String(minimo);
-
-    // Sincroniza el slider superior con el máximo corregido.
     maxRange.value = String(maximo);
 
-    // Recalcula resultados y vuelve a la primera página.
-    aplicarFiltros();
-}
-
-// Comprueba si el producto pasa las selecciones de categoría, marca y precio.
-function coincideConFiltros(producto, categorias, marcas, minimo, maximo) {
-
-    // Acepta categorías sin selección o una coincidencia con alguna categoría asignada.
-    const coincideCategoria = !categorias.size || producto.categorias.some((categoria) => categorias.has(String(categoria.id)));
-
-    // Acepta marcas sin selección o una coincidencia con la marca del producto.
-    const coincideMarca = !marcas.size || marcas.has(String(producto.id_marca));
-
-    // Acepta el producto si al menos una variante tiene precio efectivo en el rango.
-    const coincidePrecio = producto.variantes.some((variante) => {
-        const precio = precioFinal(variante.precio, producto.descuento);
-        return precio >= minimo && precio <= maximo;
-    });
-
-    // Compara la búsqueda con el nombre y la descripción normalizados.
-    const textoProducto = `${producto.nombre} ${producto.descripcion || ""}`.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("es");
-    const coincideBusqueda = !estado.busqueda || textoProducto.includes(estado.busqueda);
-
-    // Exige que se cumplan simultáneamente todos los filtros activos.
-    return coincideCategoria && coincideMarca && coincidePrecio && coincideBusqueda;
-}
-
-// Agrega a la selección las descendientes de cualquier categoría marcada.
-function incluirDescendientesSeleccionados(categoria, seleccionadas, padreSeleccionado = false) {
-
-    // Detecta si esta categoría o uno de sus padres fue seleccionado.
-    const seleccionada = padreSeleccionado || seleccionadas.has(String(categoria.id_categoria));
-
-    // Conserva el identificador cuando la categoría pertenece a la selección.
-    if (seleccionada) seleccionadas.add(String(categoria.id_categoria));
-
-    // Repite el recorrido para todos los niveles hijos.
-    (categoria.subcategorias || []).forEach((hija) => incluirDescendientesSeleccionados(hija, seleccionadas, seleccionada));
-}
-
-// Aplica los filtros seleccionados y actualiza el catálogo mostrado.
-function aplicarFiltros() {
-
-    // Lee las casillas de categorías marcadas.
-    const categorias = new Set(Array.from(document.querySelectorAll(".filtro-categoria:checked"), (casilla) => casilla.value));
-    // Al marcar cualquier nivel incluye sus subcategorías descendientes.
-    estado.categorias.forEach((categoria) => incluirDescendientesSeleccionados(categoria, categorias));
-
-    // Lee las casillas de marcas marcadas.
-    const marcas = new Set(Array.from(document.querySelectorAll(".filtro-marca:checked"), (casilla) => casilla.value));
-
-    // Obtiene el mínimo seleccionado o usa el precio mínimo disponible.
-    const minimo = Number(inputMinimo.value || estado.minimo);
-
-    // Obtiene el máximo seleccionado o usa el precio máximo disponible.
-    const maximo = Number(inputMaximo.value || estado.maximo);
-
-    // Conserva los productos que cumplen todos los filtros activos.
-    estado.filtrados = estado.productos.filter((producto) => coincideConFiltros(producto, categorias, marcas, minimo, maximo));
-
-    // Reinicia a la primera página tras cambiar los filtros.
-    estado.pagina = 1;
-
-    // Dibuja las cards y los controles de paginación actualizados.
-    renderizarPagina();
+    // Pide la página 1 filtrada (con debounce por si arrastra el slider).
+    aplicarFiltrosDebounced();
 }
 
 // Construye una card de producto con sus variantes disponibles.
@@ -323,13 +310,12 @@ function cargarCard(producto) {
         class="opcion${variante.id === varianteInicial.id ? " elegido" : ""}"
         data-id="${escaparHTML(variante.id)}"
         data-precio="${escaparHTML(variante.precio)}"
-        data-stock="${escaparHTML(variante.stock)}"
-        data-imagen="${escaparHTML(variante.imagen || "")}">
+        data-stock="${escaparHTML(variante.stock)}">
         ${escaparHTML(variante.atributo || "Disponible")}
     </button>`).join("");
 
     // Escoge la imagen del producto o la imagen de la variante elegida.
-    const imagen = escaparHTML(producto.imagen || varianteInicial.imagen || imagen404);
+    const imagen = escaparHTML(producto.imagen || imagen404);
 
     // Normaliza el porcentaje de descuento antes de insertarlo.
     const descuento = Number(producto.descuento) || 0;
@@ -354,35 +340,29 @@ function cargarCard(producto) {
     </article>`;
 }
 
-// Dibuja un máximo de ocho productos y los botones de navegación.
+// Dibuja la página actual que YA vino filtrada del servidor.
+// No usa .slice(): el backend devolvió exactamente los 8 de esta página y el
+// total para numerar los botones.
 function renderizarPagina() {
-
-    // Calcula cuántas páginas requieren los productos filtrados.
-    const totalPaginas = Math.max(1, Math.ceil(estado.filtrados.length / estado.porPagina));
-
     // Corrige el índice si una reducción de resultados eliminó páginas.
-    estado.pagina = Math.min(estado.pagina, totalPaginas);
-
-    // Calcula el índice del primer producto visible.
-    const inicio = (estado.pagina - 1) * estado.porPagina;
-
-    // Extrae solo los ocho productos correspondientes a la página actual.
-    const productosPagina = estado.filtrados.slice(inicio, inicio + estado.porPagina);
+    estado.pagina = Math.min(Math.max(1, estado.pagina), estado.totalPaginas);
 
     // Inserta las cards o un aviso cuando los filtros no dan resultados.
-    contenedorProductos.innerHTML = productosPagina.length ? productosPagina.map(cargarCard).join("") : '<p class="sin-resultados">No se encontraron productos con esos filtros.</p>';
+    contenedorProductos.innerHTML = estado.productosPagina.length
+        ? estado.productosPagina.map(cargarCard).join("")
+        : '<p class="sin-resultados">No se encontraron productos con esos filtros.</p>';
 
-    // Actualiza el número mostrado junto al título del listado.
-    contadorProductos.textContent = String(estado.filtrados.length);
+    // Muestra el TOTAL real que calculó SQL (COUNT DISTINCT), no el largo local.
+    contadorProductos.textContent = String(estado.total);
 
-    // Oculta la navegación cuando todos los productos caben en una página.
-    if (totalPaginas <= 1) {
+    // Oculta la navegación cuando todo cabe en una página.
+    if (estado.totalPaginas <= 1) {
         contenedorPaginacion.innerHTML = "";
         return;
     }
 
     // Crea un botón numérico por cada página existente.
-    const paginas = Array.from({ length: totalPaginas },
+    const paginas = Array.from({ length: estado.totalPaginas },
         (_, indice) => `
         <li class="page-item${estado.pagina === indice + 1 ? " active" : ""}">
             <button type="button"
@@ -400,7 +380,7 @@ function renderizarPagina() {
                 Anterior
             </button>
         </li>${paginas}
-        <li class="page-item${estado.pagina === totalPaginas ? " disabled" : ""}">
+        <li class="page-item${estado.pagina === estado.totalPaginas ? " disabled" : ""}">
             <button type="button" class="page-link" data-pagina="${estado.pagina + 1}">
                 Siguiente
             </button>
@@ -408,48 +388,44 @@ function renderizarPagina() {
     </ul>`;
 }
 
-// Carga productos, categorías y marcas desde los endpoints del backend.
+// Carga inicial: categorías + marcas + rango de precios en paralelo.
+// Los PRODUCTOS ya no se traen todos: solo se pide la página 1 con filtros.
 async function traerDatosCatalogo() {
 
-    // Ejecuta las solicitudes simultáneamente para reducir el tiempo de espera.
-    const respuestas = await Promise.all([fetch(apiProductos), fetch(apiCategorias), fetch(apiMarcas)]);
+    // Ejecuta las solicitudes de filtros simultáneamente para ir más rápido.
+    const respuestas = await Promise.all([fetch(apiCategorias), fetch(apiMarcas), fetch(apiRango)]);
 
     // Informa un error si alguno de los endpoints devolvió un estado no exitoso.
     if (respuestas.some((respuesta) => !respuesta.ok)) throw new Error("No se pudieron cargar los datos del catálogo.");
 
     // Convierte las tres respuestas HTTP a objetos JavaScript.
-    const [datosProductos, datosCategorias, marcas] = await Promise.all(respuestas.map((respuesta) => respuesta.json()));
+    const [datosCategorias, marcas, rango] = await Promise.all(respuestas.map((respuesta) => respuesta.json()));
 
-    // Admite el objeto agrupado actual del endpoint y también una respuesta en array.
-    estado.productos = (Array.isArray(datosProductos) ? datosProductos : Object.values(datosProductos || {})).map((producto) => ({ ...producto, categorias: producto.categorias || [], variantes: producto.variantes || [] }));
-
-    // Conserva el árbol anidado que entrega el endpoint de categorías.
-    estado.categorias = datosCategorias.categorias || datosCategorias;
+    // Calibra sliders con MIN/MAX calculados en SQL (sin descargar productos).
+    configurarControlesRango(rango.minimo, rango.maximo);
 
     // Lee los términos de búsqueda y categoría enviados desde el navbar.
     const parametros = new URLSearchParams(window.location.search);
-    // Normaliza la búsqueda para compararla sin distinguir mayúsculas ni tildes.
-    estado.busqueda = (parametros.get("q") || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("es").trim();
+    // Normaliza la búsqueda para el LIKE del servidor (sin tildes ni mayúsculas
+    // en el comparador local; el SQL usa LIKE parcial sobre nombre/descripción).
+    estado.busqueda = (parametros.get("q") || "").trim();
     // Preselecciona la categoría elegida desde el menú lateral.
     const categoriaInicial = parametros.get("categoria");
 
     // Inserta las opciones de categoría generadas desde la base de datos.
-    document.getElementById("lista-categorias").innerHTML = renderizarCategorias(estado.categorias);
+    document.getElementById("lista-categorias").innerHTML = renderizarCategorias(datosCategorias.categorias || datosCategorias);
 
     // Busca la casilla de la categoría recibida por URL, si todavía existe.
     const casillaInicial = Array.from(document.querySelectorAll(".filtro-categoria")).find((casilla) => casilla.value === categoriaInicial);
 
-    // La marca sin disparar eventos antes de configurar los precios.
+    // La marca sin disparar eventos antes de pedir la primera página.
     if (casillaInicial) casillaInicial.checked = true;
 
     // Inserta las opciones de marca generadas desde la base de datos.
     renderizarMarcas(marcas);
 
-    // Establece los límites del filtro de precio de acuerdo con el catálogo.
-    configurarPrecios();
-
-    // Muestra inicialmente todos los productos desde la primera página.
-    aplicarFiltros();
+    // Pide la primera página ya filtrada (respeta ?q= y ?categoria=).
+    await cargarPagina(1);
 }
 
 // Envía al carrito la variante activa de una tarjeta de producto.
@@ -483,7 +459,7 @@ btnFiltros.addEventListener("click", () => menuFiltros.classList.toggle("filtro-
 // Cierra el panel lateral cuando se pulsa su control de cierre.
 cerrarMenu.addEventListener("click", () => menuFiltros.classList.remove("filtro-activo"));
 
-// Recalcula resultados cuando se marca o desmarca categoría o marca.
+// Cada tildado/destildado pide la página 1 al backend (los filtros viven en SQL).
 menuFiltros.addEventListener("change", (evento) => {
     if (evento.target.matches(".filtro-categoria, .filtro-marca")) aplicarFiltros();
 });
@@ -504,9 +480,13 @@ inputMinimo.addEventListener("change", () => sincronizarPrecios("minimo"));
 // Aplica el rango al confirmar una edición del precio máximo.
 inputMaximo.addEventListener("change", () => sincronizarPrecios("maximo"));
 
-// Cambia de página sin recargar el listado desde la base de datos.
+// Cambia de página pidiendo esa página al backend (ya no es un slice local).
 contenedorPaginacion.addEventListener("click", (evento) => {
-    const boton = evento.target.closest("[data-pagina]"); if (!boton || boton.closest(".disabled")) return; estado.pagina = Number(boton.dataset.pagina); renderizarPagina();
+    const boton = evento.target.closest("[data-pagina]");
+    if (!boton || boton.closest(".disabled")) return;
+    const destino = Number(boton.dataset.pagina);
+    if (!Number.isInteger(destino) || destino === estado.pagina) return;
+    cargarPagina(destino);
 });
 
 // Maneja la selección de variantes y el botón de compra con delegación de eventos.
@@ -518,7 +498,6 @@ contenedorProductos.addEventListener("click", (evento) => {
         tarjeta.querySelectorAll(".opcion").forEach((boton) => boton.classList.remove("elegido"));
         opcion.classList.add("elegido");
         tarjeta.querySelector(".precio").innerHTML = renderizarPrecio(Number(opcion.dataset.precio), Number(tarjeta.dataset.descuento) || 0);
-        tarjeta.querySelector(".card-img-top").src = opcion.dataset.imagen || imagen404;
         return;
     }
     const botonCompra = evento.target.closest(".btn-comprar");
