@@ -589,7 +589,7 @@ td small {
 }
 
 .row-actions {
-  min-width: 190px;
+  min-width: 230px;
   vertical-align: middle
 }
 
@@ -681,6 +681,38 @@ td small {
 
 .info-row span {
   color: var(--muted)
+}
+
+/* Campo de relacion con un boton de "crear nuevo" al costado. */
+.field-con-boton {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end
+}
+
+.field-con-boton label {
+  flex: 1
+}
+
+/* Ayuda dentro de los modales: explica cuando dejar un campo vacio. */
+.modal-help {
+  margin: 0 0 14px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5
+}
+
+/* Los textos largos del detalle (observaciones, descripcion, referencia)
+   ocupan la fila entera para no dejar una columna angosta e ilegible. */
+.detalle-texto {
+  grid-column: 1 / -1;
+  align-items: flex-start
+}
+
+.detalle-texto strong {
+  text-align: right;
+  max-width: 62%;
+  white-space: pre-wrap
 }
 
 .toast {

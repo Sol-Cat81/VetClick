@@ -45,6 +45,7 @@ const inserciones = {
   },
   especie: {
     tabla: 'especies',
+    clave: 'id_especie',
     campos: ['nombre'],
     requeridos: ['nombre']
   },
@@ -55,16 +56,19 @@ const inserciones = {
   },
   atributo: {
     tabla: 'atributos',
+    clave: 'id_atributo',
     campos: ['nombre'],
     requeridos: ['nombre']
   },
   valorAtributo: {
     tabla: 'valores_atributo',
+    clave: 'id_valor',
     campos: ['id_atributo', 'nombre'],
     requeridos: ['id_atributo', 'nombre']
   },
   raza: {
     tabla: 'razas',
+    clave: 'id_raza',
     campos: ['nombre', 'id_especie'],
     requeridos: ['nombre', 'id_especie']
   },
@@ -75,6 +79,7 @@ const inserciones = {
   },
   mascotaAdopcion: {
     tabla: 'mascotas_adopcion',
+    clave: 'id_mascota_adopcion',
     campos: ['nombre', 'id_especie', 'edad', 'sexo', 'descripcion', 'estado'],
     requeridos: ['nombre', 'sexo', 'estado']
   },
@@ -90,11 +95,13 @@ const inserciones = {
   },
   adopcion: {
     tabla: 'adopciones',
+    clave: 'id_adopcion',
     campos: ['id_cliente', 'id_mascota_adopcion', 'fecha', 'estado', 'observacion'],
     requeridos: ['id_cliente', 'id_mascota_adopcion', 'fecha']
   },
   direccion: {
     tabla: 'direcciones',
+    clave: 'id_direccion',
     campos: ['id_cliente', 'tipo_direccion', 'calle', 'numero', 'piso', 'departamento', 'localidad', 'provincia', 'codigo_postal', 'referencia'],
     requeridos: ['id_cliente', 'tipo_direccion', 'calle']
   },
@@ -120,6 +127,7 @@ const inserciones = {
   },
   categoria: {
     tabla: 'categorias',
+    clave: 'id_categoria',
     campos: ['nombre', 'categoria_padre'],
     requeridos: ['nombre']
   },
@@ -130,6 +138,7 @@ const inserciones = {
   },
   variante: {
     tabla: 'variantes',
+    clave: 'id_variante',
     campos: ['id_producto', 'precio', 'id_valor_atributo'],
     requeridos: ['id_producto', 'precio']
   },
@@ -177,6 +186,157 @@ const inserciones = {
 };
 
 const convertirBooleano = valor => valor === true || valor === 'true' || valor === '1';
+
+// Normaliza y valida un valor según su tipo de columna. La comparten crear() y
+// actualizar() para que un INSERT y un PUT apliquen exactamente las mismas reglas.
+const normalizarValor = (campo, valor) => {
+  if (valor === undefined || valor === '') return null;
+  if (campo === 'activo') return convertirBooleano(valor);
+  if (campo.startsWith('id_') || ['categoria_padre', 'cantidad'].includes(campo)) {
+    const numero = Number(valor);
+    if (!Number.isInteger(numero) || numero <= 0) {
+      const error = new Error(`El campo ${campo} debe ser un entero positivo`);
+      error.status = 400;
+      throw error;
+    }
+    return numero;
+  }
+  if (['precio', 'stock', 'stock_actual', 'stock_minimo', 'subtotal', 'costo_envio', 'total'].includes(campo)) {
+    const numero = Number(valor);
+    if (!Number.isFinite(numero) || numero < 0
+      || (['stock', 'stock_actual', 'stock_minimo'].includes(campo) && !Number.isInteger(numero))) {
+      const error = new Error(`El campo ${campo} debe ser un entero no negativo o un importe válido`);
+      error.status = 400;
+      throw error;
+    }
+    return numero;
+  }
+  if (campo === 'fecha' && typeof valor === 'string' && valor.includes('T')) {
+    return valor.replace('T', ' ');
+  }
+  return typeof valor === 'string' ? valor.trim() : valor;
+};
+
+// Tablas padre contra las que se valida cada clave foránea. La comparten
+// crear() y actualizar() para que un INSERT y un PUT apliquen la misma regla.
+const referencias = {
+  raza: [{ campo: 'id_especie', tabla: 'especies', clave: 'id_especie' }],
+  mascotaAdopcion: [{ campo: 'id_especie', tabla: 'especies', clave: 'id_especie' }],
+  adopcion: [
+    { campo: 'id_cliente', tabla: 'clientes', clave: 'id_cliente' },
+    { campo: 'id_mascota_adopcion', tabla: 'mascotas_adopcion', clave: 'id_mascota_adopcion' }
+  ],
+  direccion: [{ campo: 'id_cliente', tabla: 'clientes', clave: 'id_cliente' }],
+  variante: [
+    { campo: 'id_producto', tabla: 'productos', clave: 'id_producto' },
+    { campo: 'id_valor_atributo', tabla: 'valores_atributo', clave: 'id_valor' }
+  ],
+  valorAtributo: [{ campo: 'id_atributo', tabla: 'atributos', clave: 'id_atributo' }]
+};
+
+// Comprueba que cada clave foránea enviada exista en su tabla padre.
+// MySQL rechazaria el INSERT/UPDATE por FK, pero con un error 500 opaco:
+// asi el mensaje es claro y el codigo de estado es 400.
+const validarReferencias = async (entidad, datos) => {
+  for (const ref of referencias[entidad] || []) {
+    const valor = datos[ref.campo];
+    if (valor === undefined || valor === null || valor === '') continue;
+
+    const id = Number(valor);
+    if (!Number.isInteger(id) || id <= 0) {
+      const error = new Error(`El campo ${ref.campo} debe ser un entero positivo`);
+      error.status = 400;
+      throw error;
+    }
+
+    const [filas] = await conexion.query(
+      `SELECT 1 FROM \`${ref.tabla}\` WHERE \`${ref.clave}\` = ? LIMIT 1`,
+      [id]
+    );
+    if (!filas.length) {
+      const error = new Error(`El valor ${id} no existe en ${ref.tabla}`);
+      error.status = 400;
+      throw error;
+    }
+  }
+};
+
+// Todas las variantes de un producto deben usar el MISMO atributo. Si se mezclan
+// ("Color: Rojo" + "Talla: Mediana") la tienda las muestra como botones sueltos
+// y no queda claro de que dimension habla cada uno.
+//
+// idVariante llega solo al actualizar: hay que excluir la variante que se esta
+// editando, o compararia consigo misma y siempre daria conflicto.
+const validarPresentacionDeVariante = async (entidad, datos, idVariante) => {
+  if (entidad !== 'variante' || !datos.id_producto) return;
+
+  const [previas] = await conexion.query(
+    `SELECT v.id_valor_atributo, va.id_atributo
+     FROM variantes v
+     LEFT JOIN valores_atributo va ON va.id_valor = v.id_valor_atributo
+     WHERE v.id_producto = ? AND (? IS NULL OR v.id_variante <> ?)`,
+    [Number(datos.id_producto), idVariante ?? null, idVariante ?? 0]
+  );
+
+  const conAtributo = previas.filter(v => v.id_atributo !== null);
+  // El producto no tiene variantes todavia, o ninguna usa presentacion:
+  // no hay nada que imponer.
+  if (!conAtributo.length) return;
+
+  const atributoUsado = Number(conAtributo[0].id_atributo);
+  const valorNuevo = Number(datos.id_valor_atributo || 0);
+
+  // Si llegamos aca es porque conAtributo.length > 0: el producto ya tiene
+  // variantes con presentacion, asi que la nueva tambien debe usarla.
+  if (!valorNuevo) {
+    const error = new Error('Este producto ya tiene variantes con presentación. '
+      + 'La nueva también debe usarla, o creá otro producto.');
+    error.status = 400;
+    throw error;
+  }
+
+  const [valores] = await conexion.query(
+    'SELECT id_atributo FROM valores_atributo WHERE id_valor = ?', [valorNuevo]
+  );
+  const atributoNuevo = valores.length ? Number(valores[0].id_atributo) : null;
+
+  if (atributoNuevo === atributoUsado) return;
+
+  const [nombres] = await conexion.query(
+    'SELECT (SELECT x.nombre FROM atributos x WHERE x.id_atributo = ?) AS usado, '
+    + '       (SELECT y.nombre FROM atributos y WHERE y.id_atributo = ?) AS nuevo',
+    [atributoUsado, atributoNuevo]
+  );
+  const error = new Error(
+    `Las variantes de este producto usan la presentación "${nombres[0]?.usado ?? 'otra'}". `
+    + `No podés agregar una de "${nombres[0]?.nuevo ?? 'otra'}". `
+    + `Agregá una de "${nombres[0]?.usado ?? 'otra'}" o creá otro producto.`
+  );
+  error.status = 400;
+  throw error;
+};
+
+// atributos.nombre y valores_atributo.nombre son VARCHAR(20). Sin esto, MySQL
+// corta o falla y el cliente recibe un 500 sin explicar el motivo.
+const limitarLongitud = {
+  valorAtributo: { nombre: 20 },
+  atributo: { nombre: 20 }
+};
+
+const validarLongitudes = (entidad, datos) => {
+  const limites = limitarLongitud[entidad];
+  if (!limites) return;
+
+  for (const [campo, maximo] of Object.entries(limites)) {
+    const valor = datos[campo];
+    if (valor === undefined || valor === null) continue;
+    if (String(valor).trim().length > maximo) {
+      const error = new Error(`El campo ${campo} admite máximo ${maximo} caracteres`);
+      error.status = 400;
+      throw error;
+    }
+  }
+};
 
 const AdminModel = {
   async obtenerOpciones() {
@@ -287,34 +447,11 @@ const AdminModel = {
       if (datos[campo]) datos[campo] = String(datos[campo]).toUpperCase();
     }
 
-    const valores = configuracion.campos.map(campo => {
-      const valor = datos[campo];
-      if (valor === undefined || valor === '') return null;
-      if (campo === 'activo') return convertirBooleano(valor);
-      if (campo.startsWith('id_') || ['categoria_padre', 'cantidad'].includes(campo)) {
-        const numero = Number(valor);
-        if (!Number.isInteger(numero) || numero <= 0) {
-          const error = new Error(`El campo ${campo} debe ser un entero positivo`);
-          error.status = 400;
-          throw error;
-        }
-        return numero;
-      }
-      if (['precio', 'stock', 'stock_actual', 'stock_minimo', 'subtotal', 'costo_envio', 'total'].includes(campo)) {
-        const numero = Number(valor);
-        if (!Number.isFinite(numero) || numero < 0
-          || (['stock', 'stock_actual', 'stock_minimo'].includes(campo) && !Number.isInteger(numero))) {
-          const error = new Error(`El campo ${campo} debe ser un entero no negativo o un importe válido`);
-          error.status = 400;
-          throw error;
-        }
-        return numero;
-      }
-      if (campo === 'fecha' && typeof valor === 'string' && valor.includes('T')) {
-        return valor.replace('T', ' ');
-      }
-      return typeof valor === 'string' ? valor.trim() : valor;
-    });
+    const valores = configuracion.campos.map(campo => normalizarValor(campo, datos[campo]));
+    await validarReferencias(entidad, datos);
+    validarLongitudes(entidad, datos);
+    await validarPresentacionDeVariante(entidad, datos, null);
+
     const columnas = configuracion.campos.map(campo => `\`${campo}\``).join(', ');
     const placeholders = configuracion.campos.map(() => '?').join(', ');
 
@@ -376,6 +513,74 @@ const AdminModel = {
     } finally {
       conexionTransaccion.release();
     }
+  },
+
+  // Edición genérica de las entidades declaradas en `inserciones`.
+  // Solo se tocan las columnas que figuran en configuracion.campos, y solo
+  // las que llegaron en el body: lo que no viene no se pisa con NULL.
+  async actualizar(entidad, id, datos) {
+    const configuracion = inserciones[entidad];
+    if (!configuracion) {
+      const error = new Error('No existe un formulario de edición para esta entidad');
+      error.status = 404;
+      throw error;
+    }
+
+    // Los pedidos tienen tabla hija: su alta es transaccional y no aplica acá.
+    if (configuracion.detalle) {
+      const error = new Error('Esta entidad no admite actualización directa');
+      error.status = 400;
+      throw error;
+    }
+
+    if (!configuracion.clave) {
+      const error = new Error('Esta entidad no tiene clave primaria declarada para editar');
+      error.status = 400;
+      throw error;
+    }
+
+    // En una edición los campos requeridos deben llegar con valor: es lo que
+    // evita que un PUT deje la fila con su clave foránea en NULL.
+    for (const campo of configuracion.requeridos) {
+      const valor = datos[campo];
+      if (valor === undefined || valor === null || String(valor).trim() === '') {
+        const error = new Error(`El campo ${campo} es obligatorio`);
+        error.status = 400;
+        throw error;
+      }
+    }
+
+    const columnas = configuracion.campos.filter(campo => datos[campo] !== undefined);
+    if (!columnas.length) {
+      const error = new Error('No se envió ningún campo para actualizar');
+      error.status = 400;
+      throw error;
+    }
+
+    const valores = columnas.map(campo => normalizarValor(campo, datos[campo]));
+    const sets = columnas.map(campo => `\`${campo}\` = ?`).join(', ');
+
+    await validarReferencias(entidad, datos);
+    validarLongitudes(entidad, datos);
+    await validarPresentacionDeVariante(entidad, datos, id);
+
+    // Verificamos existencia antes de escribir: MySQL devuelve affectedRows=0
+    // cuando los valores no cambian, y eso no significa que el registro falte.
+    const [existentes] = await conexion.query(
+      `SELECT 1 FROM \`${configuracion.tabla}\` WHERE \`${configuracion.clave}\` = ? LIMIT 1`,
+      [id]
+    );
+    if (!existentes.length) {
+      const error = new Error('El registro no existe');
+      error.status = 404;
+      throw error;
+    }
+
+    const [resultado] = await conexion.query(
+      `UPDATE \`${configuracion.tabla}\` SET ${sets} WHERE \`${configuracion.clave}\` = ?`,
+      [...valores, id]
+    );
+    return resultado;
   }
 };
 

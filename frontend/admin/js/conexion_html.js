@@ -25,3 +25,7 @@ async function obtenerDatos(endpoint){
 function informarErrorCarga(endpoint, error){
   console.error(`No se pudieron cargar los datos de ${endpoint}:`, error);
 }
+
+// Cada módulo de conexión registra aquí cómo se ve el detalle de sus entidades.
+// app.js lo lee para pintar el botón "Ver más" y abrir el modal de detalle.
+const detalleEntidades = {};

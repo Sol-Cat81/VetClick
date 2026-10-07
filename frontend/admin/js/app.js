@@ -253,14 +253,16 @@ function enhanceAdminPanels() {
         }
         item.tBodies[0]?.querySelectorAll('tr').forEach(row => {
           if (row.querySelector('[data-row-action]')) return;
-          const id = row.cells[0]?.textContent.trim() || '';
+          const id = row.dataset?.id || row.cells[0]?.textContent.trim() || '';
           const hasStatus = row.querySelector('.status');
+          const tieneDetalle = Boolean(detalleEntidades[entidadItem]);
           const hasActionColumn = head.cells[head.cells.length - 1]?.textContent.trim().toLowerCase() === 'acciones';
           const actions = hasActionColumn && row.cells.length === head.cells.length
             ? row.cells[row.cells.length - 1]
             : document.createElement('td');
           actions.className = 'row-actions';
-          actions.innerHTML = `<button class="btn btn-secondary btn-small" type="button" data-row-action="edit" data-entity="${entidadItem}" data-id="${id}" data-modal-panel="${panel.dataset.panel}">Editar</button>
+          actions.innerHTML = `${tieneDetalle ? `<button class="btn btn-secondary btn-small" type="button" data-row-action="detail" data-entity="${entidadItem}" data-id="${id}">Ver más</button>` : ''}
+            <button class="btn btn-secondary btn-small" type="button" data-row-action="edit" data-entity="${entidadItem}" data-id="${id}" data-modal-panel="${panel.dataset.panel}">Editar</button>
             <button class="btn btn-danger btn-small" type="button" data-row-action="delete" data-entity="${entidadItem}" data-id="${id}">Eliminar</button>
             ${hasStatus ? `<button class="btn btn-secondary btn-small" type="button" data-row-action="status" data-entity="${entidadItem}" data-id="${id}">Cambiar estado</button>` : ''}`;
           if (actions.parentElement !== row) row.appendChild(actions);
@@ -279,6 +281,84 @@ function enhanceAdminPanels() {
   });
 }
 
+// Entidades que saben rellenarse solas al editar y persistir el cambio.
+// Si una entidad no está acá, se sigue usando el mapeo por índice de celda
+// que deja el modal en modo solo lectura.
+function obtenerPrellenadorEdicion(entity){
+  const prellenadores = {
+    'cliente': prepararFormularioCliente,
+    'mascota': prepararFormularioMascota,
+    'dirección': prepararFormularioDireccion,
+    'especie': prepararFormularioEspecie,
+    'raza': prepararFormularioRaza,
+    'adopción': prepararFormularioAdopcion,
+    'mascota en adopción': prepararFormularioMascotaAdopcion,
+    // Las seis de catálogo comparten un solo prellenador.
+    'producto': prepararFormularioCatalogo,
+    'marca': prepararFormularioCatalogo,
+    'categoría': prepararFormularioCatalogo,
+    'variante': prepararFormularioCatalogo,
+    'atributo': prepararFormularioCatalogo,
+    'valor de atributo': prepararFormularioCatalogo
+  };
+  const prellenador = prellenadores[entity];
+  return typeof prellenador === 'function' ? prellenador : null;
+}
+
+// Prepara el valor de un campo del modal de detalle: vacío, fecha, enumeración,
+// etiqueta de relación o el valor crudo.
+function valorDetalle(campo, registro, opciones){
+  const bruto = registro[campo.campo];
+
+  if (bruto === null || bruto === undefined || bruto === '') return '—';
+
+  if (campo.relacion){
+    return etiquetaDeRelacion(opciones, campo.relacion, bruto) || '—';
+  }
+  if (campo.booleano){
+    return Number(bruto) ? campo.booleano[1] : campo.booleano[0];
+  }
+  if (campo.enumeracion){
+    const indice = campo.enumeracion.indexOf(String(bruto));
+    return indice >= 0 ? campo.etiquetas[indice] : bruto;
+  }
+  if (campo.fecha){
+    return String(bruto).slice(0, 10);
+  }
+  return bruto + (campo.sufijo || '');
+}
+
+async function abrirDetalle(entity, row){
+  const esquema = detalleEntidades[entity];
+  if (!esquema || !row){
+    console.warn('No hay detalle definido para:', entity);
+    return;
+  }
+
+  const id = row.dataset?.id || row.cells?.[0]?.textContent.trim() || '';
+  const registro = esquema.registro?.get(String(id));
+  if (!registro){
+    console.warn('No se encontró el registro local:', entity, id);
+    return;
+  }
+
+  const modal = document.getElementById('modal-detalle');
+  const contenedor = modal.querySelector('[data-detalle-campos]');
+
+  // Una sola llamada a admin/opciones cubre todas las relaciones del esquema.
+  const opciones = esquema.campos.some(campo => campo.relacion) ? await opcionesParaEditar() : {};
+
+  modal.querySelector('[data-detalle-titulo]').textContent = `${esquema.titulo} #${id}`;
+  contenedor.innerHTML = esquema.campos.map(campo => `
+    <div class="info-row${campo.texto ? ' detalle-texto' : ''}">
+      <span>${escaparHtml(campo.etiqueta)}</span>
+      <strong>${escaparHtml(valorDetalle(campo, registro, opciones))}</strong>
+    </div>
+  `).join('');
+
+  modal.classList.add('show');
+}
+
 function openAdminModal(action, entity, row, panel) {
   const modal = panel?.querySelector(`[data-admin-modal="${entity}"]`)
     || document.querySelector(`[data-admin-modal="${entity}"]`);
@@ -292,38 +372,35 @@ function openAdminModal(action, entity, row, panel) {
   modal.dataset.action = action;
 
   if (row) {
-    // Las tablas traen una fila con celdas; las tarjetas (.info-card) no tienen cells.
-    const values = row.cells ? [...row.cells].map(cell => cell.textContent.trim()) : [];
-    const campos = modal.querySelectorAll('[data-modal-field]');
-    if (values.length) {
-      // Mapeo por nombre de campo para no depender del orden de columnas.
-      // Reutiliza el mismo modal de insertar, solo lo muestra (sin actualizar).
-      const porNombre = {};
-      if (entity === 'producto') {
-        porNombre.producto = values[1] || '';
-        porNombre.marca_busqueda = values[2] || '';
-        porNombre.descripcion = values[3] || '';
-        porNombre.descuento = (values[4] || '').replace('%', '');
-        porNombre.estado = values[5] || '';
-      } else if (entity === 'marca') {
-        porNombre.nombre = values[1] || '';
-      } else {
-        campos.forEach((field, index) => { field.value = values[index + 1] || ''; });
-      }
-      campos.forEach(field => {
-        if (porNombre[field.name] !== undefined) field.value = porNombre[field.name];
-      });
+    const prellenador = obtenerPrellenadorEdicion(entity);
+
+    if (prellenador) {
+      // El id real viene del data-id de la fila; si no está, usamos la 1ra columna.
+      const idRegistro = row.dataset?.id || row.cells?.[0]?.textContent.trim() || '';
+      modal.dataset.idRegistro = idRegistro;
+      // Sin readonly: esta entidad ya sabe guardar el UPDATE.
+      delete modal.dataset.readonly;
+      prellenador(idRegistro, modal);
     } else {
-      // En tarjetas el nombre principal se lee del título h3.
-      const nombre = row.querySelector('h3')?.textContent.trim();
-      const descripcion = row.querySelector('small')?.textContent.trim();
-      campos.forEach(field => {
-        if (field.name === 'nombre' && nombre) field.value = nombre;
-        if (field.name === 'descripcion' && descripcion) field.value = descripcion;
-      });
+      // Las tablas traen una fila con celdas; las tarjetas (.info-card) no tienen cells.
+      const values = row.cells ? [...row.cells].map(cell => cell.textContent.trim()) : [];
+      const campos = modal.querySelectorAll('[data-modal-field]');
+      if (values.length) {
+        // Mapeo por índice de celda. Solo para entidades sin prellenador: se
+        // rellena lo visible y el modal queda en solo lectura.
+        campos.forEach((field, index) => { field.value = values[index + 1] || ''; });
+      } else {
+        // En tarjetas el nombre principal se lee del título h3.
+        const nombre = row.querySelector('h3')?.textContent.trim();
+        const descripcion = row.querySelector('small')?.textContent.trim();
+        campos.forEach(field => {
+          if (field.name === 'nombre' && nombre) field.value = nombre;
+          if (field.name === 'descripcion' && descripcion) field.value = descripcion;
+        });
+      }
+      // Solo visualización: no se permite actualizar desde este modal.
+      modal.dataset.readonly = 'true';
     }
-    // Solo visualización: no se permite actualizar desde este modal.
-    modal.dataset.readonly = 'true';
   } else {
     delete modal.dataset.readonly;
   }
@@ -443,7 +520,9 @@ appContent.addEventListener('click', event => {
   const rowButton = event.target.closest('[data-row-action]');
   if (rowButton) {
     const row = rowButton.closest('tr, .info-card');
-    if (rowButton.dataset.rowAction === 'delete') {
+    if (rowButton.dataset.rowAction === 'detail') {
+      abrirDetalle(rowButton.dataset.entity, row);
+    } else if (rowButton.dataset.rowAction === 'delete') {
       row?.remove();
       showToast(`${rowButton.dataset.entity} eliminado`);
     } else if (rowButton.dataset.rowAction === 'status') {
@@ -498,12 +577,18 @@ document.addEventListener('submit', async event => {
 
   const modal = form.closest('[data-admin-modal]');
 
-  if (modal?.dataset.entity === 'cliente'
-    || modal?.dataset.entity === 'mascota') return;
+  // Estas entidades tienen su propio manejador de submit en
+  // conexion/clientes_bd.js. Sin este return, este handler genérico correría
+  // después, haría preventDefault y cerraría el modal antes de que responda la API.
+  const entidadesConSubmitPropio = [
+    'cliente', 'mascota', 'dirección', 'especie', 'raza',
+    'adopción', 'mascota en adopción'
+  ];
+  if (entidadesConSubmitPropio.includes(modal?.dataset.entity)) return;
 
-  // En modo edición solo se muestra el modal (reutilizado del insertar);
-  // no se actualiza ni se envía nada al backend.
-  if (modal?.dataset.action === 'edit' || modal?.dataset.readonly === 'true') {
+  // Las entidades con prellenador no vienen en readonly, asi que llegan hasta
+  // aca y se guardan. Las que no lo tienen se cierran sin enviar nada.
+  if (modal?.dataset.readonly === 'true') {
     event.preventDefault();
     closeAdminModal();
     return;
@@ -557,8 +642,14 @@ document.addEventListener('submit', async event => {
     if (archivo) datos.set('imagen', archivo);
   }
 
-  fetch(`${API_BASE_URL}/${endpoint}`, {
-    method: 'POST',
+  // En modo edicion el id viaja en la URL y el metodo es PUT.
+  const editando = modal.dataset.action === 'edit' && modal.dataset.idRegistro;
+  const url = editando
+    ? `${API_BASE_URL}/${endpoint}/${modal.dataset.idRegistro}`
+    : `${API_BASE_URL}/${endpoint}`;
+
+  fetch(url, {
+    method: editando ? 'PUT' : 'POST',
     ...(esArchivo ? {} : { headers: { 'Content-Type': 'application/json' } }),
     body: esArchivo ? datos : JSON.stringify(datos)
   })
@@ -569,9 +660,11 @@ document.addEventListener('submit', async event => {
       form.reset();
       invalidarOpcionesRelaciones();
       closeAdminModal();
+      delete modal.dataset.action;
+      delete modal.dataset.idRegistro;
       showToast(asignacionesFallidas
         ? `${entity} guardado, pero ${asignacionesFallidas} permiso(s) no se pudieron asignar`
-        : `${entity} guardado correctamente`);
+        : `${entity} ${editando ? 'actualizado' : 'guardado'} correctamente`);
       cargarDatosDeVista();
     })
     .catch(error => {
