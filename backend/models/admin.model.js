@@ -51,6 +51,7 @@ const inserciones = {
   },
   categoriaServicio: {
     tabla: 'categorias_servicios',
+    clave: 'id_categoria_servicio',
     campos: ['nombre'],
     requeridos: ['nombre']
   },
@@ -74,6 +75,7 @@ const inserciones = {
   },
   servicio: {
     tabla: 'servicios',
+    clave: 'id_servicio',
     campos: ['nombre', 'descripcion', 'id_categoria_servicio', 'precio', 'activo'],
     requeridos: ['nombre']
   },
@@ -107,21 +109,25 @@ const inserciones = {
   },
   turno: {
     tabla: 'turnos',
+    clave: 'id_turno',
     campos: ['id_cliente', 'id_mascota', 'id_servicio', 'id_sucursal', 'fecha', 'hora', 'motivo', 'estado', 'observaciones'],
     requeridos: ['id_mascota', 'id_servicio', 'fecha', 'hora']
   },
   historial: {
     tabla: 'historial_medico',
+    clave: 'id_historial',
     campos: ['id_mascota', 'id_veterinario', 'fecha', 'motivo', 'diagnostico', 'observacion'],
     requeridos: ['id_mascota', 'id_veterinario']
   },
   tratamiento: {
     tabla: 'tratamientos',
+    clave: 'id_tratamiento',
     campos: ['id_historial', 'medicamento', 'dosis', 'frecuencia', 'duracion'],
     requeridos: ['id_historial', 'medicamento']
   },
   vacuna: {
     tabla: 'vacunas',
+    clave: 'id_vacuna',
     campos: ['id_mascota', 'nombre', 'fecha_aplicacion', 'fecha_proxima', 'id_veterinario'],
     requeridos: ['id_mascota', 'nombre']
   },
@@ -231,7 +237,23 @@ const referencias = {
     { campo: 'id_producto', tabla: 'productos', clave: 'id_producto' },
     { campo: 'id_valor_atributo', tabla: 'valores_atributo', clave: 'id_valor' }
   ],
-  valorAtributo: [{ campo: 'id_atributo', tabla: 'atributos', clave: 'id_atributo' }]
+  valorAtributo: [{ campo: 'id_atributo', tabla: 'atributos', clave: 'id_atributo' }],
+  turno: [
+    { campo: 'id_cliente', tabla: 'clientes', clave: 'id_cliente' },
+    { campo: 'id_mascota', tabla: 'mascota', clave: 'id_mascota' },
+    { campo: 'id_servicio', tabla: 'servicios', clave: 'id_servicio' },
+    { campo: 'id_sucursal', tabla: 'sucursales', clave: 'id_sucursal' }
+  ],
+  historial: [
+    { campo: 'id_mascota', tabla: 'mascota', clave: 'id_mascota' },
+    { campo: 'id_veterinario', tabla: 'veterinarios', clave: 'id_veterinario' }
+  ],
+  tratamiento: [{ campo: 'id_historial', tabla: 'historial_medico', clave: 'id_historial' }],
+  vacuna: [
+    { campo: 'id_mascota', tabla: 'mascota', clave: 'id_mascota' },
+    { campo: 'id_veterinario', tabla: 'veterinarios', clave: 'id_veterinario' }
+  ],
+  servicio: [{ campo: 'id_categoria_servicio', tabla: 'categorias_servicios', clave: 'id_categoria_servicio' }]
 };
 
 // Comprueba que cada clave foránea enviada exista en su tabla padre.
@@ -255,6 +277,63 @@ const validarReferencias = async (entidad, datos) => {
     );
     if (!filas.length) {
       const error = new Error(`El valor ${id} no existe en ${ref.tabla}`);
+      error.status = 400;
+      throw error;
+    }
+  }
+};
+
+// Los ENUM de MySQL no aceptan cualquier valor. Con STRICT_TRANS_TABLES (el modo
+// por defecto en MySQL 8) un valor invalido revienta con un 500 sin explicar nada,
+// asi que hay que validar antes de escribir. Se comparte entre crear() y
+// actualizar() para que una edicion aplique las mismas reglas que un alta.
+const ENUMERACIONES = {
+  turno: { estado: ['PENDIENTE', 'CONFIRMADO', 'CANCELADO', 'FINALIZADO'] },
+  pedido: { estado: ['PENDIENTE', 'PREPARANDO', 'ENVIADO', 'ENTREGADO'] },
+  pago: {
+    metodo_pago: ['EFECTIVO', 'TRANSFERENCIA', 'DEBITO', 'CREDITO'],
+    estado_pago: ['PENDIENTE', 'REALIZADO']
+  },
+  envio: {
+    tipo_entrega: ['DOMICILIO', 'SUCURSAL', 'PROGRAMADO'],
+    estado: ['EN_CAMINO', 'ENTREGADO']
+  }
+};
+
+const validarEnumeraciones = (entidad, datos) => {
+  for (const [campo, opciones] of Object.entries(ENUMERACIONES[entidad] || {})) {
+    if (datos[campo] && !opciones.includes(String(datos[campo]).toUpperCase())) {
+      const error = new Error(`El valor de ${campo} no es válido`);
+      error.status = 400;
+      throw error;
+    }
+    if (datos[campo]) datos[campo] = String(datos[campo]).toUpperCase();
+  }
+};
+
+// Reglas de negocio que no se pueden expresar con una clave foranea.
+const validarCoherencia = async (entidad, datos) => {
+  if (entidad === 'turno' && datos.id_cliente && datos.id_mascota) {
+    const [mascotas] = await conexion.query(
+      'SELECT id_cliente FROM mascota WHERE id_mascota = ?',
+      [Number(datos.id_mascota)]
+    );
+    if (!mascotas.length || Number(mascotas[0].id_cliente) !== Number(datos.id_cliente)) {
+      const error = new Error('El cliente seleccionado no es propietario de la mascota');
+      error.status = 400;
+      throw error;
+    }
+  }
+
+  if (entidad === 'envio' && datos.id_direccion) {
+    const [direcciones] = await conexion.query(
+      `SELECT d.id_cliente FROM direcciones d
+       JOIN pedidos p ON p.id_cliente = d.id_cliente
+       WHERE d.id_direccion = ? AND p.id_pedido = ?`,
+      [Number(datos.id_direccion), Number(datos.id_pedido)]
+    );
+    if (!direcciones.length) {
+      const error = new Error('La dirección debe pertenecer al cliente del pedido');
       error.status = 400;
       throw error;
     }
@@ -320,8 +399,15 @@ const validarPresentacionDeVariante = async (entidad, datos, idVariante) => {
 // corta o falla y el cliente recibe un 500 sin explicar el motivo.
 const limitarLongitud = {
   valorAtributo: { nombre: 20 },
-  atributo: { nombre: 20 }
+  atributo: { nombre: 20 },
+  historial: { motivo: 85, diagnostico: 120, observacion: 85 },
+  tratamiento: { medicamento: 85, dosis: 85, frecuencia: 85, duracion: 85 },
+  vacuna: { nombre: 85 },
+  servicio: { nombre: 50 },
+  categoriaServicio: { nombre: 50 }
 };
+// turnos.motivo y turnos.observaciones son TEXT: no tienen un limite fijo que
+// validar, asi que no aparecen arriba.
 
 const validarLongitudes = (entidad, datos) => {
   const limites = limitarLongitud[entidad];
@@ -400,52 +486,8 @@ const AdminModel = {
       }
     }
 
-    if (entidad === 'turno' && datos.id_cliente && datos.id_mascota) {
-      const [mascotas] = await conexion.query(
-        'SELECT id_cliente FROM mascota WHERE id_mascota = ?',
-        [Number(datos.id_mascota)]
-      );
-      if (!mascotas.length || Number(mascotas[0].id_cliente) !== Number(datos.id_cliente)) {
-        const error = new Error('El cliente seleccionado no es propietario de la mascota');
-        error.status = 400;
-        throw error;
-      }
-    }
-
-    if (entidad === 'envio' && datos.id_direccion) {
-      const [direcciones] = await conexion.query(
-        `SELECT d.id_cliente FROM direcciones d
-         JOIN pedidos p ON p.id_cliente = d.id_cliente
-         WHERE d.id_direccion = ? AND p.id_pedido = ?`,
-        [Number(datos.id_direccion), Number(datos.id_pedido)]
-      );
-      if (!direcciones.length) {
-        const error = new Error('La dirección debe pertenecer al cliente del pedido');
-        error.status = 400;
-        throw error;
-      }
-    }
-
-    const enumeraciones = {
-      turno: { estado: ['PENDIENTE', 'CONFIRMADO', 'CANCELADO', 'FINALIZADO'] },
-      pedido: { estado: ['PENDIENTE', 'PREPARANDO', 'ENVIADO', 'ENTREGADO'] },
-      pago: {
-        metodo_pago: ['EFECTIVO', 'TRANSFERENCIA', 'DEBITO', 'CREDITO'],
-        estado_pago: ['PENDIENTE', 'REALIZADO']
-      },
-      envio: {
-        tipo_entrega: ['DOMICILIO', 'SUCURSAL', 'PROGRAMADO'],
-        estado: ['EN_CAMINO', 'ENTREGADO']
-      }
-    };
-    for (const [campo, opciones] of Object.entries(enumeraciones[entidad] || {})) {
-      if (datos[campo] && !opciones.includes(String(datos[campo]).toUpperCase())) {
-        const error = new Error(`El valor de ${campo} no es válido`);
-        error.status = 400;
-        throw error;
-      }
-      if (datos[campo]) datos[campo] = String(datos[campo]).toUpperCase();
-    }
+    await validarCoherencia(entidad, datos);
+    validarEnumeraciones(entidad, datos);
 
     const valores = configuracion.campos.map(campo => normalizarValor(campo, datos[campo]));
     await validarReferencias(entidad, datos);
@@ -560,6 +602,8 @@ const AdminModel = {
     const valores = columnas.map(campo => normalizarValor(campo, datos[campo]));
     const sets = columnas.map(campo => `\`${campo}\` = ?`).join(', ');
 
+    await validarCoherencia(entidad, datos);
+    validarEnumeraciones(entidad, datos);
     await validarReferencias(entidad, datos);
     validarLongitudes(entidad, datos);
     await validarPresentacionDeVariante(entidad, datos, id);

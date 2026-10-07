@@ -77,66 +77,26 @@ async function cargarAtributos() {
 }
 
 // De que columna del registro se toma cada campo visible del modal.
-// Los campos que no aparecen aqui (los inputs de archivo) se dejan como estan.
-const columnasPorEntidad = {
-  'producto':          { producto: 'nombre', marca_busqueda: 'id_marca', categoria_busqueda: 'id_categoria',
-                         descripcion: 'descripcion', descuento: 'descuento', estado: 'activo' },
-  'marca':             { nombre: 'nombre' },
-  'categoría':         { nombre: 'nombre', categoria_padre_busqueda: 'categoria_padre' },
-  'variante':          { producto_busqueda: 'id_producto', precio: 'precio', atributo_busqueda: 'id_valor_atributo' },
-  'atributo':          { nombre: 'nombre' },
-  'valor de atributo': { atributo_busqueda: 'id_atributo', nombre: 'nombre' }
-};
+// De que columna del registro se toma cada campo visible del modal.
+// Los campos que no aparecen (los inputs de archivo) se dejan como estan.
+registrarFormulario('producto', {
+  producto: 'nombre', marca_busqueda: 'id_marca', categoria_busqueda: 'id_categoria',
+  descripcion: 'descripcion', descuento: 'descuento', estado: 'activo'
+}, productosPorId);
 
-const registrosPorEntidad = {
-  'producto': productosPorId,
-  'marca': marcasPorId,
-  'categoría': categoriasPorId,
-  'variante': variantesPorId,
-  'atributo': atributosPorId,
-  'valor de atributo': valoresAtributoPorId
-};
+registrarFormulario('marca', { nombre: 'nombre' }, marcasPorId);
 
-// La invoca app.js al abrir un modal de catalogo en modo edicion.
-// Una sola funcion para las seis entidades: el modal ya declara que campos son
-// relaciones (data-relation) y cual es su campo oculto (data-relation-field),
-// asi que no hace falta un prellenador por entidad.
-async function prepararFormularioCatalogo(id, modal){
-  const entidad = modal.dataset.entity;
-  const columnas = columnasPorEntidad[entidad];
-  const registro = registrosPorEntidad[entidad]?.get(String(id));
-  if (!columnas || !registro){
-    avisarRegistroFaltante(entidad, id);
-    return;
-  }
+registrarFormulario('categoría', { nombre: 'nombre', categoria_padre_busqueda: 'categoria_padre' }, categoriasPorId);
 
-  const form = modal.querySelector('form');
-  form.reset();
-  const opciones = await opcionesParaEditar();
+registrarFormulario('variante', {
+  producto_busqueda: 'id_producto', precio: 'precio', atributo_busqueda: 'id_valor_atributo'
+}, variantesPorId);
 
-  form.querySelectorAll('[data-modal-field]').forEach(campo => {
-    const columna = columnas[campo.name];
-    if (!columna) return;
+registrarFormulario('atributo', { nombre: 'nombre' }, atributosPorId);
 
-    let valor = registro[columna] ?? '';
-    if (campo.type === 'date') valor = String(valor).slice(0, 10);
-    // El estado de producto llega como 0/1 desde MySQL y el select ofrece
-    // "Activo"/"Inactivo".
-    if (campo.tagName === 'SELECT' && /^[01]$/.test(String(valor))){
-      valor = Number(valor) ? 'Activo' : 'Inactivo';
-    }
+registrarFormulario('valor de atributo', { atributo_busqueda: 'id_atributo', nombre: 'nombre' }, valoresAtributoPorId);
 
-    if (campo.dataset.relation){
-      campo.value = valor ? etiquetaDeRelacion(opciones, campo.dataset.relation, valor) : '';
-      const oculto = form.querySelector(`[data-relation-value="${campo.dataset.relationField}"]`);
-      if (oculto) oculto.value = registro[columna] ?? '';
-    } else {
-      campo.value = valor;
-    }
-  });
 
-  try { await prepararRelaciones(form); } catch (error) { /* no es critico */ }
-}
 
 // Crea una presentacion (atributo + valor) desde el modal de variante, sin
 // salir de la vista. Reutiliza los endpoints que ya existen:

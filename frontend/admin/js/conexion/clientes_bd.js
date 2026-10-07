@@ -55,26 +55,6 @@ function invalidarClientesCargados(){
   mascotasAdopcionPorId.clear();
 }
 
-// Busca la etiqueta de un registro dentro de admin/opciones.
-// Los inputs de relación son datalist: hay que escribir la etiqueta, no el id.
-async function etiquetaDeRelacion(opciones, relacion, id){
-  const registro = (opciones[relacion] || []).find(item => String(item.id) === String(id));
-  return registro ? registro.etiqueta : '';
-}
-
-async function opcionesParaEditar(){
-  try{
-    return await obtenerOpcionesRelaciones();
-  }catch(error){
-    console.warn('No se pudieron cargar las relaciones para editar:', error);
-    return {};
-  }
-}
-
-function avisarRegistroFaltante(entidad, id){
-  console.warn(`No se encontró ${entidad} en el registro local:`, id);
-}
-
 // Rellena el par input-texto / hidden-id de los datalist de relación.
 async function asignarRelacion(opciones, form, nombreTexto, nombreId, relacion, id){
   const campoTexto = form.elements[nombreTexto];

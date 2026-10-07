@@ -293,13 +293,20 @@ function obtenerPrellenadorEdicion(entity){
     'raza': prepararFormularioRaza,
     'adopción': prepararFormularioAdopcion,
     'mascota en adopción': prepararFormularioMascotaAdopcion,
-    // Las seis de catálogo comparten un solo prellenador.
-    'producto': prepararFormularioCatalogo,
-    'marca': prepararFormularioCatalogo,
-    'categoría': prepararFormularioCatalogo,
-    'variante': prepararFormularioCatalogo,
-    'atributo': prepararFormularioCatalogo,
-    'valor de atributo': prepararFormularioCatalogo
+    // Catálogo y clínica comparten un solo prellenador: cada módulo registró sus
+    // entidades con registrarFormulario() desde conexion_html.js.
+    'producto': prepararFormularioRelacional,
+    'marca': prepararFormularioRelacional,
+    'categoría': prepararFormularioRelacional,
+    'variante': prepararFormularioRelacional,
+    'atributo': prepararFormularioRelacional,
+    'valor de atributo': prepararFormularioRelacional,
+    'turno': prepararFormularioRelacional,
+    'historial médico': prepararFormularioRelacional,
+    'tratamiento': prepararFormularioRelacional,
+    'vacuna': prepararFormularioRelacional,
+    'servicio': prepararFormularioRelacional,
+    'categoría de servicio': prepararFormularioRelacional
   };
   const prellenador = prellenadores[entity];
   return typeof prellenador === 'function' ? prellenador : null;
@@ -324,6 +331,10 @@ function valorDetalle(campo, registro, opciones){
   }
   if (campo.fecha){
     return String(bruto).slice(0, 10);
+  }
+  if (campo.hora){
+    // MySQL devuelve "09:00:00"; en el detalle se muestra como "09:00".
+    return String(bruto).slice(0, 5);
   }
   return bruto + (campo.sufijo || '');
 }
