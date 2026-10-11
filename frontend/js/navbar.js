@@ -577,7 +577,7 @@ window.addEventListener("load", async () => {
     if (confirmaSession.ok) {
       controlUsuario.innerHTML = ``;
       offCanvas.innerHTML += `
-      <li><a href="#" class="ofcanvas-nav">Mi cuenta</a></li>
+      <li><a href="${rutaBaseCatalogo}pages/cuenta.html" class="ofcanvas-nav">Mi cuenta</a></li>
       <li onclick="cerrarSession()" class="ofcanvas-nav">Cerrar Sesion</li>
       `
       actualizarContadorCarrito();
