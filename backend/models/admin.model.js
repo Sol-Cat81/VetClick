@@ -156,11 +156,13 @@ const inserciones = {
   },
   pago: {
     tabla: 'pagos',
+    clave: 'id_pago',
     campos: ['id_pedido', 'metodo_pago', 'estado_pago'],
     requeridos: ['id_pedido', 'metodo_pago']
   },
   envio: {
     tabla: 'envios',
+    clave: 'id_envio',
     campos: ['id_pedido', 'tipo_entrega', 'id_direccion', 'codigo_postal', 'fecha_estimada', 'fecha_entrega', 'estado'],
     requeridos: ['id_pedido', 'tipo_entrega']
   },
@@ -181,11 +183,13 @@ const inserciones = {
   },
   stock: {
     tabla: 'inventario',
+    clave: 'id_inventario',
     campos: ['id_variante', 'id_sucursal', 'stock_actual', 'stock_minimo'],
     requeridos: ['id_variante', 'id_sucursal', 'stock_actual']
   },
   sucursal: {
     tabla: 'sucursales',
+    clave: 'id_sucursal',
     campos: ['nombre', 'direccion', 'localidad', 'telefono', 'horario', 'activo'],
     requeridos: ['nombre']
   }
@@ -237,6 +241,10 @@ const referencias = {
     { campo: 'id_producto', tabla: 'productos', clave: 'id_producto' },
     { campo: 'id_valor_atributo', tabla: 'valores_atributo', clave: 'id_valor' }
   ],
+  stock: [
+    { campo: 'id_variante', tabla: 'variantes', clave: 'id_variante' },
+    { campo: 'id_sucursal', tabla: 'sucursales', clave: 'id_sucursal' }
+  ],
   valorAtributo: [{ campo: 'id_atributo', tabla: 'atributos', clave: 'id_atributo' }],
   turno: [
     { campo: 'id_cliente', tabla: 'clientes', clave: 'id_cliente' },
@@ -253,7 +261,12 @@ const referencias = {
     { campo: 'id_mascota', tabla: 'mascota', clave: 'id_mascota' },
     { campo: 'id_veterinario', tabla: 'veterinarios', clave: 'id_veterinario' }
   ],
-  servicio: [{ campo: 'id_categoria_servicio', tabla: 'categorias_servicios', clave: 'id_categoria_servicio' }]
+  servicio: [{ campo: 'id_categoria_servicio', tabla: 'categorias_servicios', clave: 'id_categoria_servicio' }],
+  pago: [{ campo: 'id_pedido', tabla: 'pedidos', clave: 'id_pedido' }],
+  envio: [
+    { campo: 'id_pedido', tabla: 'pedidos', clave: 'id_pedido' },
+    { campo: 'id_direccion', tabla: 'direcciones', clave: 'id_direccion' }
+  ]
 };
 
 // Comprueba que cada clave foránea enviada exista en su tabla padre.
@@ -400,6 +413,10 @@ const validarPresentacionDeVariante = async (entidad, datos, idVariante) => {
 const limitarLongitud = {
   valorAtributo: { nombre: 20 },
   atributo: { nombre: 20 },
+  // sucursales.nombre, direccion, localidad, telefono y horario son VARCHAR(80)
+  // (database/VetClick-BD.sql). Sin esto, escribir de mas en cualquiera de ellas
+  // devuelve un 500 de MySQL sin explicar nada.
+  sucursal: { nombre: 80, direccion: 80, localidad: 80, telefono: 80, horario: 80 },
   historial: { motivo: 85, diagnostico: 120, observacion: 85 },
   tratamiento: { medicamento: 85, dosis: 85, frecuencia: 85, duracion: 85 },
   vacuna: { nombre: 85 },
@@ -475,7 +492,20 @@ const AdminModel = {
       sucursal: { activo: true },
       stock: { stock_minimo: 0 }
     };
-    datos = { ...(valoresPorDefecto[entidad] || {}), ...datos };
+    const defaults = valoresPorDefecto[entidad] || {};
+
+    // Un default solo aplica si el campo NO llega con valor. El form siempre
+    // manda todas las claves, asi que un campo opcional en blanco llega como
+    // '' y pisaba el default: stock_minimo vacio se guardaba NULL, y el estado
+    // del inventario comparaba contra NULL y siempre decia "Optimo".
+    const aplicarDefault = (campo, valor) =>
+      (valor === undefined || valor === '') && campo in defaults ? defaults[campo] : valor;
+    datos = Object.fromEntries(
+      Object.entries(datos).map(([campo, valor]) => [campo, aplicarDefault(campo, valor)])
+    );
+    for (const [campo, valor] of Object.entries(defaults)) {
+      if (!(campo in datos)) datos[campo] = valor;
+    }
 
     for (const campo of configuracion.requeridos) {
       const valor = datos[campo];
@@ -489,7 +519,9 @@ const AdminModel = {
     await validarCoherencia(entidad, datos);
     validarEnumeraciones(entidad, datos);
 
-    const valores = configuracion.campos.map(campo => normalizarValor(campo, datos[campo]));
+    const valores = configuracion.campos.map(campo =>
+      normalizarValor(campo, campo in defaults ? aplicarDefault(campo, datos[campo]) : datos[campo])
+    );
     await validarReferencias(entidad, datos);
     validarLongitudes(entidad, datos);
     await validarPresentacionDeVariante(entidad, datos, null);

@@ -254,7 +254,12 @@ function enhanceAdminPanels() {
         item.tBodies[0]?.querySelectorAll('tr').forEach(row => {
           if (row.querySelector('[data-row-action]')) return;
           const id = row.dataset?.id || row.cells[0]?.textContent.trim() || '';
-          const hasStatus = row.querySelector('.status');
+          // Una tabla puede declarar data-sin-estado cuando su .status no es un
+          // campo con estados (en inventario es "Bajo"/"Óptimo"): sin el opt-out
+          // aparecia un "Cambiar estado" que cycleaba Activo/Pendiente/Inactivo
+          // y se perderia en la proxima carga.
+          const tieneEstado = !item.hasAttribute('data-sin-estado');
+          const hasStatus = tieneEstado && Boolean(row.querySelector('.status'));
           const tieneDetalle = Boolean(detalleEntidades[entidadItem]);
           const hasActionColumn = head.cells[head.cells.length - 1]?.textContent.trim().toLowerCase() === 'acciones';
           const actions = hasActionColumn && row.cells.length === head.cells.length
@@ -271,11 +276,12 @@ function enhanceAdminPanels() {
       }
 
       if (item.querySelector('[data-row-action]')) return;
+      const conEstado = !item.hasAttribute('data-sin-estado') && Boolean(item.querySelector('.status'));
       const actions = document.createElement('div');
       actions.className = 'card-actions';
       actions.innerHTML = `<button class="btn btn-secondary btn-small" type="button" data-row-action="edit" data-entity="${entidadItem}">Editar</button>
         <button class="btn btn-danger btn-small" type="button" data-row-action="delete" data-entity="${entidadItem}">Eliminar</button>
-        ${item.querySelector('.status') ? `<button class="btn btn-secondary btn-small" type="button" data-row-action="status" data-entity="${entidadItem}">Cambiar estado</button>` : ''}`;
+        ${conEstado ? `<button class="btn btn-secondary btn-small" type="button" data-row-action="status" data-entity="${entidadItem}">Cambiar estado</button>` : ''}`;
       item.appendChild(actions);
     });
   });
@@ -299,6 +305,8 @@ function obtenerPrellenadorEdicion(entity){
     'marca': prepararFormularioRelacional,
     'categoría': prepararFormularioRelacional,
     'variante': prepararFormularioRelacional,
+    'registro de stock': prepararFormularioRelacional,
+    'sucursal': prepararFormularioRelacional,
     'atributo': prepararFormularioRelacional,
     'valor de atributo': prepararFormularioRelacional,
     'turno': prepararFormularioRelacional,
@@ -306,7 +314,9 @@ function obtenerPrellenadorEdicion(entity){
     'tratamiento': prepararFormularioRelacional,
     'vacuna': prepararFormularioRelacional,
     'servicio': prepararFormularioRelacional,
-    'categoría de servicio': prepararFormularioRelacional
+    'categoría de servicio': prepararFormularioRelacional,
+    'pago': prepararFormularioRelacional,
+    'envío': prepararFormularioRelacional
   };
   const prellenador = prellenadores[entity];
   return typeof prellenador === 'function' ? prellenador : null;
@@ -585,6 +595,12 @@ async function asignarRegistrosRelacionados(form, resultado) {
 document.addEventListener('submit', async event => {
   const form = event.target.closest('[data-admin-modal-form]');
   if (!form) return;
+
+  // El mini-modal de alta rapida de presentacion tiene su propio manejador en
+  // conexion/catalogo_bd.js. No es un [data-admin-modal-form], asi que igual
+  // retornamos arriba; lo dejamos explicito para que ningun handler futuro lo
+  // intercepte y termine cerrando el modal de variante.
+  if (event.target.closest('[data-form-alta-valor]')) return;
 
   const modal = form.closest('[data-admin-modal]');
 

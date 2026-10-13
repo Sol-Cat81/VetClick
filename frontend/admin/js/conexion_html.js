@@ -45,7 +45,14 @@ function avisarRegistroFaltante(entidad, id){
 
 // Busca la etiqueta de un registro dentro de admin/opciones.
 // Los inputs de relación son datalist: hay que escribir la etiqueta, no el id.
-async function etiquetaDeRelacion(opciones, relacion, id){
+//
+// Esta función es deliberadamente SÍNCRONA: no lleva ningún await dentro.
+// Antes era async y devolvía una Promise, así que los llamadores que la usan sin
+// await (prepararFormularioRelacional y valorDetalle) escribían literalmente
+// "[object Promise]" en el input. Con eso prepararRelaciones() no encontraba la
+// etiqueta y vaciaba el id_valor_atributo al guardar la edición de una variante.
+// El único llamador que usaba await (clientes_bd.js) sigue funcionando igual.
+function etiquetaDeRelacion(opciones, relacion, id){
   const registro = (opciones[relacion] || []).find(item => String(item.id) === String(id));
   return registro ? registro.etiqueta : '';
 }
@@ -104,7 +111,7 @@ async function prepararFormularioRelacional(id, modal){
       const directa = items.find(o => o.value === String(bruto)
         || o.text.trim().toLowerCase() === String(bruto).toLowerCase());
       if (!directa && /^[01]$/.test(String(bruto))){
-        const etiquetada = items.find(o => /^(activo|inactivo)$/i.test(o.text.trim()));
+        const etiquetada = items.find(o => /^(activ[oa]|inactiv[oa])$/i.test(o.text.trim()));
         if (etiquetada) campo.value = etiquetada.value;
       }else{
         campo.value = String(bruto);
@@ -123,5 +130,5 @@ async function prepararFormularioRelacional(id, modal){
   });
 
   // Cargamos las sugerencias de los datalist para que se vean al hacer clic.
-  try { await prepararRelaciones(form); } catch (error) { /* no es crítico */ }
+  try { await prepararRelaciones(form); } catch (error) {}
 }

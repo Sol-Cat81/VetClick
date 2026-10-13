@@ -142,7 +142,11 @@ async function guardarNuevaPresentacion(){
     const cuerpoValor = await respuestaValor.json();
     if (!respuestaValor.ok) throw new Error(cuerpoValor.mensaje || 'No se pudo crear el valor');
 
-    const nuevaEtiqueta = `${nombreAtributo}: ${valor}`;
+    // La etiqueta debe ser EXACTAMENTE la que devuelve admin/opciones
+    // ("Color: Rojo (ID: 5)"). Si no coincide, prepararRelaciones() no la
+    // encuentra en el datalist y vacia el id_valor_atributo al guardar la
+    // variante, y el backend rechaza el alta por falta de presentacion.
+    const nuevaEtiqueta = `${nombreAtributo}: ${valor} (ID: ${cuerpoValor.id})`;
 
     // Agregamos la opcion al datalist del modal de variante sin recargar nada.
     const lista = document.getElementById('variante-atributos');
@@ -179,8 +183,16 @@ document.addEventListener('click', event => {
     document.getElementById('modal-alta-valor').classList.remove('show');
     return;
   }
-  if (event.target.matches('[data-form-alta-valor]')) {
-    event.preventDefault();
-    guardarNuevaPresentacion();
-  }
+});
+
+// El envio del mini-modal se intercepta con un listener de 'submit', no de
+// 'click': el clic del boton "Crear y usar" tiene como target el <button>, no
+// el <form>, y un preventDefault() sobre 'click' no cancela el envio. Sin esto
+// el navegador hacia un GET con los datos del form, se recargaba la pagina y la
+// vista de catalogo volvia siempre al primer panel (Productos).
+document.addEventListener('submit', event => {
+  const form = event.target.closest('[data-form-alta-valor]');
+  if (!form) return;
+  event.preventDefault();
+  guardarNuevaPresentacion();
 });
