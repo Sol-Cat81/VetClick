@@ -17,6 +17,7 @@ const solicitarProductosDestacados = async (req, res) => {
 	          v.id_variante,
 	          v.id_valor_atributo,
 	          va.nombre AS atributo,
+	          a.nombre AS atributo_nombre,
 	          v.precio,
 	          COALESCE((
 	            SELECT SUM(i.stock_actual)
@@ -29,6 +30,8 @@ const solicitarProductosDestacados = async (req, res) => {
             ON p.id_producto = v.id_producto 
             LEFT JOIN valores_atributo AS va
             ON v.id_valor_atributo = va.id_valor
+            LEFT JOIN atributos AS a
+            ON a.id_atributo = va.id_atributo
             WHERE p.activo = TRUE
             ORDER BY p.id_producto, v.id_variante;
             `);
@@ -52,7 +55,9 @@ const solicitarProductosDestacados = async (req, res) => {
         id_atributo: producto.id_valor_atributo,
         precio: producto.precio,
         stock: producto.stock,
-        atributo: producto.atributo || "Disponible",
+        atributo: producto.atributo_nombre
+          ? `${producto.atributo_nombre}: ${producto.atributo}`
+          : "Disponible",
       });
     });
 

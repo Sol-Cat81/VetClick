@@ -14,7 +14,8 @@
 
   <div data-panel="turnos">
     <div class="toolbar">
-      <div class="filter-box">⌕ <input placeholder="Buscar paciente o servicio..."></div><button class="btn btn-primary"
+      <div class="filter-box">⌕ <input data-table-filter="#turnos-table"
+          placeholder="Buscar paciente o servicio..."></div><button class="btn btn-primary"
         data-toast="Formulario de turno listo para conectar">＋ Nuevo turno</button>
     </div>
     <article class="card table-card">
@@ -24,12 +25,8 @@
             <tr>
               <th>ID</th>
               <th>Fecha</th>
-              <th>Hora</th>
               <th>Paciente</th>
-              <th>Cliente</th>
               <th>Servicio</th>
-              <th>Sucursal</th>
-              <th>Motivo</th>
               <th>Estado</th>
             </tr>
           </thead>
@@ -41,6 +38,12 @@
   </div>
 
   <div data-panel="historial" hidden>
+    <div class="toolbar">
+      <div class="filter-box">⌕ <input data-table-filter="#historial-table"
+          placeholder="Buscar paciente o veterinario..."></div>
+      <button class="btn btn-primary" type="button" data-modal-action="create"
+        data-modal-entity="historial médico" data-modal-panel="historial">＋ Nuevo historial</button>
+    </div>
     <article class="card table-card">
       <div class="table-wrap">
         <table id="historial-table">
@@ -50,9 +53,6 @@
               <th>Fecha</th>
               <th>Paciente</th>
               <th>Veterinario</th>
-              <th>Motivo</th>
-              <th>Diagnóstico</th>
-              <th>Observación</th>
             </tr>
           </thead>
           <tbody>
@@ -63,17 +63,21 @@
   </div>
 
   <div data-panel="tratamientos" hidden>
+    <div class="toolbar">
+      <div class="filter-box">⌕ <input data-table-filter="#tratamientos-table"
+          placeholder="Buscar medicamento..."></div>
+      <button class="btn btn-primary" type="button" data-modal-action="create"
+        data-modal-entity="tratamiento" data-modal-panel="tratamientos">＋ Nuevo tratamiento</button>
+    </div>
     <article class="card table-card">
       <div class="table-wrap">
         <table id="tratamientos-table">
           <thead>
             <tr>
               <th>ID</th>
-              <th>Historial</th>
               <th>Medicamento</th>
+              <th>Historial</th>
               <th>Dosis</th>
-              <th>Frecuencia</th>
-              <th>Duración</th>
             </tr>
           </thead>
           <tbody>
@@ -85,6 +89,12 @@
   </div>
 
   <div data-panel="vacunas" hidden>
+    <div class="toolbar">
+      <div class="filter-box">⌕ <input data-table-filter="#vacunas-table"
+          placeholder="Buscar vacuna o paciente..."></div>
+      <button class="btn btn-primary" type="button" data-modal-action="create"
+        data-modal-entity="vacuna" data-modal-panel="vacunas">＋ Nueva vacuna</button>
+    </div>
     <article class="card table-card">
       <div class="table-wrap">
         <table id="vacunas-table">
@@ -93,9 +103,7 @@
               <th>ID</th>
               <th>Paciente</th>
               <th>Vacuna</th>
-              <th>Aplicación</th>
               <th>Próxima</th>
-              <th>Veterinario</th>
             </tr>
           </thead>
           <tbody>
@@ -126,9 +134,7 @@
             <tr>
               <th>ID</th>
               <th>Servicio</th>
-              <th>Categoría</th>
               <th>Precio</th>
-              <th>Descripción</th>
               <th>Estado</th>
             </tr>
           </thead>
@@ -212,9 +218,9 @@
               data-relation="veterinarios" data-relation-field="id_veterinario" autocomplete="off" required>
             <datalist id="historial-veterinarios"></datalist></label>
           <input type="hidden" name="id_veterinario" data-relation-value="id_veterinario">
-          <label>Motivo<textarea data-modal-field name="motivo"
-              rows="2"></textarea></label><label>Diagnóstico<textarea data-modal-field name="diagnostico"
-              rows="2"></textarea></label><label>Observación<textarea data-modal-field name="observacion"
+          <label>Motivo<textarea data-modal-field name="motivo" maxlength="85"
+              rows="2"></textarea></label><label>Diagnóstico<textarea data-modal-field name="diagnostico" maxlength="120"
+              rows="2"></textarea></label><label>Observación<textarea data-modal-field name="observacion" maxlength="85"
               rows="2"></textarea></label></div>
         <div class="modal-actions"><button class="btn btn-secondary" type="button"
             data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar historial</button>
@@ -234,9 +240,9 @@
               list="tratamiento-historiales" data-relation="historiales" data-relation-field="id_historial"
               autocomplete="off" required><datalist id="tratamiento-historiales"></datalist></label>
           <input type="hidden" name="id_historial" data-relation-value="id_historial">
-          <label>Medicamento<input data-modal-field name="medicamento"
-              required></label><label>Dosis<input data-modal-field name="dosis"></label><label>Frecuencia<input
-              data-modal-field name="frecuencia"></label><label>Duración<input data-modal-field name="duracion"></label>
+          <label>Medicamento<input data-modal-field name="medicamento" maxlength="85"
+              required></label><label>Dosis<input data-modal-field name="dosis" maxlength="85"></label><label>Frecuencia<input
+              data-modal-field name="frecuencia"></label><label>Duración<input data-modal-field name="duracion" maxlength="85"></label>
         </div>
         <div class="modal-actions"><button class="btn btn-secondary" type="button"
             data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar tratamiento</button>
@@ -256,7 +262,7 @@
               list="vacuna-mascotas" data-relation="mascotas" data-relation-field="id_mascota"
               autocomplete="off" required><datalist id="vacuna-mascotas"></datalist></label>
           <input type="hidden" name="id_mascota" data-relation-value="id_mascota">
-          <label>Vacuna<input data-modal-field name="nombre"
+          <label>Vacuna<input data-modal-field name="nombre" maxlength="85"
               required></label><label>Aplicación<input data-modal-field name="fecha_aplicacion"
               type="date"></label><label>Próxima<input data-modal-field name="fecha_proxima"
               type="date"></label><label>Veterinario<input data-modal-field name="veterinario_busqueda"
@@ -278,7 +284,7 @@
       </div>
       <form data-admin-modal-form>
         <div class="modal-fields">
-          <label>Servicio<input data-modal-field name="nombre" required></label>
+          <label>Servicio<input data-modal-field name="nombre" maxlength="50" required></label>
           <label>Categoría<input data-modal-field name="categoria_servicio_busqueda" list="servicio-categorias"
               data-relation="categoriasServicios" data-relation-field="id_categoria_servicio" autocomplete="off">
             <datalist id="servicio-categorias"></datalist></label>
@@ -305,7 +311,7 @@
       </div>
       <form data-admin-modal-form>
         <div class="modal-fields">
-          <label>Categoría de servicio<input data-modal-field name="nombre" required></label>
+          <label>Categoría de servicio<input data-modal-field name="nombre" maxlength="50" required></label>
         </div>
         <div class="modal-actions"><button class="btn btn-secondary" type="button"
             data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar categoría</button>

@@ -14,7 +14,8 @@
 
   <div data-panel="productos">
     <div class="toolbar">
-      <div class="filter-box">⌕ <input placeholder="Buscar producto..."></div><button class="btn btn-primary"
+      <div class="filter-box">⌕ <input data-table-filter="#productos-table"
+          placeholder="Buscar producto..."></div><button class="btn btn-primary"
         data-toast="Formulario de producto listo para conectar">＋ Añadir producto</button>
     </div>
     <article class="card table-card">
@@ -205,7 +206,7 @@
       </div>
       <form data-admin-modal-form>
         <div class="modal-fields"><label>Marca<input data-modal-field name="nombre" required></label>
-          <label>Imagen<input type="file" data-modal-field name="imagen_marca" required></label>
+          <label>Imagen<input type="file" data-modal-field name="imagen_marca"></label>
         </div>
         <div class="modal-actions"><button class="btn btn-secondary" type="button"
             data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar marca</button></div>
@@ -225,13 +226,49 @@
               required><datalist id="variante-productos"></datalist></label>
           <input type="hidden" name="id_producto" data-relation-value="id_producto">
           <label>Precio<input data-modal-field name="precio" type="number" step="0.01" required></label>
-          <label>Atributo<input data-modal-field name="atributo_busqueda" list="variante-atributos"
-              data-relation="valoresAtributo" data-relation-field="id_valor_atributo" autocomplete="off">
-            <datalist id="variante-atributos"></datalist></label>
+          <div class="field-con-boton">
+            <label>Presentación<input data-modal-field name="atributo_busqueda" list="variante-atributos"
+                data-relation="valoresAtributo" data-relation-field="id_valor_atributo"
+                autocomplete="off" placeholder="Vacío = precio único">
+              <datalist id="variante-atributos"></datalist></label>
+            <button class="btn btn-secondary btn-small" type="button" data-abrir-alta-valor
+              title="Crear una presentación nueva">+ Nueva</button>
+          </div>
           <input type="hidden" name="id_valor_atributo" data-relation-value="id_valor_atributo">
         </div>
+        <p class="modal-help">Dejá <strong>Presentación</strong> vacío si el producto tiene un solo
+          precio. Completalo solo cuando el precio dependa de algo (talla, color, sabor). Todas las
+          variantes de un mismo producto deben usar la misma presentación.</p>
         <div class="modal-actions"><button class="btn btn-secondary" type="button"
             data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar variante</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Mini-modal de alta rapida de presentacion. NO lleva data-admin-modal a
+       proposito: el submit generico de app.js lo interceptaria e intentaria
+       POST /api/admin/alta de valor, y el clic en su fondo cerraria tambien el
+       modal de variante (closeAdminModal cierra todos los .show). -->
+  <div class="modal-backdrop" id="modal-alta-valor">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="alta-valor-titulo">
+      <div class="modal-head">
+        <div><span class="modal-kicker">Catálogo</span>
+          <h2 id="alta-valor-titulo">Nueva presentación</h2>
+        </div><button class="modal-close" type="button" data-cerrar-alta-valor aria-label="Cerrar">×</button>
+      </div>
+      <form data-form-alta-valor>
+        <div class="modal-fields">
+          <label>Atributo<input name="atributo_busqueda" list="alta-valor-atributos"
+              data-relation="atributos" data-relation-field="id_atributo"
+              autocomplete="off" placeholder="Talla, o escribí uno nuevo" required>
+            <datalist id="alta-valor-atributos"></datalist></label>
+          <input type="hidden" name="id_atributo" data-relation-value="id_atributo">
+          <label>Valor<input name="valor" placeholder="Mediana" maxlength="20" required></label>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-secondary" type="button" data-cerrar-alta-valor>Cancelar</button>
+          <button class="btn btn-primary" type="submit">Crear y usar</button>
         </div>
       </form>
     </div>

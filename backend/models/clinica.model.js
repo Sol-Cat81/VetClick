@@ -2,9 +2,11 @@ const conexion = require('../config/database');
 const ClinicaModel = {
   obtenerTurnos: async () => {
     const [rows] = await conexion.query(`
-      SELECT t.id_turno, t.fecha, t.hora, m.nombre AS mascota,
+      SELECT t.id_turno, t.id_cliente, t.id_mascota, t.id_servicio, t.id_sucursal,
+             t.fecha, t.hora, m.nombre AS mascota,
              CONCAT(c.nombre, ' ', c.apellido) AS cliente,
-             s.nombre AS servicio, su.nombre AS sucursal, t.motivo, t.estado
+             s.nombre AS servicio, su.nombre AS sucursal,
+             t.motivo, t.estado, t.observaciones
       FROM turnos t JOIN mascota m ON m.id_mascota = t.id_mascota
       JOIN servicios s ON s.id_servicio = t.id_servicio
       LEFT JOIN clientes c ON c.id_cliente = t.id_cliente
@@ -14,7 +16,7 @@ const ClinicaModel = {
   },
   obtenerHistorial: async () => {
     const [rows] = await conexion.query(`
-      SELECT h.id_historial, h.fecha, m.nombre AS paciente,
+      SELECT h.id_historial, h.id_mascota, h.id_veterinario, h.fecha, m.nombre AS paciente,
              CONCAT(e.nombre, ' ', e.apellido) AS veterinario,
              h.motivo, h.diagnostico, h.observacion
       FROM historial_medico h JOIN mascota m ON m.id_mascota = h.id_mascota
@@ -24,14 +26,22 @@ const ClinicaModel = {
     return rows;
   },
   obtenerTratamientos: async () => {
+    // Los LEFT JOIN mantienen el tratamiento visible aunque su historial o la
+    // mascota se borren: antes solo se veia un id_historial suelto.
     const [rows] = await conexion.query(
-      'SELECT id_tratamiento, id_historial, medicamento, dosis, frecuencia, duracion FROM tratamientos ORDER BY id_tratamiento'
+      `SELECT tr.id_tratamiento, tr.id_historial, m.nombre AS paciente,
+              h.fecha AS historial_fecha,
+              tr.medicamento, tr.dosis, tr.frecuencia, tr.duracion
+       FROM tratamientos tr
+       LEFT JOIN historial_medico h ON h.id_historial = tr.id_historial
+       LEFT JOIN mascota m ON m.id_mascota = h.id_mascota
+       ORDER BY tr.id_tratamiento`
     );
     return rows;
   },
   obtenerVacunas: async () => {
     const [rows] = await conexion.query(`
-      SELECT v.id_vacuna, m.nombre AS paciente, v.nombre,
+      SELECT v.id_vacuna, v.id_mascota, v.id_veterinario, m.nombre AS paciente, v.nombre,
              v.fecha_aplicacion, v.fecha_proxima,
              CONCAT(e.nombre, ' ', e.apellido) AS veterinario
       FROM vacunas v JOIN mascota m ON m.id_mascota = v.id_mascota

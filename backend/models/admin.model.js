@@ -45,36 +45,43 @@ const inserciones = {
   },
   especie: {
     tabla: 'especies',
+    clave: 'id_especie',
     campos: ['nombre'],
     requeridos: ['nombre']
   },
   categoriaServicio: {
     tabla: 'categorias_servicios',
+    clave: 'id_categoria_servicio',
     campos: ['nombre'],
     requeridos: ['nombre']
   },
   atributo: {
     tabla: 'atributos',
+    clave: 'id_atributo',
     campos: ['nombre'],
     requeridos: ['nombre']
   },
   valorAtributo: {
     tabla: 'valores_atributo',
+    clave: 'id_valor',
     campos: ['id_atributo', 'nombre'],
     requeridos: ['id_atributo', 'nombre']
   },
   raza: {
     tabla: 'razas',
+    clave: 'id_raza',
     campos: ['nombre', 'id_especie'],
     requeridos: ['nombre', 'id_especie']
   },
   servicio: {
     tabla: 'servicios',
+    clave: 'id_servicio',
     campos: ['nombre', 'descripcion', 'id_categoria_servicio', 'precio', 'activo'],
     requeridos: ['nombre']
   },
   mascotaAdopcion: {
     tabla: 'mascotas_adopcion',
+    clave: 'id_mascota_adopcion',
     campos: ['nombre', 'id_especie', 'edad', 'sexo', 'descripcion', 'estado'],
     requeridos: ['nombre', 'sexo', 'estado']
   },
@@ -90,36 +97,43 @@ const inserciones = {
   },
   adopcion: {
     tabla: 'adopciones',
+    clave: 'id_adopcion',
     campos: ['id_cliente', 'id_mascota_adopcion', 'fecha', 'estado', 'observacion'],
     requeridos: ['id_cliente', 'id_mascota_adopcion', 'fecha']
   },
   direccion: {
     tabla: 'direcciones',
+    clave: 'id_direccion',
     campos: ['id_cliente', 'tipo_direccion', 'calle', 'numero', 'piso', 'departamento', 'localidad', 'provincia', 'codigo_postal', 'referencia'],
     requeridos: ['id_cliente', 'tipo_direccion', 'calle']
   },
   turno: {
     tabla: 'turnos',
+    clave: 'id_turno',
     campos: ['id_cliente', 'id_mascota', 'id_servicio', 'id_sucursal', 'fecha', 'hora', 'motivo', 'estado', 'observaciones'],
     requeridos: ['id_mascota', 'id_servicio', 'fecha', 'hora']
   },
   historial: {
     tabla: 'historial_medico',
+    clave: 'id_historial',
     campos: ['id_mascota', 'id_veterinario', 'fecha', 'motivo', 'diagnostico', 'observacion'],
     requeridos: ['id_mascota', 'id_veterinario']
   },
   tratamiento: {
     tabla: 'tratamientos',
+    clave: 'id_tratamiento',
     campos: ['id_historial', 'medicamento', 'dosis', 'frecuencia', 'duracion'],
     requeridos: ['id_historial', 'medicamento']
   },
   vacuna: {
     tabla: 'vacunas',
+    clave: 'id_vacuna',
     campos: ['id_mascota', 'nombre', 'fecha_aplicacion', 'fecha_proxima', 'id_veterinario'],
     requeridos: ['id_mascota', 'nombre']
   },
   categoria: {
     tabla: 'categorias',
+    clave: 'id_categoria',
     campos: ['nombre', 'categoria_padre'],
     requeridos: ['nombre']
   },
@@ -130,6 +144,7 @@ const inserciones = {
   },
   variante: {
     tabla: 'variantes',
+    clave: 'id_variante',
     campos: ['id_producto', 'precio', 'id_valor_atributo'],
     requeridos: ['id_producto', 'precio']
   },
@@ -141,11 +156,13 @@ const inserciones = {
   },
   pago: {
     tabla: 'pagos',
+    clave: 'id_pago',
     campos: ['id_pedido', 'metodo_pago', 'estado_pago'],
     requeridos: ['id_pedido', 'metodo_pago']
   },
   envio: {
     tabla: 'envios',
+    clave: 'id_envio',
     campos: ['id_pedido', 'tipo_entrega', 'id_direccion', 'codigo_postal', 'fecha_estimada', 'fecha_entrega', 'estado'],
     requeridos: ['id_pedido', 'tipo_entrega']
   },
@@ -166,17 +183,263 @@ const inserciones = {
   },
   stock: {
     tabla: 'inventario',
+    clave: 'id_inventario',
     campos: ['id_variante', 'id_sucursal', 'stock_actual', 'stock_minimo'],
     requeridos: ['id_variante', 'id_sucursal', 'stock_actual']
   },
   sucursal: {
     tabla: 'sucursales',
+    clave: 'id_sucursal',
     campos: ['nombre', 'direccion', 'localidad', 'telefono', 'horario', 'activo'],
     requeridos: ['nombre']
   }
 };
 
 const convertirBooleano = valor => valor === true || valor === 'true' || valor === '1';
+
+// Normaliza y valida un valor según su tipo de columna. La comparten crear() y
+// actualizar() para que un INSERT y un PUT apliquen exactamente las mismas reglas.
+const normalizarValor = (campo, valor) => {
+  if (valor === undefined || valor === '') return null;
+  if (campo === 'activo') return convertirBooleano(valor);
+  if (campo.startsWith('id_') || ['categoria_padre', 'cantidad'].includes(campo)) {
+    const numero = Number(valor);
+    if (!Number.isInteger(numero) || numero <= 0) {
+      const error = new Error(`El campo ${campo} debe ser un entero positivo`);
+      error.status = 400;
+      throw error;
+    }
+    return numero;
+  }
+  if (['precio', 'stock', 'stock_actual', 'stock_minimo', 'subtotal', 'costo_envio', 'total'].includes(campo)) {
+    const numero = Number(valor);
+    if (!Number.isFinite(numero) || numero < 0
+      || (['stock', 'stock_actual', 'stock_minimo'].includes(campo) && !Number.isInteger(numero))) {
+      const error = new Error(`El campo ${campo} debe ser un entero no negativo o un importe válido`);
+      error.status = 400;
+      throw error;
+    }
+    return numero;
+  }
+  if (campo === 'fecha' && typeof valor === 'string' && valor.includes('T')) {
+    return valor.replace('T', ' ');
+  }
+  return typeof valor === 'string' ? valor.trim() : valor;
+};
+
+// Tablas padre contra las que se valida cada clave foránea. La comparten
+// crear() y actualizar() para que un INSERT y un PUT apliquen la misma regla.
+const referencias = {
+  raza: [{ campo: 'id_especie', tabla: 'especies', clave: 'id_especie' }],
+  mascotaAdopcion: [{ campo: 'id_especie', tabla: 'especies', clave: 'id_especie' }],
+  adopcion: [
+    { campo: 'id_cliente', tabla: 'clientes', clave: 'id_cliente' },
+    { campo: 'id_mascota_adopcion', tabla: 'mascotas_adopcion', clave: 'id_mascota_adopcion' }
+  ],
+  direccion: [{ campo: 'id_cliente', tabla: 'clientes', clave: 'id_cliente' }],
+  variante: [
+    { campo: 'id_producto', tabla: 'productos', clave: 'id_producto' },
+    { campo: 'id_valor_atributo', tabla: 'valores_atributo', clave: 'id_valor' }
+  ],
+  stock: [
+    { campo: 'id_variante', tabla: 'variantes', clave: 'id_variante' },
+    { campo: 'id_sucursal', tabla: 'sucursales', clave: 'id_sucursal' }
+  ],
+  valorAtributo: [{ campo: 'id_atributo', tabla: 'atributos', clave: 'id_atributo' }],
+  turno: [
+    { campo: 'id_cliente', tabla: 'clientes', clave: 'id_cliente' },
+    { campo: 'id_mascota', tabla: 'mascota', clave: 'id_mascota' },
+    { campo: 'id_servicio', tabla: 'servicios', clave: 'id_servicio' },
+    { campo: 'id_sucursal', tabla: 'sucursales', clave: 'id_sucursal' }
+  ],
+  historial: [
+    { campo: 'id_mascota', tabla: 'mascota', clave: 'id_mascota' },
+    { campo: 'id_veterinario', tabla: 'veterinarios', clave: 'id_veterinario' }
+  ],
+  tratamiento: [{ campo: 'id_historial', tabla: 'historial_medico', clave: 'id_historial' }],
+  vacuna: [
+    { campo: 'id_mascota', tabla: 'mascota', clave: 'id_mascota' },
+    { campo: 'id_veterinario', tabla: 'veterinarios', clave: 'id_veterinario' }
+  ],
+  servicio: [{ campo: 'id_categoria_servicio', tabla: 'categorias_servicios', clave: 'id_categoria_servicio' }],
+  pago: [{ campo: 'id_pedido', tabla: 'pedidos', clave: 'id_pedido' }],
+  envio: [
+    { campo: 'id_pedido', tabla: 'pedidos', clave: 'id_pedido' },
+    { campo: 'id_direccion', tabla: 'direcciones', clave: 'id_direccion' }
+  ]
+};
+
+// Comprueba que cada clave foránea enviada exista en su tabla padre.
+// MySQL rechazaria el INSERT/UPDATE por FK, pero con un error 500 opaco:
+// asi el mensaje es claro y el codigo de estado es 400.
+const validarReferencias = async (entidad, datos) => {
+  for (const ref of referencias[entidad] || []) {
+    const valor = datos[ref.campo];
+    if (valor === undefined || valor === null || valor === '') continue;
+
+    const id = Number(valor);
+    if (!Number.isInteger(id) || id <= 0) {
+      const error = new Error(`El campo ${ref.campo} debe ser un entero positivo`);
+      error.status = 400;
+      throw error;
+    }
+
+    const [filas] = await conexion.query(
+      `SELECT 1 FROM \`${ref.tabla}\` WHERE \`${ref.clave}\` = ? LIMIT 1`,
+      [id]
+    );
+    if (!filas.length) {
+      const error = new Error(`El valor ${id} no existe en ${ref.tabla}`);
+      error.status = 400;
+      throw error;
+    }
+  }
+};
+
+// Los ENUM de MySQL no aceptan cualquier valor. Con STRICT_TRANS_TABLES (el modo
+// por defecto en MySQL 8) un valor invalido revienta con un 500 sin explicar nada,
+// asi que hay que validar antes de escribir. Se comparte entre crear() y
+// actualizar() para que una edicion aplique las mismas reglas que un alta.
+const ENUMERACIONES = {
+  turno: { estado: ['PENDIENTE', 'CONFIRMADO', 'CANCELADO', 'FINALIZADO'] },
+  pedido: { estado: ['PENDIENTE', 'PREPARANDO', 'ENVIADO', 'ENTREGADO'] },
+  pago: {
+    metodo_pago: ['EFECTIVO', 'TRANSFERENCIA', 'DEBITO', 'CREDITO'],
+    estado_pago: ['PENDIENTE', 'REALIZADO']
+  },
+  envio: {
+    tipo_entrega: ['DOMICILIO', 'SUCURSAL', 'PROGRAMADO'],
+    estado: ['EN_CAMINO', 'ENTREGADO']
+  }
+};
+
+const validarEnumeraciones = (entidad, datos) => {
+  for (const [campo, opciones] of Object.entries(ENUMERACIONES[entidad] || {})) {
+    if (datos[campo] && !opciones.includes(String(datos[campo]).toUpperCase())) {
+      const error = new Error(`El valor de ${campo} no es válido`);
+      error.status = 400;
+      throw error;
+    }
+    if (datos[campo]) datos[campo] = String(datos[campo]).toUpperCase();
+  }
+};
+
+// Reglas de negocio que no se pueden expresar con una clave foranea.
+const validarCoherencia = async (entidad, datos) => {
+  if (entidad === 'turno' && datos.id_cliente && datos.id_mascota) {
+    const [mascotas] = await conexion.query(
+      'SELECT id_cliente FROM mascota WHERE id_mascota = ?',
+      [Number(datos.id_mascota)]
+    );
+    if (!mascotas.length || Number(mascotas[0].id_cliente) !== Number(datos.id_cliente)) {
+      const error = new Error('El cliente seleccionado no es propietario de la mascota');
+      error.status = 400;
+      throw error;
+    }
+  }
+
+  if (entidad === 'envio' && datos.id_direccion) {
+    const [direcciones] = await conexion.query(
+      `SELECT d.id_cliente FROM direcciones d
+       JOIN pedidos p ON p.id_cliente = d.id_cliente
+       WHERE d.id_direccion = ? AND p.id_pedido = ?`,
+      [Number(datos.id_direccion), Number(datos.id_pedido)]
+    );
+    if (!direcciones.length) {
+      const error = new Error('La dirección debe pertenecer al cliente del pedido');
+      error.status = 400;
+      throw error;
+    }
+  }
+};
+
+// Todas las variantes de un producto deben usar el MISMO atributo. Si se mezclan
+// ("Color: Rojo" + "Talla: Mediana") la tienda las muestra como botones sueltos
+// y no queda claro de que dimension habla cada uno.
+//
+// idVariante llega solo al actualizar: hay que excluir la variante que se esta
+// editando, o compararia consigo misma y siempre daria conflicto.
+const validarPresentacionDeVariante = async (entidad, datos, idVariante) => {
+  if (entidad !== 'variante' || !datos.id_producto) return;
+
+  const [previas] = await conexion.query(
+    `SELECT v.id_valor_atributo, va.id_atributo
+     FROM variantes v
+     LEFT JOIN valores_atributo va ON va.id_valor = v.id_valor_atributo
+     WHERE v.id_producto = ? AND (? IS NULL OR v.id_variante <> ?)`,
+    [Number(datos.id_producto), idVariante ?? null, idVariante ?? 0]
+  );
+
+  const conAtributo = previas.filter(v => v.id_atributo !== null);
+  // El producto no tiene variantes todavia, o ninguna usa presentacion:
+  // no hay nada que imponer.
+  if (!conAtributo.length) return;
+
+  const atributoUsado = Number(conAtributo[0].id_atributo);
+  const valorNuevo = Number(datos.id_valor_atributo || 0);
+
+  // Si llegamos aca es porque conAtributo.length > 0: el producto ya tiene
+  // variantes con presentacion, asi que la nueva tambien debe usarla.
+  if (!valorNuevo) {
+    const error = new Error('Este producto ya tiene variantes con presentación. '
+      + 'La nueva también debe usarla, o creá otro producto.');
+    error.status = 400;
+    throw error;
+  }
+
+  const [valores] = await conexion.query(
+    'SELECT id_atributo FROM valores_atributo WHERE id_valor = ?', [valorNuevo]
+  );
+  const atributoNuevo = valores.length ? Number(valores[0].id_atributo) : null;
+
+  if (atributoNuevo === atributoUsado) return;
+
+  const [nombres] = await conexion.query(
+    'SELECT (SELECT x.nombre FROM atributos x WHERE x.id_atributo = ?) AS usado, '
+    + '       (SELECT y.nombre FROM atributos y WHERE y.id_atributo = ?) AS nuevo',
+    [atributoUsado, atributoNuevo]
+  );
+  const error = new Error(
+    `Las variantes de este producto usan la presentación "${nombres[0]?.usado ?? 'otra'}". `
+    + `No podés agregar una de "${nombres[0]?.nuevo ?? 'otra'}". `
+    + `Agregá una de "${nombres[0]?.usado ?? 'otra'}" o creá otro producto.`
+  );
+  error.status = 400;
+  throw error;
+};
+
+// atributos.nombre y valores_atributo.nombre son VARCHAR(20). Sin esto, MySQL
+// corta o falla y el cliente recibe un 500 sin explicar el motivo.
+const limitarLongitud = {
+  valorAtributo: { nombre: 20 },
+  atributo: { nombre: 20 },
+  // sucursales.nombre, direccion, localidad, telefono y horario son VARCHAR(80)
+  // (database/VetClick-BD.sql). Sin esto, escribir de mas en cualquiera de ellas
+  // devuelve un 500 de MySQL sin explicar nada.
+  sucursal: { nombre: 80, direccion: 80, localidad: 80, telefono: 80, horario: 80 },
+  historial: { motivo: 85, diagnostico: 120, observacion: 85 },
+  tratamiento: { medicamento: 85, dosis: 85, frecuencia: 85, duracion: 85 },
+  vacuna: { nombre: 85 },
+  servicio: { nombre: 50 },
+  categoriaServicio: { nombre: 50 }
+};
+// turnos.motivo y turnos.observaciones son TEXT: no tienen un limite fijo que
+// validar, asi que no aparecen arriba.
+
+const validarLongitudes = (entidad, datos) => {
+  const limites = limitarLongitud[entidad];
+  if (!limites) return;
+
+  for (const [campo, maximo] of Object.entries(limites)) {
+    const valor = datos[campo];
+    if (valor === undefined || valor === null) continue;
+    if (String(valor).trim().length > maximo) {
+      const error = new Error(`El campo ${campo} admite máximo ${maximo} caracteres`);
+      error.status = 400;
+      throw error;
+    }
+  }
+};
 
 const AdminModel = {
   async obtenerOpciones() {
@@ -229,7 +492,20 @@ const AdminModel = {
       sucursal: { activo: true },
       stock: { stock_minimo: 0 }
     };
-    datos = { ...(valoresPorDefecto[entidad] || {}), ...datos };
+    const defaults = valoresPorDefecto[entidad] || {};
+
+    // Un default solo aplica si el campo NO llega con valor. El form siempre
+    // manda todas las claves, asi que un campo opcional en blanco llega como
+    // '' y pisaba el default: stock_minimo vacio se guardaba NULL, y el estado
+    // del inventario comparaba contra NULL y siempre decia "Optimo".
+    const aplicarDefault = (campo, valor) =>
+      (valor === undefined || valor === '') && campo in defaults ? defaults[campo] : valor;
+    datos = Object.fromEntries(
+      Object.entries(datos).map(([campo, valor]) => [campo, aplicarDefault(campo, valor)])
+    );
+    for (const [campo, valor] of Object.entries(defaults)) {
+      if (!(campo in datos)) datos[campo] = valor;
+    }
 
     for (const campo of configuracion.requeridos) {
       const valor = datos[campo];
@@ -240,81 +516,16 @@ const AdminModel = {
       }
     }
 
-    if (entidad === 'turno' && datos.id_cliente && datos.id_mascota) {
-      const [mascotas] = await conexion.query(
-        'SELECT id_cliente FROM mascota WHERE id_mascota = ?',
-        [Number(datos.id_mascota)]
-      );
-      if (!mascotas.length || Number(mascotas[0].id_cliente) !== Number(datos.id_cliente)) {
-        const error = new Error('El cliente seleccionado no es propietario de la mascota');
-        error.status = 400;
-        throw error;
-      }
-    }
+    await validarCoherencia(entidad, datos);
+    validarEnumeraciones(entidad, datos);
 
-    if (entidad === 'envio' && datos.id_direccion) {
-      const [direcciones] = await conexion.query(
-        `SELECT d.id_cliente FROM direcciones d
-         JOIN pedidos p ON p.id_cliente = d.id_cliente
-         WHERE d.id_direccion = ? AND p.id_pedido = ?`,
-        [Number(datos.id_direccion), Number(datos.id_pedido)]
-      );
-      if (!direcciones.length) {
-        const error = new Error('La dirección debe pertenecer al cliente del pedido');
-        error.status = 400;
-        throw error;
-      }
-    }
+    const valores = configuracion.campos.map(campo =>
+      normalizarValor(campo, campo in defaults ? aplicarDefault(campo, datos[campo]) : datos[campo])
+    );
+    await validarReferencias(entidad, datos);
+    validarLongitudes(entidad, datos);
+    await validarPresentacionDeVariante(entidad, datos, null);
 
-    const enumeraciones = {
-      turno: { estado: ['PENDIENTE', 'CONFIRMADO', 'CANCELADO', 'FINALIZADO'] },
-      pedido: { estado: ['PENDIENTE', 'PREPARANDO', 'ENVIADO', 'ENTREGADO'] },
-      pago: {
-        metodo_pago: ['EFECTIVO', 'TRANSFERENCIA', 'DEBITO', 'CREDITO'],
-        estado_pago: ['PENDIENTE', 'REALIZADO']
-      },
-      envio: {
-        tipo_entrega: ['DOMICILIO', 'SUCURSAL', 'PROGRAMADO'],
-        estado: ['EN_CAMINO', 'ENTREGADO']
-      }
-    };
-    for (const [campo, opciones] of Object.entries(enumeraciones[entidad] || {})) {
-      if (datos[campo] && !opciones.includes(String(datos[campo]).toUpperCase())) {
-        const error = new Error(`El valor de ${campo} no es válido`);
-        error.status = 400;
-        throw error;
-      }
-      if (datos[campo]) datos[campo] = String(datos[campo]).toUpperCase();
-    }
-
-    const valores = configuracion.campos.map(campo => {
-      const valor = datos[campo];
-      if (valor === undefined || valor === '') return null;
-      if (campo === 'activo') return convertirBooleano(valor);
-      if (campo.startsWith('id_') || ['categoria_padre', 'cantidad'].includes(campo)) {
-        const numero = Number(valor);
-        if (!Number.isInteger(numero) || numero <= 0) {
-          const error = new Error(`El campo ${campo} debe ser un entero positivo`);
-          error.status = 400;
-          throw error;
-        }
-        return numero;
-      }
-      if (['precio', 'stock', 'stock_actual', 'stock_minimo', 'subtotal', 'costo_envio', 'total'].includes(campo)) {
-        const numero = Number(valor);
-        if (!Number.isFinite(numero) || numero < 0
-          || (['stock', 'stock_actual', 'stock_minimo'].includes(campo) && !Number.isInteger(numero))) {
-          const error = new Error(`El campo ${campo} debe ser un entero no negativo o un importe válido`);
-          error.status = 400;
-          throw error;
-        }
-        return numero;
-      }
-      if (campo === 'fecha' && typeof valor === 'string' && valor.includes('T')) {
-        return valor.replace('T', ' ');
-      }
-      return typeof valor === 'string' ? valor.trim() : valor;
-    });
     const columnas = configuracion.campos.map(campo => `\`${campo}\``).join(', ');
     const placeholders = configuracion.campos.map(() => '?').join(', ');
 
@@ -376,6 +587,76 @@ const AdminModel = {
     } finally {
       conexionTransaccion.release();
     }
+  },
+
+  // Edición genérica de las entidades declaradas en `inserciones`.
+  // Solo se tocan las columnas que figuran en configuracion.campos, y solo
+  // las que llegaron en el body: lo que no viene no se pisa con NULL.
+  async actualizar(entidad, id, datos) {
+    const configuracion = inserciones[entidad];
+    if (!configuracion) {
+      const error = new Error('No existe un formulario de edición para esta entidad');
+      error.status = 404;
+      throw error;
+    }
+
+    // Los pedidos tienen tabla hija: su alta es transaccional y no aplica acá.
+    if (configuracion.detalle) {
+      const error = new Error('Esta entidad no admite actualización directa');
+      error.status = 400;
+      throw error;
+    }
+
+    if (!configuracion.clave) {
+      const error = new Error('Esta entidad no tiene clave primaria declarada para editar');
+      error.status = 400;
+      throw error;
+    }
+
+    // En una edición los campos requeridos deben llegar con valor: es lo que
+    // evita que un PUT deje la fila con su clave foránea en NULL.
+    for (const campo of configuracion.requeridos) {
+      const valor = datos[campo];
+      if (valor === undefined || valor === null || String(valor).trim() === '') {
+        const error = new Error(`El campo ${campo} es obligatorio`);
+        error.status = 400;
+        throw error;
+      }
+    }
+
+    const columnas = configuracion.campos.filter(campo => datos[campo] !== undefined);
+    if (!columnas.length) {
+      const error = new Error('No se envió ningún campo para actualizar');
+      error.status = 400;
+      throw error;
+    }
+
+    const valores = columnas.map(campo => normalizarValor(campo, datos[campo]));
+    const sets = columnas.map(campo => `\`${campo}\` = ?`).join(', ');
+
+    await validarCoherencia(entidad, datos);
+    validarEnumeraciones(entidad, datos);
+    await validarReferencias(entidad, datos);
+    validarLongitudes(entidad, datos);
+    await validarPresentacionDeVariante(entidad, datos, id);
+
+    // Verificamos existencia antes de escribir: MySQL devuelve affectedRows=0
+    // cuando los valores no cambian, y eso no significa que el registro falte.
+    const [existentes] = await conexion.query(
+      `SELECT 1 FROM \`${configuracion.tabla}\` WHERE \`${configuracion.clave}\` = ? LIMIT 1`,
+      [id]
+    );
+    if (!existentes.length) {
+      const error = new Error('El registro no existe');
+      error.status = 404;
+      throw error;
+    }
+
+    const [resultado] = await conexion.query(
+      `UPDATE \`${configuracion.tabla}\` SET ${sets} WHERE \`${configuracion.clave}\` = ?`,
+      [...valores, id]
+    );
+    return resultado;
   }
 };
 

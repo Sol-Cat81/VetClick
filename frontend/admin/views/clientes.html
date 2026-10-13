@@ -26,7 +26,6 @@
               <th>ID</th>
               <th>Nombre</th>
               <th>Apellido</th>
-              <th>Teléfono</th>
               <th>Estado</th>
               <th>Acciones</th>
             </tr>
@@ -52,12 +51,8 @@
             <tr>
               <th>ID</th>
               <th>Paciente</th>
-              <th>Propietario</th>
               <th>Especie</th>
-              <th>Raza</th>
-              <th>Sexo</th>
-              <th>Nacimiento</th>
-              <th>Peso</th>
+              <th>Propietario</th>
             </tr>
           </thead>
           <tbody>
@@ -84,9 +79,6 @@
               <th>Cliente</th>
               <th>Tipo</th>
               <th>Dirección</th>
-              <th>Localidad</th>
-              <th>C.P.</th>
-              <th>Referencia</th>
             </tr>
           </thead>
           <tbody id="tablaDirecciones">
@@ -167,7 +159,6 @@
               <th>Mascota</th>
               <th>Fecha</th>
               <th>Estado</th>
-              <th>Observación</th>
             </tr>
           </thead>
           <tbody>
@@ -187,8 +178,6 @@
               <th>Nombre</th>
               <th>Especie</th>
               <th>Edad</th>
-              <th>Sexo</th>
-              <th>Descripción</th>
               <th>Estado</th>
             </tr>
           </thead>
@@ -206,7 +195,7 @@
           <h2 id="cliente-modal-title" data-modal-title>Agregar cliente</h2>
         </div>
         <button class="modal-close" type="button" data-modal-close aria-label="Cerrar">×</button>
-      </div>
+      </div>  
       <form data-admin-modal-form>
         <div class="modal-fields">
           <label>Nombre<input data-modal-field name="nombre" required></label>
@@ -215,6 +204,7 @@
               data-relation="usuarios" data-relation-field="id_usuario" autocomplete="off" required>
             <datalist id="clientes-usuarios"></datalist></label>
           <input type="hidden" name="id_usuario" data-relation-value="id_usuario">
+          <input type="hidden" name="id_cliente" data-modal-field>
           <label>Teléfono<input data-modal-field name="telefono"></label><label>Estado<select data-modal-field
               name="estado">
               <option value="1">Activo</option>
@@ -347,7 +337,11 @@
             <datalist id="adopcion-mascotas"></datalist></label>
           <input type="hidden" name="id_mascota_adopcion" data-relation-value="id_mascota_adopcion">
           <label>Fecha<input data-modal-field name="fecha" type="date" required></label>
-          <label>Estado<input data-modal-field name="estado"></label>
+          <label>Estado<select data-modal-field name="estado">
+              <option value="EN ADOPCION">En adopción</option>
+              <option value="ADOPTADO">Adoptado</option>
+              <option value="CANCELADA">Cancelada</option>
+            </select></label>
           <label>Observación<textarea data-modal-field name="observacion" rows="2"></textarea></label>
         </div>
         <div class="modal-actions"><button class="btn btn-secondary" type="button"
