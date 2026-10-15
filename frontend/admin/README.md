@@ -18,8 +18,85 @@ Las tablas muestran datos de demostración tomados del `bd.sql` proporcionado. N
 Cada panel administrativo incorpora un botón para agregar registros y acciones de editar/eliminar. Los registros que muestran
 un estado también incluyen el botón para alternarlo. Cada vista declara sus modales directamente en HTML mediante
 `data-admin-modal`, con sus etiquetas, campos y validaciones visibles en el archivo correspondiente. `js/app.js` solo localiza
-el modal, lo muestra, carga los valores de una fila al editar y procesa el evento de envío. Actualmente las acciones funcionan
-en modo demo y muestran confirmaciones, pero todavía deben persistirse mediante la API.
+el modal, lo muestra, carga los valores de una fila al editar y procesa el evento de envío.
+
+**Estado de las acciones:**
+
+- **Crear** y **Editar**: persistidos contra la API en las secciones Clientes, Clinica, Catálogo, Inventario, Ventas y Personal y Seguridad.
+- **Eliminar**: persistido en Personal y Seguridad, y en Ventas (con su propia regla: no se borra un pago `REALIZADO` ni un envío `ENTREGADO`). En las demás secciones avisa que todavía no está conectado, en vez de fingir que funciona.
+- **Cambiar estado**: conectado solo en Ventas. En las demás secciones sigue siendo visual y **el ciclo es incorrecto**: rota el texto entre "Activo", "Pendiente" e "Inactivo", valores que columnas como `usuarios.activo` (un `tinyint`) no admiten.
+
+Cuando una entidad no tiene prellenador de edición registrado con `registrarFormulario()`, el modal se rellena mapeando celdas
+por índice y queda en solo lectura. Por eso hay que registrar el prellenador **y** su clave primaria en el backend antes de
+declarar una entidad editable.
+
+`detalleEntidades` es otra cosa y no se contradice con lo anterior: es el modal de **solo lectura** del botón "Ver más", y no
+tiene nada que ver con que la entidad sea editable. El pedido es el ejemplo: no tiene `registrarFormulario` porque su
+actualización va por tabla hija, y sí tiene detalle.
+
+### El botón "Ver más" y los datos anidados
+
+`abrirDetalle()` lee campos planos del registro en memoria. Cuando el esquema declara `carga`, pide lo que cuelga del registro
+a un endpoint propio **solo al abrir el modal**, y `listas` declara los bloques que se renderizan como tabla:
+
+```js
+detalleEntidades['pedido'] = {
+  titulo: 'Pedido', registro: pedidosPorId,
+  carga: 'ventas/pedidos/:id/detalle',   // se pide al abrir, no al listar
+  campos: [ /* info-rows, como antes */ ],
+  listas: [ { titulo: 'Productos', campo: 'lineas', vacio: '…', columnas: [ /* mismo formato que campos */ ] } ]
+};
+```
+
+Las columnas de una lista usan el mismo formato que los campos planos (`etiqueta`, `enumeracion`, `etiquetas`, `fecha`,
+`prefijo`, `sufijo`) porque se resuelven con la misma función `valorDetalle()`. Un bloque sin filas muestra su texto `vacio`:
+un pedido sin pagos es un dato, no un fallo de carga.
+
+Lo que cuelga de un registro debe ir en un endpoint aparte. Meterlo en el listado son N consultas extra por fila, para
+mostrar datos que casi nadie mira.
+
+La contraseña de un usuario no se edita nunca: en el modal de edición el campo aparece deshabilitado y el backend ignora
+cualquier `password` que llegue en un `PUT`.
+
+## Conectar el borrado de una entidad
+
+El "Eliminar" usa un modal de confirmación único, en `index.html`, que es reutilizable: todas las secciones comparten el mismo
+`data-admin-modal="confirmar-borrado"`. No hace falta copiarlo en cada vista.
+
+Para que una entidad se pueda eliminar desde el panel hay que declararla en la tabla `borrados` de `backend/models/admin.model.js`,
+con estas listas:
+
+- **`bloqueantes`**: tablas hijas que impiden el borrado. Si hay alguna, el `DELETE` responde 400 nombrándolas.
+- **`cascada`**: tablas hijas que se borran con el padre. Es anidable y se recorre en post-order, porque las FK son `NO ACTION`
+  y los nietos tienen que irse antes que los padres.
+- **`desasociar`**: tablas hijas que **no** se borran: se les pone la FK en `NULL`. Para cuando la hija tiene un valor propio que
+  sobrevivir (la ficha de un veterinario, con los historiales que atendió).
+- **`reasignar`**: tablas hijas que tienen que mudarse a otro padre antes de borrar este. El destino lo elige el usuario en el
+  modal, y el `DELETE` lo lleva en el body.
+- **`requiere`**: condiciones de la fila **propia**, no de sus hijas. Impide borrar un registro que no tiene algo
+  (`veterinarios.id_empleado`).
+- **`impideSi`**: valores de la fila propia que impiden el borrado. Un pago `REALIZADO` y un envío `ENTREGADO` no se
+  borran: no son un error de carga, son el comprobante de que pasó.
+
+`bloqueantes`, `desasociar` y `cascada` son excluyentes en la práctica: cada tabla hija entra en una sola. La elección no es
+técnica sino de criterio, y por eso la tabla es explícita y no se deduce del esquema: el historial clínico de un paciente
+`NO` le pertenece al veterinario que lo atendió, así que se desasocia y no se borra; una asignación de permiso, en cambio,
+no significa nada sin su permiso, así que se borra en cascada.
+
+La lista de la tabla `<table>` debe llevar `data-modal-entity` con la **etiqueta de la interfaz** ("rol de usuario", no
+`rolUsuario`): es lo que leen `enhanceAdminPanels()` y `aplicarBloqueoBorrado()`.
+
+Si el backend no tiene política para la entidad, el `GET .../dependientes` responde 404 y el panel lo dice. Es el mecanismo que
+permite que las secciones todavía sin borrar no finjan que lo hacen.
+
+### Probar borrados sin perder datos
+
+`backend/test_admin_borrado.js` corre 44 verificaciones del borrado y del cambio de estado. Cada sección abre **su propia
+transacción** y termina en `ROLLBACK`, así que no deja rastro y las secciones no se ensucian entre sí. Ejecutar con
+`node test_admin_borrado.js`.
+
+Por eso los métodos `eliminar()` y `avanzarEstado()` aceptan `opciones.conexion`: sin eso escribirían sobre el pool y el
+rollback del test no las alcanzaría, y el test commitearía cambios reales.
 
 ## Guía paso a paso para conectar una tabla con la API
 

@@ -14,6 +14,22 @@ const viewFiles = {
 const appContent = document.getElementById('app-content');
 const toast = document.getElementById('toast');
 
+// Traduce la etiqueta que ve el usuario ("rol de usuario") al nombre de la
+// entidad en la API ("rolUsuario"). Lo usan el alta/edición y el borrado.
+const entidadApi = {
+  'dirección': 'direccion',
+  'categoría': 'categoria',
+  'categoría de servicio': 'categoriaServicio',
+  'valor de atributo': 'valorAtributo',
+  'adopción': 'adopcion',
+  'mascota en adopción': 'mascotaAdopcion',
+  'rol de usuario': 'rolUsuario',
+  'envío': 'envio',
+  'historial médico': 'historial',
+  'registro de stock': 'stock',
+  venta: 'pedido'
+};
+
 const entityLabels = {
   clientes: 'cliente',
   mascotas: 'mascota',
@@ -316,7 +332,16 @@ function obtenerPrellenadorEdicion(entity){
     'servicio': prepararFormularioRelacional,
     'categoría de servicio': prepararFormularioRelacional,
     'pago': prepararFormularioRelacional,
-    'envío': prepararFormularioRelacional
+    'envío': prepararFormularioRelacional,
+    // Personal y seguridad: sin esto, "Editar" caía en el mapeo por índice de
+    // celda y mezclaba los datos (el nombre completo iba al campo nombre y el
+    // texto de los botones al último input). personal_bd.js registra las suyas.
+    'empleado': prepararFormularioRelacional,
+    'veterinario': prepararFormularioRelacional,
+    'usuario': prepararFormularioRelacional,
+    'rol': prepararFormularioRelacional,
+    'permiso': prepararFormularioRelacional,
+    'rol de usuario': prepararFormularioRelacional
   };
   const prellenador = prellenadores[entity];
   return typeof prellenador === 'function' ? prellenador : null;
@@ -346,7 +371,41 @@ function valorDetalle(campo, registro, opciones){
     // MySQL devuelve "09:00:00"; en el detalle se muestra como "09:00".
     return String(bruto).slice(0, 5);
   }
-  return bruto + (campo.sufijo || '');
+  // `prefijo` existe para los importes: "$55000.00" se lee de una, "55000.00"
+  // a secas no. Se aplica solo al valor crudo, porque en un ENUM o una fecha
+  // un "$" delante no significaria nada.
+  return (campo.prefijo || '') + bruto + (campo.sufijo || '');
+}
+
+// Un bloque con tabla dentro del modal de detalle: las lineas de un pedido, sus
+// pagos, sus envios. Las columnas tienen la misma forma que los campos planos
+// (etiqueta, enumeracion, fecha...), asi que se resuelven con valorDetalle() y
+// un ENUM se muestra como "Realizado" y no como "REALIZADO".
+function detalleDeListas(listas, carga, opciones){
+  return (listas || []).map(lista => {
+    const filas = carga[lista.campo] || [];
+    const celdas = lista.columnas
+      .map(columna => `<th>${escaparHtml(columna.etiqueta)}</th>`)
+      .join('');
+    const cuerpo = filas.length
+      ? filas.map(fila => `<tr>${lista.columnas
+        .map(columna => `<td>${escaparHtml(valorDetalle(columna, fila, opciones))}</td>`)
+        .join('')}</tr>`).join('')
+      // Un bloque vacio tambien es informacion: un pedido sin pagos registrados
+      // es un dato, no un fallo de carga.
+      : `<tr class="detalle-vacio"><td colspan="${lista.columnas.length}">${
+        escaparHtml(lista.vacio || 'Sin registros')}</td></tr>`;
+
+    return `<section class="detalle-bloque">
+      <h4>${escaparHtml(lista.titulo)} <em>${filas.length}</em></h4>
+      <div class="table-wrap">
+        <table class="detalle-tabla">
+          <thead><tr>${celdas}</tr></thead>
+          <tbody>${cuerpo}</tbody>
+        </table>
+      </div>
+    </section>`;
+  }).join('');
 }
 
 async function abrirDetalle(entity, row){
@@ -366,16 +425,38 @@ async function abrirDetalle(entity, row){
   const modal = document.getElementById('modal-detalle');
   const contenedor = modal.querySelector('[data-detalle-campos]');
 
+  // Los datos anidados no vienen en el listado: se piden solo si el esquema
+  // declara de donde. Un pedido muestra sus lineas, pagos y envios, que son
+  // tablas hijas y no tiene sentido cargarlas para cada fila de la tabla.
+  let carga = {};
+  if (esquema.carga){
+    try {
+      carga = await obtenerDatos(esquema.carga.replace(':id', id)) || {};
+    } catch (error) {
+      // El modal se abre igual con los campos planos: perder las listas anidadas
+      // es una molestia, pero no un motivo para no mostrar el pedido.
+      informarErrorCarga(esquema.carga, error);
+    }
+  }
+
   // Una sola llamada a admin/opciones cubre todas las relaciones del esquema.
-  const opciones = esquema.campos.some(campo => campo.relacion) ? await opcionesParaEditar() : {};
+  const necesitaOpciones = esquema.campos.some(campo => campo.relacion)
+    || (esquema.listas || []).some(lista => lista.columnas.some(columna => columna.relacion));
+  const opciones = necesitaOpciones ? await opcionesParaEditar() : {};
+
+  // El endpoint puede traer campos frescos: se mezclan sobre el registro del
+  // listado para que el detalle no dependa de cuando se cargo la tabla.
+  const completo = { ...registro, ...(carga.pedido || {}) };
 
   modal.querySelector('[data-detalle-titulo]').textContent = `${esquema.titulo} #${id}`;
   contenedor.innerHTML = esquema.campos.map(campo => `
     <div class="info-row${campo.texto ? ' detalle-texto' : ''}">
       <span>${escaparHtml(campo.etiqueta)}</span>
-      <strong>${escaparHtml(valorDetalle(campo, registro, opciones))}</strong>
+      <strong>${escaparHtml(valorDetalle(campo, completo, opciones))}</strong>
     </div>
   `).join('');
+
+  modal.querySelector('[data-detalle-listas]').innerHTML = detalleDeListas(esquema.listas, carga, opciones);
 
   modal.classList.add('show');
 }
@@ -392,7 +473,16 @@ function openAdminModal(action, entity, row, panel) {
   modal.dataset.entity = entity;
   modal.dataset.action = action;
 
-  if (row) {
+  bloquearPasswordEnEdicion(modal, action === 'edit');
+
+  if (!row) {
+    // Un modal se reutiliza para altas y ediciones. Si el registro anterior se
+    // editó y se cerró sin guardar, sus valores quedaban en el formulario de
+    // alta y se dablan de alta registros copiados sin querer.
+    modal.querySelector('form')?.reset();
+    delete modal.dataset.readonly;
+    delete modal.dataset.idRegistro;
+  } else {
     const prellenador = obtenerPrellenadorEdicion(entity);
 
     if (prellenador) {
@@ -422,8 +512,6 @@ function openAdminModal(action, entity, row, panel) {
       // Solo visualización: no se permite actualizar desde este modal.
       modal.dataset.readonly = 'true';
     }
-  } else {
-    delete modal.dataset.readonly;
   }
 
   precargarPermisosDeRol(entity, action, row);
@@ -432,12 +520,39 @@ function openAdminModal(action, entity, row, panel) {
   modal.querySelector('input, textarea, select')?.focus();
 }
 
+// La contraseña de un usuario nunca se modifica desde el panel: solo se fija al
+// darlo de alta. En edición el input queda deshabilitado (un input disabled no
+// entra al FormData, así que ni siquiera viaja en el PUT) y se lo reemplaza por
+// un aviso. El backend además la ignora: `password_hash` no está en la lista
+// blanca de columnas que puede escribir un UPDATE.
+function bloquearPasswordEnEdicion(modal, editando) {
+  const password = modal.querySelector('input[name="password"]');
+  if (!password) return;
+  password.disabled = editando;
+  password.required = !editando;
+  password.value = '';
+  if (editando) {
+    password.placeholder = 'No se puede modificar desde el panel';
+    password.title = 'La contraseña solo se define al crear el usuario.';
+  } else {
+    password.removeAttribute('placeholder');
+    password.removeAttribute('title');
+  }
+  const aviso = modal.querySelector('[data-password-edit-notice]');
+  if (aviso) aviso.hidden = !editando;
+}
+
 // Marca los permisos ya asignados cuando se abre el modal de un rol de usuario.
 function precargarPermisosDeRol(entity, action, row) {
   const contenedor = document.getElementById('rol-usuario-permisos');
   if (!contenedor || entity !== 'rol de usuario') return;
   const casillas = [...contenedor.querySelectorAll('input[data-permiso-check]')];
-  casillas.forEach(casilla => { casilla.checked = false; });
+  // En edición las casillas son solo informativas: no se reenvían (no hay forma
+  // de quitar permisos todavía), así que se muestran bloqueadas.
+  casillas.forEach(casilla => {
+    casilla.checked = false;
+    casilla.disabled = action === 'edit';
+  });
   const idRol = row?.dataset?.id;
   if (action !== 'edit' || !idRol) return;
   obtenerDatos('personal/rolpermiso')
@@ -476,12 +591,56 @@ document.addEventListener('change', event => {
   if (input && opcionesRelaciones) relacionSeleccionada(input, opcionesRelaciones);
 });
 
+// Entidades cuyo boton "Cambiar estado" ya llama a la API. Se listan una por una
+// a proposito: conectarlas todas de golpe seria tocar seis secciones, y las
+// demas siguen con el ciclo visual de antes.
+const ENTIDADES_CON_ESTADO = new Set(['pedido', 'pago', 'envio']);
+
+// El ciclo visual de siempre. Solo se usa para las entidades que todavia no
+// estan conectadas; rota el texto del .status sin tocar la base.
+//
+// Ojo: para ventas esta rotacion seria incorrecta. La columna de un pago es
+// ENUM('PENDIENTE','REALIZADO') y la de un envio ENUM('EN_CAMINO','ENTREGADO'),
+// asi que un "Pendiente" o un "Activo" no se podrian ni guardar.
 function cycleStatus(status) {
   const values = ['Activo', 'Pendiente', 'Inactivo'];
   const next = values[(values.indexOf(status.textContent.trim()) + 1) % values.length];
   status.textContent = next;
   status.className = `status ${next === 'Activo' ? 'success' : next === 'Pendiente' ? 'warning' : 'danger'}`;
   showToast(`Estado cambiado a ${next}`);
+}
+
+// Avanza el estado contra la API. El backend decide cual es el siguiente valor
+// valido y lo devuelve; el panel solo lo pinta. Asi la lista de estados vive en
+// un solo lado y no puede desincronizarse.
+async function avanzarEstado(entity, id, fila) {
+  if (!id) {
+    showToast('No se puede cambiar el estado: falta el identificador');
+    return;
+  }
+  const nombreEntidad = entidadApi[entity] || entity;
+  const boton = document.querySelector(`[data-id="${CSS.escape(String(id))}"] [data-row-action="status"]`)
+    || fila?.querySelector('[data-row-action="status"]');
+  if (boton) boton.disabled = true;
+
+  try {
+    const respuesta = await fetch(
+      `${API_BASE_URL}/admin/${encodeURIComponent(nombreEntidad)}/${encodeURIComponent(id)}/estado`,
+      { method: 'POST' }
+    );
+    const cuerpo = await respuesta.json();
+    if (!respuesta.ok) throw new Error(cuerpo.mensaje || 'No se pudo cambiar el estado');
+
+    // Volvemos a pedir los datos en vez de retocar la fila a mano: el listado
+    // vuelve a pintar la fila con su clase de estado correcta y no queda
+    // desincronizado con la base.
+    cargarDatosDeVista();
+    showToast(`${entity}: ${cuerpo.anterior} → ${cuerpo.estado}${cuerpo.ultimo ? ' (vuelve al primero)' : ''}`);
+  } catch (error) {
+    console.error(`No se pudo cambiar el estado de ${entity}:`, error);
+    showToast(error.message || `No se pudo cambiar el estado de ${entity}`);
+    if (boton) boton.disabled = false;
+  }
 }
 
 // Decide qué endpoints debe cargar según las tablas presentes en la vista actual.
@@ -532,6 +691,231 @@ window.addEventListener('popstate', () => {
   loadView(location.hash.replace('#', '') || 'dashboard');
 });
 
+// ------------------------------------------------------------------
+// Borrado de un registro.
+// ------------------------------------------------------------------
+// Antes esto era un simulacro: `row.remove()` sacaba la fila del DOM y un
+// toast anunciaba un borrado que nunca ocurria. Ahora consulta que se va a
+// llevar, pide confirmacion y recien ahi llama al DELETE.
+//
+// La confirmacion es obligatoria siempre, y muestra la cantidad exacta de
+// filas hijas: pedirle a alguien que confirme "se va a eliminar en cascada"
+// sin decirle cuantas filas son es pedirle que confirme a ciegas.
+let borradoPendiente = null;
+
+const pluralizar = (etiqueta, cantidad) => `${cantidad} ${etiqueta}${cantidad === 1 ? '' : 's'}`;
+
+// Se guarda la peticion en `borradoPendiente` y se muestra el modal. El click
+// en "Sí, eliminar" la retoma desde confirmarBorrado().
+async function abrirConfirmacionBorrado({ entity, id, plan, fila }) {
+  const modal = document.querySelector('[data-admin-modal="confirmar-borrado"]');
+  if (!modal) {
+    console.error('No se encontró el modal de confirmación de borrado');
+    return;
+  }
+  borradoPendiente = { entity, id, destino: null };
+
+  const descripcion = fila ? textoDeFila(fila) : '';
+  modal.querySelector('[data-confirmar-titulo]').textContent = `Eliminar ${entity}`;
+  modal.querySelector('[data-confirmar-mensaje]').textContent = descripcion
+    ? `Se eliminará ${descripcion}.`
+    : `Se eliminará el registro #${id} de ${entity}.`;
+
+  // 1) Lo que se borra de verdad.
+  const bloque = modal.querySelector('[data-confirmar-cascada]');
+  const lista = modal.querySelector('[data-confirmar-lista]');
+  const items = plan.cascada || [];
+  bloque.hidden = items.length === 0;
+  lista.innerHTML = items
+    .map(item => `<li>${escaparHtml(pluralizar(item.etiqueta, item.cantidad))}</li>`)
+    .join('');
+
+  // 2) Lo que se suelta pero sobrevive. Own block, own wording: desasociar no
+  //    es borrar, y decirlo con la misma lista roja seria mentir.
+  const bloqueDesasociar = modal.querySelector('[data-confirmar-desasociar]');
+  const listaDesasociar = modal.querySelector('[data-confirmar-lista-desasociar]');
+  const sueltos = plan.desasociar || [];
+  bloqueDesasociar.hidden = sueltos.length === 0;
+  listaDesasociar.innerHTML = sueltos
+    .map(item => `<li>${escaparHtml(pluralizar(item.etiqueta, item.cantidad))} sobrevivirá${item.cantidad === 1 ? '' : 'n'}, con su historial intacto</li>`)
+    .join('');
+
+  // 3) Lo que hay que resolver antes de poder borrar.
+  await prepararReasignacion(modal, entity, id, plan);
+
+  modal.classList.add('show');
+  const destino = modal.querySelector('[data-confirmar-destino]');
+  if (!modal.querySelector('[data-confirmar-reasignar]').hidden && destino?.options.length) destino.focus();
+  else modal.querySelector('[data-confirmar-aceptar]')?.focus();
+}
+
+// Arma el bloque de reasignacion: lista a quienes afecta y obliga a elegir
+// destino. Sin destino elegido el boton rojo no se habilita, porque el backend
+// lo rechaza igual: es la misma regla, aplicada antes de pedirle nada al usuario.
+async function prepararReasignacion(modal, entity, id, plan) {
+  const bloque = modal.querySelector('[data-confirmar-reasignar]');
+  const pendientes = plan.reasignar || [];
+  bloque.hidden = pendientes.length === 0;
+  const boton = modal.querySelector('[data-confirmar-aceptar]');
+  const error = modal.querySelector('[data-confirmar-destino-error]');
+  const select = modal.querySelector('[data-confirmar-destino]');
+
+  if (!pendientes.length) {
+    boton.disabled = false;
+    error.hidden = true;
+    return;
+  }
+
+  const total = pendientes.reduce((suma, item) => suma + item.cantidad, 0);
+  modal.querySelector('[data-confirmar-reasignar-titulo]').textContent =
+    `${total} ${total === 1 ? 'registro se' : 'registros se'} reasignará${total === 1 ? '' : 'n'} antes de borrar:`;
+
+  const nombres = pendientes.flatMap(item => item.registros.map(f => f.nombre)).filter(Boolean);
+  modal.querySelector('[data-confirmar-lista-reasignar]').innerHTML = nombres.length
+    ? nombres.map(nombre => `<li>${escaparHtml(nombre)}</li>`).join('')
+    : `<li>${total} ${total === 1 ? 'registro' : 'registros'} sin detalle</li>`;
+
+  // Los destinos posibles vienen de las opciones de relacion que ya se usan
+  // para los datalist. Solo los roles: el resto de entidades no reasignan.
+  select.innerHTML = '<option value="">Elegí un rol…</option>';
+  let destinos = [];
+  try {
+    const opciones = await obtenerOpcionesRelaciones();
+    destinos = (opciones.rolesEmpleados || []).filter(opcion => String(opcion.id) !== String(id));
+  } catch (error) {
+    informarErrorCarga('opciones de roles', error);
+  }
+  select.insertAdjacentHTML('beforeend', destinos
+    .map(opcion => `<option value="${escaparHtml(opcion.id)}">${escaparHtml(opcion.etiqueta)}</option>`)
+    .join(''));
+
+  if (!destinos.length) {
+    error.hidden = false;
+    error.textContent = 'No hay otro rol al que reasignar. No se puede eliminar este registro.';
+    boton.disabled = true;
+  } else {
+    error.hidden = true;
+    boton.disabled = true;   // sigue deshabilitado hasta que se elija
+  }
+  select.onchange = () => {
+    borradoPendiente.destino = select.value || null;
+    boton.disabled = !select.value;
+  };
+}
+
+// Un texto legible de la fila, para que el modal diga a quien se esta borrando.
+// Se descartan la celda de acciones y las que solo traen el id.
+function textoDeFila(fila) {
+  if (!fila?.cells) return '';
+  const celdas = [...fila.cells]
+    .filter(celda => !celda.querySelector('[data-row-action]'))
+    .map(celda => celda.textContent.trim())
+    .filter(texto => texto && !/^#?\d+$/.test(texto));
+  return celdas.slice(0, 2).join(' — ');
+}
+
+async function solicitarBorrado(entity, id, fila) {
+  // Las tarjetas (.info-card) no declaran data-id en el boton, y sin el id no
+  // hay forma de saber que registro es.
+  if (!id) {
+    showToast('No se puede eliminar: falta el identificador del registro');
+    return;
+  }
+
+  const nombreEntidad = entidadApi[entity] || entity;
+  let plan;
+  try {
+    const respuesta = await fetch(
+      `${API_BASE_URL}/admin/${encodeURIComponent(nombreEntidad)}/${encodeURIComponent(id)}/dependientes`
+    );
+    const cuerpo = await respuesta.json();
+    // Sin politica de borrado, la seccion todavia no esta conectada. Decirlo
+    // es mejor que el viejo toast mentiroso de "eliminado".
+    if (!respuesta.ok) throw new Error(cuerpo.mensaje || 'La eliminación no está disponible');
+    plan = cuerpo;
+  } catch (error) {
+    showToast(error.message || 'No se pudo consultar el registro');
+    return;
+  }
+
+  if (plan.bloqueantes?.length) {
+    showToast(`No se puede eliminar: tiene ${plan.bloqueantes.map(b => pluralizar(b.etiqueta, b.cantidad)).join(' y ')} asociado${plan.bloqueantes.some(b => b.cantidad !== 1) ? 's' : ''}`);
+    return;
+  }
+
+  // Requisito de la propia fila: una ficha de veterinario ya desasociada no se
+  // puede borrar. El boton deberia venir deshabilitado, pero si alguien llega
+  // por otra via el motivo se dice igual.
+  if (plan.sinRequisito?.length) {
+    showToast(`No se puede eliminar: no tiene ${plan.sinRequisito.map(r => r.etiqueta).join(' ni ')}`);
+    return;
+  }
+
+  // Un pago REALIZADO o un envio ENTREGADO no se borran: no son un error de
+  // carga, son el comprobante.
+  if (plan.impiden?.length) {
+    showToast(`No se puede eliminar: ${plan.impiden.join(' y ')}`);
+    return;
+  }
+
+  await abrirConfirmacionBorrado({ entity, id, plan, fila });
+}
+
+async function confirmarBorrado() {
+  if (!borradoPendiente) return;
+  const { entity, id, destino } = borradoPendiente;
+  const nombreEntidad = entidadApi[entity] || entity;
+  const boton = document.querySelector('[data-confirmar-aceptar]');
+  boton.disabled = true;
+
+  try {
+    const respuesta = await fetch(
+      `${API_BASE_URL}/admin/${encodeURIComponent(nombreEntidad)}/${encodeURIComponent(id)}`,
+      {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        // Solo viaja si la entidad reasigna. El backend lo ignora en el resto.
+        body: destino ? JSON.stringify({ id_rol_empleado_destino: Number(destino) }) : undefined
+      }
+    );
+    const cuerpo = await respuesta.json();
+    if (!respuesta.ok) throw new Error(cuerpo.mensaje || 'No se pudo eliminar el registro');
+
+    showToast(resumenBorrado(entity, cuerpo));
+    // Las listas de relaciones (roles, sucursales, usuarios) tambien cambiaron.
+    invalidarOpcionesRelaciones();
+    cargarDatosDeVista();
+  } catch (error) {
+    console.error(`No se pudo eliminar ${entity}:`, error);
+    showToast(error.message || `No se pudo eliminar ${entity}`);
+  } finally {
+    boton.disabled = false;
+    borradoPendiente = null;
+    closeAdminModal();
+  }
+}
+
+// El toast dice que paso de verdad, incluidas las filas que sobrevivieron:
+// si solo se anunciara "eliminado", el usuario no sabria que su ficha de
+// veterinario quedo huerfana ni que sus empleados cambiaron de rol.
+function resumenBorrado(entity, cuerpo) {
+  const partes = [`${entity} eliminado`];
+  (cuerpo.reasignar || []).forEach(item =>
+    partes.push(`${pluralizar(item.etiqueta, item.cantidad)} reasignado${item.cantidad === 1 ? '' : 's'}`));
+  (cuerpo.cascada || []).forEach(item =>
+    partes.push(`${pluralizar(item.etiqueta, item.cantidad)} eliminado${item.cantidad === 1 ? '' : 's'}`));
+  (cuerpo.desasociar || []).forEach(item =>
+    partes.push(`${pluralizar(item.etiqueta, item.cantidad)} conservado${item.cantidad === 1 ? '' : 's'}`));
+  return partes.join(', ');
+}
+
+document.addEventListener('click', event => {
+  if (event.target.closest('[data-confirmar-aceptar]')) {
+    event.preventDefault();
+    confirmarBorrado();
+  }
+});
+
 appContent.addEventListener('click', event => {
   const modalButton = event.target.closest('[data-modal-action]');
   if (modalButton) {
@@ -544,11 +928,16 @@ appContent.addEventListener('click', event => {
     if (rowButton.dataset.rowAction === 'detail') {
       abrirDetalle(rowButton.dataset.entity, row);
     } else if (rowButton.dataset.rowAction === 'delete') {
-      row?.remove();
-      showToast(`${rowButton.dataset.entity} eliminado`);
+      solicitarBorrado(rowButton.dataset.entity, rowButton.dataset.id, row);
     } else if (rowButton.dataset.rowAction === 'status') {
-      const status = row?.querySelector('.status');
-      if (status) cycleStatus(status);
+      const entity = rowButton.dataset.entity;
+      const nombreEntidad = entidadApi[entity] || entity;
+      if (ENTIDADES_CON_ESTADO.has(nombreEntidad)) {
+        avanzarEstado(entity, rowButton.dataset.id, row);
+      } else {
+        const status = row?.querySelector('.status');
+        if (status) cycleStatus(status);
+      }
     } else {
       openAdminModal('edit', rowButton.dataset.entity, row, rowButton.closest('[data-panel]'));
     }
@@ -569,9 +958,14 @@ document.addEventListener('click', event => {
 
 // Algunos formularios declaran registros hijos con casillas (p. ej. los permisos
 // que recibirá un rol de usuario). Tras crear el registro padre se envían aquí.
-async function asignarRegistrosRelacionados(form, resultado) {
+//
+// Solo en el alta: al editar un rol ya existe cada fila de rol_permiso, y un POST
+// sobre la PK compuesta (id_rol_usuario, id_permiso) vuelve con 500 por duplicado.
+// Tampoco podemos quitar permisos desde acá porque no hay DELETE todavía, así que
+// en edición solo se actualiza el nombre del rol y se avisa.
+async function asignarRegistrosRelacionados(form, resultado, editando) {
   const entidadHija = form.dataset.assignEntity;
-  if (!entidadHija || !resultado?.id) return 0;
+  if (!entidadHija || !resultado?.id || editando) return 0;
   const campoPadre = form.dataset.assignParent || 'id';
   const campoHijo = form.dataset.assignField || 'id';
   const marcados = [...form.querySelectorAll('[data-permiso-check]:checked')].map(casilla => casilla.value);
@@ -624,20 +1018,7 @@ document.addEventListener('submit', async event => {
   event.preventDefault();
 
   const entity = modal.dataset.entity;
-  const entidades = {
-    'dirección': 'direccion',
-    'categoría': 'categoria',
-    'categoría de servicio': 'categoriaServicio',
-    'valor de atributo': 'valorAtributo',
-    'adopción': 'adopcion',
-    'mascota en adopción': 'mascotaAdopcion',
-    'rol de usuario': 'rolUsuario',
-    'envío': 'envio',
-    'historial médico': 'historial',
-    'registro de stock': 'stock',
-    venta: 'pedido'
-  };
-  const nombreEntidad = entidades[entity] || entity;
+  const nombreEntidad = entidadApi[entity] || entity;
   try {
     await prepararRelaciones(form);
   } catch (error) {
@@ -683,15 +1064,20 @@ document.addEventListener('submit', async event => {
     .then(async respuesta => {
       const resultado = await respuesta.json();
       if (!respuesta.ok) throw new Error(resultado.mensaje || 'No se pudo guardar el registro');
-      const asignacionesFallidas = await asignarRegistrosRelacionados(form, resultado);
+      const asignacionesFallidas = await asignarRegistrosRelacionados(form, resultado, editando);
       form.reset();
       invalidarOpcionesRelaciones();
       closeAdminModal();
       delete modal.dataset.action;
       delete modal.dataset.idRegistro;
+      // En un PUT solo se actualizó el nombre: los permisos del rol no se
+      // reenvían, así que hay que decirlo en vez de prometer un guardado total.
+      const avisoPermisos = editando && form.dataset.assignEntity
+        ? ' (los permisos no se modifican al editar)'
+        : '';
       showToast(asignacionesFallidas
         ? `${entity} guardado, pero ${asignacionesFallidas} permiso(s) no se pudieron asignar`
-        : `${entity} ${editando ? 'actualizado' : 'guardado'} correctamente`);
+        : `${entity} ${editando ? 'actualizado' : 'guardado'} correctamente${avisoPermisos}`);
       cargarDatosDeVista();
     })
     .catch(error => {

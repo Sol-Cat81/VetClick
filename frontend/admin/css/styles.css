@@ -536,6 +536,28 @@ td small {
   border: 1px solid #f6c9cd
 }
 
+/* Un boton deshabilitado no deberia seguir pareciendo pulsable. Se usa para el
+   "Eliminar" de las filas que tienen registros asociados: el title explica por
+   que, y el cursor de "no permitido" lo dice sin necesidad de un tooltip. */
+.btn:disabled,
+.btn[disabled] {
+  opacity: .45;
+  cursor: not-allowed;
+  filter: grayscale(.5)
+}
+
+.btn:disabled:hover,
+.btn[disabled]:hover {
+  background: var(--red-soft)
+}
+
+/* Envoltorio del "Eliminar" bloqueado:exists para que su title se vea, ya que
+   un boton disabled no dispara eventos y no muestra el suyo. */
+.bloqueo-borrado {
+  display: inline-flex;
+  cursor: not-allowed
+}
+
 .btn-small {
   padding: 7px 9px;
   font-size: 10px
@@ -683,6 +705,63 @@ td small {
   color: var(--muted)
 }
 
+/* Bloques con tabla dentro del modal de detalle (lineas de un pedido, sus
+   pagos, sus envios). Van aparte del .detail-grid porque ese reparte en tres
+   columnas y una tabla no entra. */
+.detalle-bloque {
+  margin-top: 18px
+}
+
+.detalle-bloque h4 {
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .05em
+}
+
+.detalle-bloque h4 em {
+  font-style: normal;
+  color: var(--ink);
+  font-size: 11px
+}
+
+.detalle-tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px
+}
+
+.detalle-tabla th {
+  text-align: left;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--line)
+}
+
+.detalle-tabla td {
+  padding: 7px 10px;
+  border-bottom: 1px solid #edf1f3
+}
+
+.detalle-tabla tr:last-child td {
+  border-bottom: 0
+}
+
+/* Un bloque sin filas no es un error: es informacion ("este pedido no tiene
+   pagos registrados"), asi que se muestra el texto en vez de una tabla vacia. */
+.detalle-vacio td {
+  color: var(--muted);
+  font-style: italic;
+  text-align: center;
+  padding: 12px 10px
+}
+
 /* Campo de relacion con un boton de "crear nuevo" al costado. */
 .field-con-boton {
   display: flex;
@@ -822,6 +901,148 @@ td small {
 
 .modal-fields label:has(textarea) {
   grid-column: 1 / -1
+}
+
+/* Modal de confirmación de borrado. El bloque de cascada es lo que obliga a
+   leer antes de confirmar: lista exactamente qué filas se van también. */
+.modal-confirmar .confirmar-cuerpo {
+  padding: 4px 0 2px
+}
+
+.modal-confirmar .confirmar-cuerpo p {
+  margin: 0 0 4px;
+  color: var(--ink);
+  line-height: 1.5
+}
+
+.modal-confirmar .confirmar-cascada {
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: #fdf0f0;
+  border: 1px solid #f6c9cd;
+  border-radius: 10px
+}
+
+/* Mismo problema que .aviso-password: sin esta regla, el display:block de la
+   clase le gana al [hidden] del navegador y el bloque sale siempre. */
+.modal-confirmar .confirmar-cascada[hidden] {
+  display: none
+}
+
+.modal-confirmar .confirmar-cascada-titulo {
+  color: #b23a42;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .04em
+}
+
+.modal-confirmar .confirmar-cascada ul {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  color: #8c3037
+}
+
+.modal-confirmar .confirmar-cascada li {
+  margin: 3px 0
+}
+
+/* Lo que se suelta pero sobrevive. Tono distinto del rojo de la cascada: acá
+   no se pierde nada, y presentarlo igual seria mentir. */
+.modal-confirmar .confirmar-desasociar {
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: #f2f7fa;
+  border: 1px solid var(--line);
+  border-radius: 10px
+}
+
+.modal-confirmar .confirmar-desasociar[hidden] {
+  display: none
+}
+
+.modal-confirmar .confirmar-desasociar-titulo {
+  color: #4d6b80;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .04em
+}
+
+.modal-confirmar .confirmar-desasociar ul {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  color: #3d5c72
+}
+
+/* Reasignacion: es la unica parte del modal que exige una accion antes de
+   poder confirmar, asi que el select va destacado. */
+.modal-confirmar .confirmar-reasignar {
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: #fdf8ec;
+  border: 1px solid #f0dfb4;
+  border-radius: 10px
+}
+
+.modal-confirmar .confirmar-reasignar[hidden] {
+  display: none
+}
+
+.modal-confirmar .confirmar-reasignar-titulo {
+  color: #8a6a1f;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .04em
+}
+
+.modal-confirmar .confirmar-reasignar ul {
+  margin: 8px 0 12px;
+  padding-left: 18px;
+  color: #6f5518
+}
+
+.modal-confirmar .confirmar-destino {
+  display: block;
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: #6f5518
+}
+
+.modal-confirmar .confirmar-destino span {
+  display: block;
+  margin-bottom: 4px
+}
+
+.modal-confirmar .confirmar-destino select {
+  width: 100%
+}
+
+.modal-confirmar .confirmar-destino-error {
+  margin: 8px 0 0;
+  color: #b23a42;
+  font-size: 12px;
+  font-weight: 600
+}
+
+.modal-confirmar .confirmar-destino-error[hidden] {
+  display: none
+}
+
+/* Aviso de solo lectura en el modal de usuario (la contraseña no se edita).
+   La regla [hidden] va aparte porque, si no, el display:block de la clase
+   ganaría y el aviso aparecería también al dar de alta un usuario. */
+.modal .aviso-password {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 4px
+}
+
+.modal .aviso-password[hidden] {
+  display: none
 }
 
 /* Lista de permisos dentro del modal de "Rol de usuario" */
