@@ -63,6 +63,23 @@
     <main id="app-content" class="main-content" aria-live="polite"></main>
   </div>
 
+  <!-- Modal único de detalle, compartido por todas las vistas. Vive en el shell
+       y no en las vistas porque app.js es genérico y las vistas se recargan. -->
+  <div class="modal-backdrop" id="modal-detalle" data-admin-modal="detalle">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="detalle-titulo">
+      <div class="modal-head">
+        <div><span class="modal-kicker">Detalle del registro</span>
+          <h2 id="detalle-titulo" data-detalle-titulo>Detalle</h2>
+        </div>
+        <button class="modal-close" type="button" data-modal-close aria-label="Cerrar">×</button>
+      </div>
+      <div class="detail-grid" data-detalle-campos></div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" type="button" data-modal-close>Cerrar</button>
+      </div>
+    </div>
+  </div>
+
   <div id="toast" class="toast" role="status"></div>
   <script src="js/conexion_html.js"></script>
   <script src="js/conexion/clientes_bd.js"></script>

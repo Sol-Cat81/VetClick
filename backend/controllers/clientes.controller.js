@@ -75,6 +75,72 @@ const crearMascotas = async(req, res)=>{
     });
   }
 };
+const obtenerCliente = async (req, res) => {
+  const id = Number(req.params.id_cliente);
+  if (!Number.isInteger(id) || id <= 0) {
+    return res.status(400).json({ mensaje: 'ID de cliente inválido' });
+  }
+
+  try {
+    res.json(await service.obtenerClientesPorId(id));
+  } catch (error) {
+    console.error('Error al obtener cliente:', error);
+    res.status(error.status || 500).json({
+      mensaje: error.status ? error.message : 'No se pudo obtener el cliente'
+    });
+  }
+};
+
+const actualizarCliente = async (req, res) => {
+  const id = Number(req.params.id_cliente);
+  if (!Number.isInteger(id) || id <= 0) {
+    return res.status(400).json({ mensaje: 'ID de cliente inválido' });
+  }
+
+  try {
+    await service.actualizarCliente(id, req.body || {});
+    res.json({ mensaje: 'cliente actualizado correctamente', id_cliente: id });
+  } catch (error) {
+    console.error('Error al actualizar cliente:', error);
+    res.status(error.status || 500).json({
+      mensaje: error.status ? error.message : 'No se pudo actualizar el cliente'
+    });
+  }
+};
+
+const obtenerMascota = async (req, res) => {
+  const id = Number(req.params.id_mascota);
+  if (!Number.isInteger(id) || id <= 0) {
+    return res.status(400).json({ mensaje: 'ID de mascota inválido' });
+  }
+
+  try {
+    res.json(await service.obtenerMascotaPorId(id));
+  } catch (error) {
+    console.error('Error al obtener mascota:', error);
+    res.status(error.status || 500).json({
+      mensaje: error.status ? error.message : 'No se pudo obtener la mascota'
+    });
+  }
+};
+
+const actualizarMascota = async (req, res) => {
+  const id = Number(req.params.id_mascota);
+  if (!Number.isInteger(id) || id <= 0) {
+    return res.status(400).json({ mensaje: 'ID de mascota inválido' });
+  }
+
+  try {
+    await service.actualizarMascota(id, req.body || {});
+    res.json({ mensaje: 'mascota actualizada correctamente', id_mascota: id });
+  } catch (error) {
+    console.error('Error al actualizar mascota:', error);
+    res.status(error.status || 500).json({
+      mensaje: error.status ? error.message : 'No se pudo actualizar la mascota'
+    });
+  }
+};
+
 module.exports = {
   clientes: responder(service.listarClientes),
   mascotas: responder(service.listarMascotas),
@@ -85,5 +151,11 @@ module.exports = {
   adopciones: responder(service.listarAdopciones),
 
   crearCliente,
-  crearMascotas
+  crearMascotas,
+
+  obtenerCliente,
+  actualizarCliente,
+
+  obtenerMascota,
+  actualizarMascota
 };

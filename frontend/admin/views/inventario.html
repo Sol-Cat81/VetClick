@@ -11,12 +11,15 @@
 
   <div data-panel="stock">
     <div class="toolbar">
-      <div class="filter-box">⌕ <input placeholder="Buscar producto o sucursal..."></div><button
+      <div class="filter-box">⌕ <input data-table-filter="#stock-table"
+          placeholder="Buscar producto o sucursal..."></div><button
         class="btn btn-secondary" data-toast="Ajuste de stock preparado">Ajustar stock</button>
     </div>
     <article class="card table-card">
       <div class="table-wrap">
-        <table id="stock-table">
+        <!-- data-sin-estado: la columna Estado muestra "Bajo"/"Óptimo", no un estado
+             conmutable, así que no debe aparecer el botón "Cambiar estado". -->
+        <table id="stock-table" data-sin-estado>
           <thead>
             <tr>
               <th>Producto / variante</th>

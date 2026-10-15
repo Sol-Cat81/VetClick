@@ -71,7 +71,9 @@ function agruparFilas(productos) {
           id_atributo: producto.id_valor_atributo,
           precio: producto.precio,
           stock: producto.stock,
-          atributo: producto.atributo || "Disponible",
+          atributo: producto.atributo_nombre
+            ? `${producto.atributo_nombre}: ${producto.atributo}`
+            : "Disponible",
         });
       }
     });

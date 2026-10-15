@@ -1,3 +1,26 @@
+// Objetos completos de cada registro, para poder rellenar los modales de
+// edicion sin depender del texto visible de la tabla.
+const productosPorId        = new Map();
+const categoriasPorId       = new Map();
+const marcasPorId           = new Map();
+const variantesPorId        = new Map();
+const atributosPorId        = new Map();
+const valoresAtributoPorId  = new Map();
+
+function guardarEnRegistro(mapa, filas, campoId){
+  mapa.clear();
+  (filas || []).forEach(fila => mapa.set(String(fila[campoId]), fila));
+}
+
+function invalidarCatalogoCargado(){
+  productosPorId.clear();
+  categoriasPorId.clear();
+  marcasPorId.clear();
+  variantesPorId.clear();
+  atributosPorId.clear();
+  valoresAtributoPorId.clear();
+}
+
 async function cargarCatalogo() {
   const paneles = [
     ['productos', 'catalogo/productos', row => `
@@ -11,16 +34,24 @@ async function cargarCatalogo() {
         <td>${escaparHtml(truncarTexto(row.imagen || 'Sin imagen',18))}</td>
       </tr>
     `],
-    ['categorias', 'catalogo/categorias', row => `<tr><td>${escaparHtml(row.id_categoria)}</td><td>${escaparHtml(row.nombre)}</td><td>${escaparHtml(row.categoria_padre || '—')}</td></tr>`],
+    ['categorias', 'catalogo/categorias', row => `<tr data-id="${escaparHtml(row.id_categoria)}"><td>${escaparHtml(row.id_categoria)}</td><td>${escaparHtml(row.nombre)}</td><td>${escaparHtml(row.categoria_padre || '—')}</td></tr>`],
     ['marcas', 'catalogo/marcas', row => `<tr data-id="${escaparHtml(row.id_marca)}"><td>${escaparHtml(row.id_marca)}</td><td>${escaparHtml(row.nombre)}</td><td>${escaparHtml(truncarTexto(row.imagen_marca || 'sin imagen', 18))}</td></tr>`],
-    ['variantes', 'catalogo/variantes', row => `<tr><td>${escaparHtml(row.id_variante)}</td><td>${escaparHtml(row.producto)}</td><td>$${escaparHtml(row.precio)}</td><td>${escaparHtml(row.atributo || '—')}</td></tr>`]
+    ['variantes', 'catalogo/variantes', row => `<tr data-id="${escaparHtml(row.id_variante)}"><td>${escaparHtml(row.id_variante)}</td><td>${escaparHtml(row.producto)}</td><td>$${escaparHtml(row.precio)}</td><td>${escaparHtml([row.atributo_nombre, row.atributo].filter(Boolean).join(': ') || '—')}</td></tr>`]
   ];
+
+  const registros = {
+    productos: [productosPorId, 'id_producto'],
+    categorias: [categoriasPorId, 'id_categoria'],
+    marcas: [marcasPorId, 'id_marca'],
+    variantes: [variantesPorId, 'id_variante']
+  };
 
   for (const [panel, endpoint, render] of paneles) {
     try {
       const table = document.querySelector(`#${panel}-table`);
       if (!table) continue;
       const rows = await obtenerDatos(endpoint);
+      if (registros[panel]) guardarEnRegistro(registros[panel][0], rows, registros[panel][1]);
       table.querySelector('tbody').innerHTML = rows.map(render).join('');
     } catch (error) {
       informarErrorCarga(endpoint, error);
@@ -35,11 +66,133 @@ async function cargarAtributos() {
   try {
     const atributos = await obtenerDatos('catalogo/atributos');
     const tbody = document.querySelector('#atributos-table tbody');
-    if (tbody) tbody.innerHTML = (atributos || []).map(row => `<tr><td>${escaparHtml(row.id_atributo)}</td><td>${escaparHtml(row.nombre)}</td></tr>`).join('');
-  } catch (error) { informarErrorCarga('catalogo/atributos', error); }
+    guardarEnRegistro(atributosPorId, atributos, 'id_atributo');
+    if (tbody) tbody.innerHTML = (atributos || []).map(row => `<tr data-id="${escaparHtml(row.id_atributo)}"><td>${escaparHtml(row.id_atributo)}</td><td>${escaparHtml(row.nombre)}</td></tr>`).join('');
+  } catch (error) { InformarErrorCarga('catalogo/atributos', error); }
   try {
     const valores = await obtenerDatos('catalogo/valores-atributo');
     const tbody = document.querySelector('#valores-atributo-table tbody');
-    if (tbody) tbody.innerHTML = (valores || []).map(row => `<tr><td>${escaparHtml(row.id_valor)}</td><td>${escaparHtml(row.atributo || '—')}</td><td>${escaparHtml(row.nombre)}</td></tr>`).join('');
+    if (tbody) tbody.innerHTML = (valores || []).map(row => `<tr data-id="${escaparHtml(row.id_valor)}"><td>${escaparHtml(row.id_valor)}</td><td>${escaparHtml(row.atributo || '—')}</td><td>${escaparHtml(row.nombre)}</td></tr>`).join('');
   } catch (error) { informarErrorCarga('catalogo/valores-atributo', error); }
 }
+
+// De que columna del registro se toma cada campo visible del modal.
+// De que columna del registro se toma cada campo visible del modal.
+// Los campos que no aparecen (los inputs de archivo) se dejan como estan.
+registrarFormulario('producto', {
+  producto: 'nombre', marca_busqueda: 'id_marca', categoria_busqueda: 'id_categoria',
+  descripcion: 'descripcion', descuento: 'descuento', estado: 'activo'
+}, productosPorId);
+
+registrarFormulario('marca', { nombre: 'nombre' }, marcasPorId);
+
+registrarFormulario('categoría', { nombre: 'nombre', categoria_padre_busqueda: 'categoria_padre' }, categoriasPorId);
+
+registrarFormulario('variante', {
+  producto_busqueda: 'id_producto', precio: 'precio', atributo_busqueda: 'id_valor_atributo'
+}, variantesPorId);
+
+registrarFormulario('atributo', { nombre: 'nombre' }, atributosPorId);
+
+registrarFormulario('valor de atributo', { atributo_busqueda: 'id_atributo', nombre: 'nombre' }, valoresAtributoPorId);
+
+
+
+// Crea una presentacion (atributo + valor) desde el modal de variante, sin
+// salir de la vista. Reutiliza los endpoints que ya existen:
+// POST /api/admin/atributo y POST /api/admin/valorAtributo.
+async function guardarNuevaPresentacion(){
+  const mini = document.getElementById('modal-alta-valor');
+  const form = mini.querySelector('[data-form-alta-valor]');
+  const texto = form.atributo_busqueda.value.trim();
+  const valor = form.valor.value.trim();
+
+  if (!texto || !valor) return;
+
+  try {
+    await prepararRelaciones(form);
+
+    let idAtributo = Number(form.querySelector('[name="id_atributo"]').value) || 0;
+    let nombreAtributo = texto;
+
+    if (idAtributo){
+      // Eligio un atributo de la lista: solo hay que crear el valor.
+      const opciones = await opcionesParaEditar();
+      const encontrado = (opciones.atributos || []).find(o => String(o.id) === String(idAtributo));
+      // admin/opciones devuelve "Color (ID: 1)"; el datalist quiere "Color: Rojo".
+      if (encontrado) nombreAtributo = encontrado.etiqueta.replace(/\s*\(ID:\s*\d+\)\s*$/, '');
+    } else {
+      // Escribio un atributo que no existe: lo creamos primero.
+      const respuesta = await fetch(`${API_BASE_URL}/admin/atributo`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nombre: texto })
+      });
+      const cuerpo = await respuesta.json();
+      if (!respuesta.ok) throw new Error(cuerpo.mensaje || 'No se pudo crear el atributo');
+      idAtributo = cuerpo.id;
+      invalidarOpcionesRelaciones();
+    }
+
+    const respuestaValor = await fetch(`${API_BASE_URL}/admin/valorAtributo`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id_atributo: idAtributo, nombre: valor })
+    });
+    const cuerpoValor = await respuestaValor.json();
+    if (!respuestaValor.ok) throw new Error(cuerpoValor.mensaje || 'No se pudo crear el valor');
+
+    // La etiqueta debe ser EXACTAMENTE la que devuelve admin/opciones
+    // ("Color: Rojo (ID: 5)"). Si no coincide, prepararRelaciones() no la
+    // encuentra en el datalist y vacia el id_valor_atributo al guardar la
+    // variante, y el backend rechaza el alta por falta de presentacion.
+    const nuevaEtiqueta = `${nombreAtributo}: ${valor} (ID: ${cuerpoValor.id})`;
+
+    // Agregamos la opcion al datalist del modal de variante sin recargar nada.
+    const lista = document.getElementById('variante-atributos');
+    if (lista) lista.insertAdjacentHTML('beforeend', `<option value="${escaparHtml(nuevaEtiqueta)}"></option>`);
+    invalidarOpcionesRelaciones();
+
+    // Dejamos la presentacion nueva ya seleccionada en el modal de variante.
+    const modalVariante = document.querySelector('[data-admin-modal="variante"]');
+    modalVariante.querySelector('[name="atributo_busqueda"]').value = nuevaEtiqueta;
+    modalVariante.querySelector('[name="id_valor_atributo"]').value = cuerpoValor.id;
+
+    form.reset();
+    mini.classList.remove('show');
+    modalVariante.querySelector('[name="atributo_busqueda"]').focus();
+    showToast(`Presentación "${nuevaEtiqueta}" creada`);
+  } catch (error) {
+    console.error(error);
+    alert(error.message || 'No se pudo crear la presentación');
+  }
+}
+
+document.addEventListener('click', event => {
+  if (event.target.closest('[data-abrir-alta-valor]')) {
+    const mini = document.getElementById('modal-alta-valor');
+    const form = mini.querySelector('[data-form-alta-valor]');
+    form.reset();
+    mini.classList.add('show');
+    prepararRelaciones(form).catch(() => {});
+    form.atributo_busqueda.focus();
+    return;
+  }
+  // Cerramos solo este mini-modal: closeAdminModal() cerraria tambien el de variante.
+  if (event.target.closest('[data-cerrar-alta-valor]') || event.target.matches('#modal-alta-valor')) {
+    document.getElementById('modal-alta-valor').classList.remove('show');
+    return;
+  }
+});
+
+// El envio del mini-modal se intercepta con un listener de 'submit', no de
+// 'click': el clic del boton "Crear y usar" tiene como target el <button>, no
+// el <form>, y un preventDefault() sobre 'click' no cancela el envio. Sin esto
+// el navegador hacia un GET con los datos del form, se recargaba la pagina y la
+// vista de catalogo volvia siempre al primer panel (Productos).
+document.addEventListener('submit', event => {
+  const form = event.target.closest('[data-form-alta-valor]');
+  if (!form) return;
+  event.preventDefault();
+  guardarNuevaPresentacion();
+});
