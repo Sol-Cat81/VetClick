@@ -4,6 +4,12 @@ const db = require("./../config/database");
 // bcrypt compara y genera hashes sin guardar contraseñas en texto plano.
 const bcrypt = require("bcryptjs");
 
+const {
+  traerInfoUsuario,
+  guardarCrearCliente,
+  trerDirecciones
+} = require("../service/usuarios.service");
+
 // Comprueba email y contraseña y devuelve únicamente datos públicos del usuario.
 const verificarUsuario = async (req, res) => {
   // Extraemos los campos enviados por el frontend.
@@ -207,4 +213,47 @@ const refreshToken = async (req, res) => {
   }
 };
 
-module.exports = { verificarUsuario, registrarUsuario, detectarsession, logout, refreshToken };
+const guardarCliente = async (req, res) => {
+  const idUsuario = req.usuario.id
+  const { nombre, apellido, telefono, username } = req.body;
+
+  const resultado = await guardarCrearCliente(idUsuario, nombre, apellido, telefono, username);
+
+  if (resultado) {
+    res.status(201).json({ mensaje: "Cliente guardado correctamente" });
+  } else {
+    res.status(401).json({ mensaje: "No se pudo guardar el cliente" })
+  }
+};
+
+const traerClienteUsuario = async (req, res) => {
+  const idUsuario = req.usuario.id;
+  const info = await traerInfoUsuario(idUsuario)
+
+  if (!info) {
+    res.status(500).json({ mensaje: "Hubo un error con el sevidor" })
+  } else {
+    res.status(201).json({ info })
+  }
+}
+
+const traerDireccionesCliente = async (req, res) => {
+  const idUsuario = req.usuario.id;
+  const direcciones = await trerDirecciones(idUsuario);
+  if(!direcciones){
+    res.status(404).json({mensaje: "No hay direcciones registradas"})
+  }else{
+    res.status(201).json(direcciones)
+  }
+}
+
+module.exports = {
+  verificarUsuario,
+  registrarUsuario,
+  detectarsession,
+  logout,
+  refreshToken,
+  guardarCliente,
+  traerClienteUsuario,
+  traerDireccionesCliente
+};

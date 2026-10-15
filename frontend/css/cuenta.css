@@ -63,10 +63,25 @@ section {
 
 .aside {
     padding: 20px;
-    height: 100%;
     width: 400px;
-    overflow-y: auto;
     overflow-x: hidden;
+}
+
+.aside::-webkit-scrollbar {
+    width: 5px;
+    /* Grosor de barra vertical */
+    height: 10px;
+    /* Grosor de barra horizontal */
+}
+
+.aside::-webkit-scrollbar-track {
+    background: var(--principal-fondo);
+    border-radius: 5px;
+}
+
+.aside::-webkit-scrollbar-thumb {
+    background: var(--elem-importantes);
+    border-radius: 5px;
 }
 
 .abrir-aside {
@@ -94,6 +109,10 @@ section {
 .mostrar-aside {
     display: block !important;
     position: fixed !important;
+    top: 0;
+    bottom: 0;
+    height: 100vh;
+    height: 100dvh;
     z-index: 1000;
 }
 
@@ -217,6 +236,20 @@ section {
     background-color: #266b80 !important;
 }
 
+.alerta {
+    padding: 15px;
+    margin: 10px;
+    background-color: rgba(244, 188, 188, 0.681);
+    color: red;
+    border-radius: 10px;
+    display: none;
+    width: auto;
+}
+
+.alertaActiva {
+    display: block !important;
+}
+
 /* = = = SECCION INFO USUARIO = = = */
 
 .info-usuario {
@@ -244,12 +277,18 @@ section {
     overflow: hidden;
 }
 
+.contenido input:focus {
+    outline: none;
+    border: 1px solid var(--elem-secun) !important;
+}
+
 .info-usuario .row:first-child {
     font-family: 'texto';
     font-size: 20px;
 }
 
-.btn-cambiar-foto, .btn-editar-direccion {
+.btn-cambiar-foto,
+.btn-editar-direccion {
     font-size: 15px;
     background-color: transparent;
     border: 1px solid #c8cbcc;
@@ -258,16 +297,16 @@ section {
     border-radius: 10px;
 }
 
-.btn-cambiar-foto:hover, 
+.btn-cambiar-foto:hover,
 .btn-editar-direccion:hover,
 .btn-filtro:hover {
     border: 0.5px solid #155f7565;
     background-color: #8cf4f41e;
 }
 
-.guardar-cambios, 
-.agregar-direccion, 
-.agregar-mascota, 
+.guardar-cambios,
+.agregar-direccion,
+.agregar-mascota,
 .reservar-turno,
 .detalle-turno {
     margin: 15px;
@@ -278,7 +317,7 @@ section {
     background-color: var(--elem-importantes);
 }
 
-.info-usuario .row:nth-child(2) input {
+.info-usuario .row:nth-child(3) input {
     padding: 8px 10px;
     border-radius: 10px;
     border: 1px solid #c8cbcc;
@@ -291,11 +330,13 @@ section {
 }
 
 /* = = = SECCION DIRECCIONES = = = */
-.card{
+.card {
     border-radius: 15px;
     box-shadow: 0px 0px 15px 0px #c8cbcc8f;
 }
-.btn-eliminar-direccion,.eliminar-turno{
+
+.btn-eliminar-direccion,
+.eliminar-turno {
     border: none;
     background-color: transparent;
     padding: 8px 10px;
@@ -303,17 +344,19 @@ section {
     color: var(--elem-importantes);
     font-weight: bold;
 }
+
 .btn-eliminar-direccion:hover,
-.eliminar-turno:hover{
+.eliminar-turno:hover {
     background-color: #ebf8fc75;
 }
 
 /* = = = SECCION MASCOTAS = = = */
-.col-10{
-    display:flex;
+.col-10 {
+    display: flex;
     gap: 10px;
 }
-.avatar-mascota{
+
+.avatar-mascota {
     width: fit-content;
     height: fit-content;
     overflow: hidden;
@@ -323,28 +366,32 @@ section {
     border-radius: 10px;
     color: var(--elem-importantes);
 }
-#mascotas .card{
+
+#mascotas .card {
     padding: 20px 5px;
 }
-#mascotas .ph-pencil-simple-line{
+
+#mascotas .ph-pencil-simple-line {
     color: var(--elem-importantes);
     font-size: 20px;
     cursor: pointer;
     padding: 10px;
     border-radius: 10px;
 }
-#mascotas .ph-pencil-simple-line:hover{
+
+#mascotas .ph-pencil-simple-line:hover {
     background-color: #ebf8fc75;
 }
 
 /* = = = SECCION TURNOS = = = */
-.contenedor-turnos .card{
+.contenedor-turnos .card {
     padding: 20px;
     display: flex;
     flex-direction: row;
     gap: 15px;
 }
-.avatar-fecha{
+
+.avatar-fecha {
     background-color: #d9fbfb72;
     border-radius: 10px;
     color: var(--elem-importantes);
@@ -358,18 +405,20 @@ section {
     flex-direction: column;
     justify-content: center;
 }
-.acciones-turno{
+
+.acciones-turno {
     position: relative;
     margin-left: auto;
 }
 
 /* = = = SECCION HISTORIAL = = = */
-.filtrar-historial{
+.filtrar-historial {
     display: flex;
     flex-direction: row;
     gap: 10px;
     margin: 10px 0px;
 }
+
 .btn-filtro {
     padding: 8px 15px;
     border-radius: 10px;
@@ -378,34 +427,41 @@ section {
     border: 1px solid #c8cbcc;
     font-family: 'texto';
 }
-.filtro-activo{
+
+.filtro-activo {
     background-color: var(--elem-importantes);
     border: none;
     color: var(--secundario-fondo);
 }
-#historial .seccion-historial{
+
+#historial .seccion-historial {
     background-color: var(--secundario-fondo);
     padding: 5px 0px;
     border-radius: 20px;
     display: none;
 }
-.filtro-activo:hover{
+
+.filtro-activo:hover {
     background-color: #10495a;
 }
+
 .cabezal-compras,
-.compra{
+.compra {
     padding: 10px 20px;
     border-bottom: 1px solid #c0c0c0c6;
 }
-.compra{
+
+.compra {
     display: flex;
     gap: 15px;
     align-items: center;
 }
-.compra:hover{
+
+.compra:hover {
     background-color: var(--principal-fondo);
 }
-.avatarCompra{
+
+.avatarCompra {
     font-size: 35px;
     width: 70px;
     height: 70px;
@@ -416,20 +472,24 @@ section {
     display: flex;
     border-radius: 15px;
 }
-.cabezalCompra{
+
+.cabezalCompra {
     display: flex;
     flex-direction: column;
 }
-.total-compra{
+
+.total-compra {
     font-family: 'texto';
     color: var(--elem-importantes);
     font-size: 20px;
 }
-.fecha-compra{
+
+.fecha-compra {
     color: #4d5656;
     font-size: 15px;
 }
-.vermas{
+
+.vermas {
     display: flex;
     align-content: center;
     justify-content: center;
@@ -439,7 +499,8 @@ section {
     cursor: pointer;
     border-radius: 15px;
 }
-.vermas:hover{
+
+.vermas:hover {
     background-color: #d1d2d237;
 }
 
@@ -449,6 +510,9 @@ section {
         background-color: var(--principal-fondo);
         box-shadow: 0px 0px 20px 0px gray;
         width: 350px;
+        overflow-y: auto;
+        height: 100vh;
+        height: 100dvh;
     }
 
     .aside .opcion {
@@ -473,8 +537,9 @@ section {
         margin-top: -50px;
     }
 }
-@media (max-width: 600px){
-    .contenedor-turnos .card{
+
+@media (max-width: 600px) {
+    .contenedor-turnos .card {
         flex-direction: column;
     }
 }
