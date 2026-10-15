@@ -74,8 +74,50 @@
         <button class="modal-close" type="button" data-modal-close aria-label="Cerrar">×</button>
       </div>
       <div class="detail-grid" data-detalle-campos></div>
+      <!-- Los bloques con tabla (lineas de un pedido, pagos, envios) van aparte
+           del .detail-grid porque ese es de tres columnas y una tabla no entra. -->
+      <div data-detalle-listas></div>
       <div class="modal-actions">
         <button class="btn btn-secondary" type="button" data-modal-close>Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal reutilizable de confirmación de borrado. Vive en el shell, y no en
+       una vista, porque lo van a usar todas las secciones a medida que se
+       conecten su DELETE. No lleva <form> a proposito: el handler generico de
+       submit de app.js interceptaria el envio y cerraria el modal. -->
+  <div class="modal-backdrop" data-admin-modal="confirmar-borrado">
+    <div class="modal modal-confirmar" role="alertdialog" aria-modal="true"
+      aria-labelledby="confirmar-borrado-titulo" aria-describedby="confirmar-borrado-detalle">
+      <div class="modal-head">
+        <div><span class="modal-kicker">Acción irreversible</span>
+          <h2 id="confirmar-borrado-titulo" data-confirmar-titulo>Eliminar</h2>
+        </div><button class="modal-close" type="button" data-modal-close aria-label="Cerrar">×</button>
+      </div>
+      <div class="confirmar-cuerpo" id="confirmar-borrado-detalle">
+        <p data-confirmar-mensaje></p>
+        <div class="confirmar-cascada" data-confirmar-cascada hidden>
+          <p class="confirmar-cascada-titulo">También se eliminará:</p>
+          <ul data-confirmar-lista></ul>
+        </div>
+        <div class="confirmar-desasociar" data-confirmar-desasociar hidden>
+          <p class="confirmar-desasociar-titulo">No se eliminará, pero:</p>
+          <ul data-confirmar-lista-desasociar></ul>
+        </div>
+        <div class="confirmar-reasignar" data-confirmar-reasignar hidden>
+          <p class="confirmar-reasignar-titulo" data-confirmar-reasignar-titulo></p>
+          <ul data-confirmar-lista-reasignar></ul>
+          <label class="confirmar-destino">
+            <span data-confirmar-destino-etiqueta>Reasignar a</span>
+            <select data-confirmar-destino></select>
+          </label>
+          <p class="confirmar-destino-error" data-confirmar-destino-error hidden></p>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" type="button" data-modal-close>Cancelar</button>
+        <button class="btn btn-danger" type="button" data-confirmar-aceptar>Sí, eliminar</button>
       </div>
     </div>
   </div>

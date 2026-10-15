@@ -1,2 +1,7 @@
 const model = require('../models/ventas.model');
-module.exports = { listarPedidos: model.pedidos, listarPagos: model.pagos, listarEnvios: model.envios };
+module.exports = {
+  listarPedidos: model.pedidos,
+  listarPagos: model.pagos,
+  listarEnvios: model.envios,
+  listarDetallePedido: model.detallePedido
+};
