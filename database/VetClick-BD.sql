@@ -250,7 +250,6 @@ CREATE TABLE mascota (
     id_mascota INT AUTO_INCREMENT PRIMARY KEY,
     id_cliente INT NOT NULL,
     nombre VARCHAR(50) NOT NULL,
-    id_especie INT NOT NULL,
     id_raza INT NOT NULL,
     sexo ENUM('MACHO', 'HEMBRA') NOT NULL,
     fecha_nacimiento DATE,
@@ -258,8 +257,7 @@ CREATE TABLE mascota (
     observaciones TEXT,
 
     FOREIGN KEY (id_raza) REFERENCES razas(id_raza),
-    FOREIGN KEY (id_cliente) REFERENCES clientes(id_cliente),
-    FOREIGN KEY (id_especie) REFERENCES especies(id_especie)
+    FOREIGN KEY (id_cliente) REFERENCES clientes(id_cliente)
 );
 
 CREATE TABLE pedidos (
@@ -556,15 +554,15 @@ INSERT INTO productos_categorias (id_categoria, id_producto) VALUES
 
 -- Tabla: clientes
 INSERT INTO clientes (id_cliente, id_usuario, nombre, apellido, telefono, estado) VALUES
-(1, 3, 'Juan', 'Perez', '011-4000-1111', TRUE),
-(2, NULL, 'Maria', 'Gomez', '011-4000-2222', TRUE),
-(3, NULL, 'Pedro', 'Lopez', '011-4000-3333', FALSE);
+(1, 3, 'Juan', 'Perez', '4000-1111', TRUE),
+(2, NULL, 'Maria', 'Gomez', '4000-2222', TRUE),
+(3, NULL, 'Pedro', 'Lopez', '4000-3333', FALSE);
 
 -- Tabla: empleados
 INSERT INTO empleados (id_empleado, id_usuario, id_rol_empleado, nombre, apellido, telefono, direccion, id_sucursal) VALUES
-(1, 1, 1, 'Ana', 'Gomez', '011-5000-1111', 'Av. Siempreviva 742', 1),
-(2, 2, 2, 'Luis', 'Ruiz', '011-5000-2222', 'Calle Falsa 123', 1),
-(3, NULL, 2, 'Marta', 'Lopez', '011-5000-3333', 'Av. Libertad 55', 2);
+(1, 1, 1, 'Ana', 'Gomez', '5000-1111', 'Av. Siempreviva 742', 1),
+(2, 2, 2, 'Luis', 'Ruiz', '5000-2222', 'Calle Falsa 123', 1),
+(3, NULL, 2, 'Marta', 'Lopez', '5000-3333', 'Av. Libertad 55', 2);
 
 -- Tabla: carrito_items
 INSERT INTO carrito_items (id_carrito, id_usuario, id_variante, cantidad) VALUES
