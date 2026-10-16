@@ -30,6 +30,15 @@ const entidadApi = {
   venta: 'pedido'
 };
 
+// Que lista de `admin/opciones` ofrece el selector de destinos cuando el borrado
+// pide reasignar, y como se llama esa fila en los textos del modal. El backend
+// usa las mismas dos piezas (`destinoEtiqueta` en `borrados`), asi que el nombre
+// del campo que viaja en el DELETE sale de `confirmarBorrado()`.
+const DESTINOS_REASIGNACION = {
+  rol: { opciones: 'rolesEmpleados', etiqueta: 'rol', campo: 'id_rol_empleado_destino' },
+  sucursal: { opciones: 'sucursales', etiqueta: 'sucursal', campo: 'id_sucursal_destino' }
+};
+
 const entityLabels = {
   clientes: 'cliente',
   mascotas: 'mascota',
@@ -276,6 +285,11 @@ function enhanceAdminPanels() {
           // y se perderia en la proxima carga.
           const tieneEstado = !item.hasAttribute('data-sin-estado');
           const hasStatus = tieneEstado && Boolean(row.querySelector('.status'));
+          // data-sin-borrado oculta el boton de eliminar cuando el registro no
+          // se borra sino que se ajusta: el stock de una sucursal se modifica
+          // desde Editar, y el backend no tiene politica de borrado para esa
+          // tabla, asi que el boton solo podria llevar a un error.
+          const tieneBorrado = !item.hasAttribute('data-sin-borrado');
           const tieneDetalle = Boolean(detalleEntidades[entidadItem]);
           const hasActionColumn = head.cells[head.cells.length - 1]?.textContent.trim().toLowerCase() === 'acciones';
           const actions = hasActionColumn && row.cells.length === head.cells.length
@@ -284,7 +298,7 @@ function enhanceAdminPanels() {
           actions.className = 'row-actions';
           actions.innerHTML = `${tieneDetalle ? `<button class="btn btn-secondary btn-small" type="button" data-row-action="detail" data-entity="${entidadItem}" data-id="${id}">Ver más</button>` : ''}
             <button class="btn btn-secondary btn-small" type="button" data-row-action="edit" data-entity="${entidadItem}" data-id="${id}" data-modal-panel="${panel.dataset.panel}">Editar</button>
-            <button class="btn btn-danger btn-small" type="button" data-row-action="delete" data-entity="${entidadItem}" data-id="${id}">Eliminar</button>
+            ${tieneBorrado ? `<button class="btn btn-danger btn-small" type="button" data-row-action="delete" data-entity="${entidadItem}" data-id="${id}">Eliminar</button>` : ''}
             ${hasStatus ? `<button class="btn btn-secondary btn-small" type="button" data-row-action="status" data-entity="${entidadItem}" data-id="${id}">Cambiar estado</button>` : ''}`;
           if (actions.parentElement !== row) row.appendChild(actions);
         });
@@ -293,11 +307,19 @@ function enhanceAdminPanels() {
 
       if (item.querySelector('[data-row-action]')) return;
       const conEstado = !item.hasAttribute('data-sin-estado') && Boolean(item.querySelector('.status'));
+      // Mismo opt-out que en las tablas: la tarjeta se puede dejar sin boton de
+      // eliminar declarando data-sin-borrado.
+      const conBorrado = !item.hasAttribute('data-sin-borrado');
+      // El id vive en la tarjeta (data-id), no en el boton. Hay que copiarlo a
+      // los botones: el manejador de eliminar lo lee del boton, y sin el la
+      // accion se corta con "falta el identificador del registro". Editar no
+      // lo sufria porque lee el id de la tarjeta, no del boton.
+      const id = item.dataset?.id || '';
       const actions = document.createElement('div');
       actions.className = 'card-actions';
-      actions.innerHTML = `<button class="btn btn-secondary btn-small" type="button" data-row-action="edit" data-entity="${entidadItem}">Editar</button>
-        <button class="btn btn-danger btn-small" type="button" data-row-action="delete" data-entity="${entidadItem}">Eliminar</button>
-        ${conEstado ? `<button class="btn btn-secondary btn-small" type="button" data-row-action="status" data-entity="${entidadItem}">Cambiar estado</button>` : ''}`;
+      actions.innerHTML = `<button class="btn btn-secondary btn-small" type="button" data-row-action="edit" data-entity="${entidadItem}" data-id="${escaparHtml(id)}">Editar</button>
+        ${conBorrado ? `<button class="btn btn-danger btn-small" type="button" data-row-action="delete" data-entity="${entidadItem}" data-id="${escaparHtml(id)}">Eliminar</button>` : ''}
+        ${conEstado ? `<button class="btn btn-secondary btn-small" type="button" data-row-action="status" data-entity="${entidadItem}" data-id="${escaparHtml(id)}">Cambiar estado</button>` : ''}`;
       item.appendChild(actions);
     });
   });
@@ -776,14 +798,24 @@ async function prepararReasignacion(modal, entity, id, plan) {
     : `<li>${total} ${total === 1 ? 'registro' : 'registros'} sin detalle</li>`;
 
   // Los destinos posibles vienen de las opciones de relacion que ya se usan
-  // para los datalist. Solo los roles: el resto de entidades no reasignan.
-  select.innerHTML = '<option value="">Elegí un rol…</option>';
+  // para los datalist. Cada entidad reasignadora dice cual es su lista: un rol
+  // de empleado se reasigna a otro rol, una sucursal a otra sucursal.
+  const nombreEntidad = entidadApi[entity] || entity;
+  const configuracion = DESTINOS_REASIGNACION[nombreEntidad];
+  const nombreDestino = configuracion?.etiqueta || 'rol';
+  const articulo = /^[aeiou]/.test(nombreDestino) ? 'una' : 'un';
+
+  select.innerHTML = `<option value="">Elegí ${articulo} ${nombreDestino}…</option>`;
+  const tituloDestino = modal.querySelector('[data-confirmar-destino-etiqueta]');
+  if (tituloDestino) tituloDestino.textContent = `Reasignar a ${articulo} ${nombreDestino}`;
+
   let destinos = [];
   try {
     const opciones = await obtenerOpcionesRelaciones();
-    destinos = (opciones.rolesEmpleados || []).filter(opcion => String(opcion.id) !== String(id));
+    destinos = ((configuracion?.opciones ? opciones[configuracion.opciones] : null) || [])
+      .filter(opcion => String(opcion.id) !== String(id));
   } catch (error) {
-    informarErrorCarga('opciones de roles', error);
+    informarErrorCarga(`opciones de ${nombreDestino}s`, error);
   }
   select.insertAdjacentHTML('beforeend', destinos
     .map(opcion => `<option value="${escaparHtml(opcion.id)}">${escaparHtml(opcion.etiqueta)}</option>`)
@@ -791,7 +823,9 @@ async function prepararReasignacion(modal, entity, id, plan) {
 
   if (!destinos.length) {
     error.hidden = false;
-    error.textContent = 'No hay otro rol al que reasignar. No se puede eliminar este registro.';
+    error.textContent =
+      `No hay ${articulo === 'una' ? 'otra' : 'otro'} ${nombreDestino} al que reasignar. `
+      + 'No se puede eliminar este registro.';
     boton.disabled = true;
   } else {
     error.hidden = true;
@@ -815,8 +849,9 @@ function textoDeFila(fila) {
 }
 
 async function solicitarBorrado(entity, id, fila) {
-  // Las tarjetas (.info-card) no declaran data-id en el boton, y sin el id no
-  // hay forma de saber que registro es.
+  // El id llega en el boton (las tablas y las tarjetas lo copian desde su
+  // data-id). Sin el no hay forma de saber que registro es: sigue siendo una
+  // red de seguridad, no el camino normal.
   if (!id) {
     showToast('No se puede eliminar: falta el identificador del registro');
     return;
@@ -865,6 +900,10 @@ async function confirmarBorrado() {
   if (!borradoPendiente) return;
   const { entity, id, destino } = borradoPendiente;
   const nombreEntidad = entidadApi[entity] || entity;
+  // El backend lee el destino con el nombre que declara la entidad: un rol y
+  // una sucursal no viajan en el mismo campo del cuerpo.
+  const campoDestino = DESTINOS_REASIGNACION[nombreEntidad]?.campo
+    || 'id_rol_empleado_destino';
   const boton = document.querySelector('[data-confirmar-aceptar]');
   boton.disabled = true;
 
@@ -875,7 +914,7 @@ async function confirmarBorrado() {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         // Solo viaja si la entidad reasigna. El backend lo ignora en el resto.
-        body: destino ? JSON.stringify({ id_rol_empleado_destino: Number(destino) }) : undefined
+        body: destino ? JSON.stringify({ [campoDestino]: Number(destino) }) : undefined
       }
     );
     const cuerpo = await respuesta.json();

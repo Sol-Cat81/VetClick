@@ -18,8 +18,12 @@
     <article class="card table-card">
       <div class="table-wrap">
         <!-- data-sin-estado: la columna Estado muestra "Bajo"/"Óptimo", no un estado
-             conmutable, así que no debe aparecer el botón "Cambiar estado". -->
-        <table id="stock-table" data-sin-estado>
+             conmutable, así que no debe aparecer el botón "Cambiar estado".
+             data-sin-borrado: un registro de stock no se borra, se ajusta. El
+             stock de una variante en una sucursal se corrige desde "Editar"
+             (Guardar stock), y el backend no tiene política de borrado para esta
+             tabla: el botón solo podría llevar a un error. -->
+        <table id="stock-table" data-sin-estado data-sin-borrado>
           <thead>
             <tr>
               <th>Producto / variante</th>

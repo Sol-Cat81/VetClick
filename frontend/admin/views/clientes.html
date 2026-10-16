@@ -176,7 +176,7 @@
             <tr>
               <th>ID</th>
               <th>Nombre</th>
-              <th>Especie</th>
+              <th>Raza</th>
               <th>Edad</th>
               <th>Estado</th>
             </tr>
@@ -230,13 +230,8 @@
           <label>Propietario<input data-modal-field name="propietario" list="propietarios-sugeridos" data-owner-autocomplete autocomplete="off" required>
             <datalist id="propietarios-sugeridos"></datalist></label>
           <input type="hidden" name="id_cliente">
-          <label>Especie<input data-modal-field name="especie_busqueda" list="mascota-especies"
-              data-relation="especies" data-relation-field="id_especie" autocomplete="off" required>
-            <datalist id="mascota-especies"></datalist></label>
-          <input type="hidden" name="id_especie" data-relation-value="id_especie">
           <label>Raza<input data-modal-field name="raza_busqueda" list="mascota-razas"
-              data-relation="razas" data-relation-field="id_raza" data-relation-parent="id_especie"
-              autocomplete="off" required>
+              data-relation="razas" data-relation-field="id_raza" autocomplete="off" required>
             <datalist id="mascota-razas"></datalist></label>
           <input type="hidden" name="id_raza" data-relation-value="id_raza">
           <label>Sexo<select data-modal-field name="sexo" required><option value="MACHO">Macho</option>
@@ -338,8 +333,8 @@
           <input type="hidden" name="id_mascota_adopcion" data-relation-value="id_mascota_adopcion">
           <label>Fecha<input data-modal-field name="fecha" type="date" required></label>
           <label>Estado<select data-modal-field name="estado">
-              <option value="EN ADOPCION">En adopción</option>
-              <option value="ADOPTADO">Adoptado</option>
+              <option value="EN_CURSO">En curso</option>
+              <option value="COMPLETADA">Completada</option>
               <option value="CANCELADA">Cancelada</option>
             </select></label>
           <label>Observación<textarea data-modal-field name="observacion" rows="2"></textarea></label>
@@ -360,10 +355,10 @@
       <form data-admin-modal-form>
         <div class="modal-fields">
           <label>Nombre<input data-modal-field name="nombre" required></label>
-          <label>Especie<input data-modal-field name="especie_busqueda" list="mascota-adopcion-especies"
-              data-relation="especies" data-relation-field="id_especie" autocomplete="off">
-            <datalist id="mascota-adopcion-especies"></datalist></label>
-          <input type="hidden" name="id_especie" data-relation-value="id_especie">
+          <label>Raza<input data-modal-field name="raza_busqueda" list="mascota-adopcion-razas"
+              data-relation="razas" data-relation-field="id_raza" autocomplete="off">
+            <datalist id="mascota-adopcion-razas"></datalist></label>
+          <input type="hidden" name="id_raza" data-relation-value="id_raza">
           <label>Edad<input data-modal-field name="edad" maxlength="20"></label>
           <label>Sexo<select data-modal-field name="sexo" required>
               <option value="MACHO">Macho</option>

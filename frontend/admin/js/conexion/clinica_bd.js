@@ -146,7 +146,8 @@ registrarFormulario('turno', {
     fecha: 'fecha', hora: 'hora', motivo: 'motivo', estado: 'estado',
     observaciones: 'observaciones',
     mascota_busqueda: 'id_mascota', cliente_busqueda: 'id_cliente',
-    servicio_busqueda: 'id_servicio', sucursal_busqueda: 'id_sucursal'
+    servicio_busqueda: 'id_servicio', sucursal_busqueda: 'id_sucursal',
+    veterinario_busqueda: 'id_veterinario'
 }, turnosPorId);
 
 registrarFormulario('historial médico', {
@@ -186,6 +187,7 @@ detalleEntidades['turno'] = {
     { campo: 'cliente', etiqueta: 'Cliente' },
     { campo: 'servicio', etiqueta: 'Servicio' },
     { campo: 'sucursal', etiqueta: 'Sucursal' },
+    { campo: 'veterinario', etiqueta: 'Veterinario' },
     { campo: 'estado', etiqueta: 'Estado' },
     { campo: 'motivo', etiqueta: 'Motivo', texto: true },
     { campo: 'observaciones', etiqueta: 'Observaciones', texto: true }
