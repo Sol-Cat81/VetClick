@@ -83,6 +83,7 @@ CREATE TABLE usuarios (
     email VARCHAR(100),
     id_rol_usuario INT,
     activo BOOLEAN DEFAULT TRUE,
+    img_usuario TEXT,
 
     FOREIGN KEY (id_rol_usuario) REFERENCES rol_usuario(id_rol_usuario)
 );
@@ -122,13 +123,14 @@ CREATE TABLE productos (
 CREATE TABLE mascotas_adopcion (
     id_mascota_adopcion INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(85),
-    id_especie INT,
+    id_raza INT,
     edad VARCHAR(20),
     sexo ENUM('MACHO', 'HEMBRA') NOT NULL,
     descripcion VARCHAR(120),
     estado ENUM('ADOPTADO', 'EN_ADOPCION'),
+    img_masc_adop TEXT,
 
-    FOREIGN KEY (id_especie) REFERENCES especies(id_especie)
+    FOREIGN KEY (id_raza) REFERENCES razas(id_raza)
 );
 
 CREATE TABLE valores_atributo (
@@ -195,17 +197,6 @@ CREATE TABLE empleados (
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario),
     FOREIGN KEY (id_sucursal) REFERENCES sucursales(id_sucursal),
     FOREIGN KEY (id_rol_empleado) REFERENCES rol_empleados(id_rol_empleado)
-);
-
-
-CREATE TABLE carrito_items (
-    id_carrito INT AUTO_INCREMENT PRIMARY KEY,
-    id_usuario INT NOT NULL,
-    id_variante INT NOT NULL,
-    cantidad INT NOT NULL DEFAULT 1,
-    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
-    FOREIGN KEY (id_variante) REFERENCES variantes(id_variante) ON DELETE CASCADE,
-    UNIQUE KEY usuario_producto_unico (id_usuario, id_variante)
 );
 
 /* ====================================================
@@ -342,6 +333,7 @@ CREATE TABLE turnos (
     id_mascota INT NOT NULL,
     id_servicio INT NOT NULL,
     id_sucursal INT,
+    id_veterinario INT,
     fecha DATE NOT NULL,
     hora TIME NOT NULL,
     motivo TEXT,
@@ -352,7 +344,8 @@ CREATE TABLE turnos (
     FOREIGN KEY (id_mascota) REFERENCES mascota(id_mascota),
     FOREIGN KEY (id_servicio) REFERENCES servicios(id_servicio),
     FOREIGN KEY (id_cliente) REFERENCES clientes(id_cliente),
-    FOREIGN KEY (id_sucursal) REFERENCES sucursales(id_sucursal)
+    FOREIGN KEY (id_sucursal) REFERENCES sucursales(id_sucursal),
+    FOREIGN KEY (id_veterinario) REFERENCES veterinarios(id_veterinario)
 );
 
 CREATE TABLE detalle_pedidos (
@@ -440,210 +433,273 @@ SET FOREIGN_KEY_CHECKS = 1;
 
 /* ====================================================
    DATOS DE EJEMPLO (3 filas por tabla)
-   Solo se escriben: no se ejecutan. Van en el mismo
-   orden de dependencias que la creacion de tablas.
+   Se ejecutan al final del script, en el mismo orden
+   de dependencias que la creacion de tablas.
+
+   Los IDs foreign KEY van escritos a mano (1, 2, 3)
+   porque el bloque TRUNCATE de arriba reinicia los
+   AUTO_INCREMENT en 1.
+
+   Usuario de ejemplo: admin / 123456
+   (hash bcrypt real, coste 10, para que el login
+   funcione desde el primer arranque)
    ==================================================== */
 
--- Tabla: sucursales
+START TRANSACTION;
+
+/* ---------- NIVEL 1: TABLAS INDEPENDIENTES ---------- */
+
+-- 3 sucursales
 INSERT INTO sucursales (id_sucursal, nombre, direccion, localidad, telefono, horario, activo) VALUES
-(1, 'Sucursal Centro', 'Av. Principal 100', 'Centro', '011-4444-100', 'Lun a Vie 09:00 a 18:00', TRUE),
-(2, 'Sucursal Norte', 'Av. Norte 250', 'Norte', '011-4444-200', 'Lun a Sab 09:00 a 20:00', TRUE),
-(3, 'Sucursal Sur', 'Calle Sur 45', 'Sur', '011-4444-300', 'Lun a Vie 08:00 a 17:00', FALSE);
+(1, 'VetClick Central', 'Av. Corrientes 1450', 'CABA',       '01143210001', 'Lun a Sab 09:00 a 20:00', TRUE),
+(2, 'VetClick Norte',   'Av. Cabildo 2345',    'CABA',       '01143210002', 'Lun a Vie 09:00 a 19:00', TRUE),
+(3, 'VetClick Sur',     'Ruta 8 km 12',        'Avellaneda', '01143210003', 'Mar a Dom 10:00 a 18:00', TRUE);
 
--- Tabla: atributos
+-- 3 atributos de producto (base de las variantes)
 INSERT INTO atributos (id_atributo, nombre) VALUES
-(1, 'Color'),
-(2, 'Talla'),
-(3, 'Sabor');
+(1, 'Talla'),
+(2, 'Color'),
+(3, 'Peso');
 
--- Tabla: permisos
+-- 3 permisos
 INSERT INTO permisos (id_permiso, nombre, descripcion) VALUES
-(1, 'gestionar_usuarios', 'Alta, baja y edicion de usuarios'),
-(2, 'gestionar_ventas', 'Consulta y registro de pedidos'),
-(3, 'gestionar_inventario', 'Ajuste de stock por sucursal');
+(1, 'gestionar_usuarios',   'Crear, editar y dar de baja usuarios'),
+(2, 'gestionar_productos',  'Administrar el catalogo de productos y stock'),
+(3, 'gestionar_clinica',    'Administrar turnos, historial medico y adopciones');
 
--- Tabla: rol_empleados
+-- 3 roles de empleado
 INSERT INTO rol_empleados (id_rol_empleado, nombre) VALUES
-(1, 'Administrador'),
-(2, 'Veterinario'),
-(3, 'Recepcionista');
+(1, 'ADMINISTRADOR'),
+(2, 'VETERINARIO'),
+(3, 'RECEPCIONISTA');
 
--- Tabla: rol_usuario
+-- 3 roles de usuario
 INSERT INTO rol_usuario (id_rol_usuario, nombre) VALUES
-(1, 'Administrador'),
-(2, 'Vendedor'),
-(3, 'Cliente');
+(1, 'ADMIN'),
+(2, 'VETERINARIO'),
+(3, 'CLIENTE');
 
--- Tabla: especies
+-- 3 especies
 INSERT INTO especies (id_especie, nombre) VALUES
 (1, 'Perro'),
 (2, 'Gato'),
-(3, 'Ave');
+(3, 'Conejo');
 
--- Tabla: categorias_servicios
+-- 3 categorias de servicio
 INSERT INTO categorias_servicios (id_categoria_servicio, nombre) VALUES
 (1, 'Consultas'),
-(2, 'Cirugias'),
-(3, 'Estetica');
+(2, 'Estetica'),
+(3, 'Vacunacion');
 
--- Tabla: categorias
+-- 3 categorias (la tercera cuelga de la primera)
 INSERT INTO categorias (id_categoria, nombre, categoria_padre) VALUES
 (1, 'Alimentos', NULL),
-(2, 'Medicamentos', NULL),
-(3, 'Lacteos', 1);
+(2, 'Juguetes', NULL),
+(3, 'Accesorios', 1);
 
--- Tabla: marcas
-INSERT INTO marcas (id_marca, imagen_marca, nombre) VALUES
-(1, 'img/marca-1.png', 'Royal Canin'),
-(2, 'img/marca-2.png', 'Purina'),
-(3, 'img/marca-3.png', 'Hills');
+-- 3 marcas
+INSERT INTO marcas (id_marca, nombre, imagen_marca) VALUES
+(1, 'Royal Canin', 'img/marca-1.png'),
+(2, 'Pedigree',    'img/marca-2.png'),
+(3, 'Ferplast',    'img/marca-3.png');
 
--- Tabla: rol_permiso
+/* ---------- NIVEL 2: PRIMER NIVEL DE DEPENDENCIA ---------- */
+
+-- 3 asignaciones de permisos al rol ADMIN
 INSERT INTO rol_permiso (id_rol_usuario, id_permiso) VALUES
 (1, 1),
 (1, 2),
 (1, 3);
 
--- Tabla: usuarios
-INSERT INTO usuarios (id_usuario, username, password_hash, email, id_rol_usuario, activo) VALUES
-(1, 'admin', '$2a$10$ejemploHashDePassword0000000000000000000000000000', 'admin@vetclick.com', 1, TRUE),
-(2, 'veterinario1', '$2a$10$ejemploHashDePassword0000000000000000000000000000', 'vet1@vetclick.com', 2, TRUE),
-(3, 'cliente1', '$2a$10$ejemploHashDePassword0000000000000000000000000000', 'cliente1@vetclick.com', 3, TRUE);
+-- 3 usuarios (la contraseña de los tres es 123456)
+INSERT INTO usuarios (id_usuario, username, password_hash, email, id_rol_usuario, activo , img_usuario) VALUES
+(1, 'admin',    '$2b$10$LzcCUhPfyNvZPPmBD40pjuFKzrasAAG5bo1Ux2K2vg8RdHmMYLP2G', 'admin@vetclick.com', 1, TRUE , "https:fotochida"),
+(2, 'vetlucia', '$2b$10$LzcCUhPfyNvZPPmBD40pjuFKzrasAAG5bo1Ux2K2vg8RdHmMYLP2G', 'lucia@vetclick.com', 2, TRUE , "https:fotochida"),
+(3, 'carlos',   '$2b$10$LzcCUhPfyNvZPPmBD40pjuFKzrasAAG5bo1Ux2K2vg8RdHmMYLP2G', 'carlos@email.com',   3, TRUE , "https:fotochida");
 
--- Tabla: razas
+-- 3 razas (una por especie)
 INSERT INTO razas (id_raza, nombre, id_especie) VALUES
-(1, 'Labrador', 1),
-(2, 'Siames', 2),
-(3, 'Canario', 3);
+(1, 'Golden Retriever', 1),
+(2, 'Siames',           2),
+(3, 'Rex',              3);
 
--- Tabla: servicios
+-- 3 servicios
 INSERT INTO servicios (id_servicio, nombre, descripcion, id_categoria_servicio, precio, activo) VALUES
-(1, 'Consulta general', 'Control clinico de rutina', 1, 15000.00, TRUE),
-(2, 'Vacunacion', 'Aplicacion de vacuna', 1, 12000.00, TRUE),
-(3, 'Bano y corte', 'Servicio de estetica canina', 3, 9000.00, TRUE);
+(1, 'Consulta veterinaria', 'Evaluacion clinica general de la mascota', 1,  8500.00, TRUE),
+(2, 'Corte de pelo',        'Corte, banado y secado en grooming',      2,  6000.00, TRUE),
+(3, 'Vacunacion anual',     'Aplicacion de vacuna polivalente',         3,  5000.00, TRUE);
 
--- Tabla: productos
+-- 3 productos
 INSERT INTO productos (id_producto, id_marca, nombre, descripcion, activo, descuento, imagen) VALUES
-(1, 1, 'Balanceado para perro adulto', 'Presentacion 15 kg', TRUE, 0, 'img/producto-1.jpg'),
-(2, 2, 'Antipulgas gato', 'Spot-on con 3 dosis', TRUE, 10, 'img/producto-2.jpg'),
-(3, 3, 'Juguete para aves', 'Juguete de madera', FALSE, 0, NULL);
+(1, 1, 'Alimento balanceado para perros adultos', 'Racion de 15 kg de croquetas de pollo', TRUE, 10, 'img/producto-1.jpg'),
+(2, 2, 'Alimento para gatitos',                 'Racion de 3 kg sabor pescado',         TRUE,  0, 'img/producto-2.jpg'),
+(3, 3, 'Juguete interactivo para perros',       'Pelota de goma resistente',            TRUE, 15, 'img/producto-3.jpg');
 
--- Tabla: mascotas_adopcion
-INSERT INTO mascotas_adopcion (id_mascota_adopcion, nombre, id_especie, edad, sexo, descripcion, estado) VALUES
-(1, 'Toby', 1, '2 anos', 'MACHO', 'Perro mestizo, sociable', 'EN_ADOPCION'),
-(2, 'Mishi', 2, '1 anio', 'HEMBRA', 'Gata activa', 'EN_ADOPCION'),
-(3, 'Loro', 3, '4 anos', 'MACHO', 'Ave de colores', 'ADOPTADO');
+SELECT * FROM mascotas_adopcion;
+-- 3 mascotas en adopcion
+INSERT INTO mascotas_adopcion (id_mascota_adopcion, nombre, id_raza, edad, sexo, descripcion, estado , img_masc_adop) VALUES
+(1, 'Luna', 1, '2 anos',  'HEMBRA', 'Cachorra mestiza, muy sociable', 'ADOPTADO', 'https:fotochida'),
+(2, 'Toto', 2, '6 meses', 'MACHO',  'Gatito tricolor en buen estado', 'EN_ADOPCION', 'https:fotochida'),
+(3, 'Nube', 3, '1 ano',   'HEMBRA', 'Coneja blanca de pelo largo',    'EN_ADOPCION', 'https:fotochida');
 
--- Tabla: valores_atributo
+-- 3 valores de atributo
 INSERT INTO valores_atributo (id_valor, id_atributo, nombre) VALUES
-(1, 1, 'Rojo'),
-(2, 2, 'Mediana'),
-(3, 3, 'Pollo');
+(1, 1, 'Chico'),
+(2, 2, 'Marron'),
+(3, 3, '15 kg');
 
--- Tabla: variantes
+/* ---------- NIVEL 3: SEGUNDO NIVEL DE DEPENDENCIA ---------- */
+
+-- 3 variantes (una por producto)
 INSERT INTO variantes (id_variante, id_producto, id_valor_atributo, precio) VALUES
-(1, 1, 1, 25000.00),
-(2, 2, 2, 30000.00),
-(3, 3, 3, 45000.00);
+(1, 1, 1, 12500.00),
+(2, 2, 2,  9800.00),
+(3, 3, 3,  4500.00);
 
--- Tabla: productos_categorias
+-- 3 filas puente producto <-> categoria
 INSERT INTO productos_categorias (id_categoria, id_producto) VALUES
 (1, 1),
-(2, 2),
-(3, 3);
+(2, 3),
+(3, 1);
 
--- Tabla: clientes
+-- 3 clientes (el primero con usuario, los otros dos como registrados)
 INSERT INTO clientes (id_cliente, id_usuario, nombre, apellido, telefono, estado) VALUES
-(1, 3, 'Juan', 'Perez', '011-4000-1111', TRUE),
-(2, NULL, 'Maria', 'Gomez', '011-4000-2222', TRUE),
-(3, NULL, 'Pedro', 'Lopez', '011-4000-3333', FALSE);
+(1, 3,    'Carlos', 'Gomez', '01140001111', TRUE),
+(2, NULL, 'Maria',  'Lopez', '01140002222', TRUE),
+(3, NULL, 'Javier', 'Rios',  '01140003333', FALSE);
 
--- Tabla: empleados
+-- 3 empleados repartidos en distintas sucursales
 INSERT INTO empleados (id_empleado, id_usuario, id_rol_empleado, nombre, apellido, telefono, direccion, id_sucursal) VALUES
-(1, 1, 1, 'Ana', 'Gomez', '011-5000-1111', 'Av. Siempreviva 742', 1),
-(2, 2, 2, 'Luis', 'Ruiz', '011-5000-2222', 'Calle Falsa 123', 1),
-(3, NULL, 2, 'Marta', 'Lopez', '011-5000-3333', 'Av. Libertad 55', 2);
+(1, 1,    1, 'Lucia',  'Fernandez', '01143210001', 'Av. Corrientes 1450', 1),
+(2, 2,    2, 'Diego',  'Sosa',      '01143210002', 'Av. Cabildo 2345',    2),
+(3, NULL, 3, 'Carla',  'Mendez',    '01143210003', 'Ruta 8 km 12',        3);
 
--- Tabla: carrito_items
+-- 3 items de carrito
 INSERT INTO carrito_items (id_carrito, id_usuario, id_variante, cantidad) VALUES
-(1, 1, 1, 2),
-(2, 2, 2, 1),
-(3, 3, 3, 1);
+(1, 3, 1, 1),
+(2, 3, 3, 2),
+(3, 2, 2, 1);
 
--- Tabla: direcciones
+/* ---------- NIVEL 4: TERCER NIVEL DE DEPENDENCIA ---------- */
+
+-- 3 direcciones
 INSERT INTO direcciones (id_direccion, id_cliente, tipo_direccion, calle, numero, piso, departamento, localidad, provincia, codigo_postal, referencia) VALUES
-(1, 1, 'DOMICILIO', 'Av. Siempreviva', '742', NULL, NULL, 'Centro', 'Buenos Aires', '1000', 'Casa baja'),
-(2, 1, 'COMERCIO', 'Calle Comercio', '45', '2', 'A', 'Centro', 'Buenos Aires', '1001', 'Oficina'),
-(3, 2, 'DOMICILIO', 'Calle Falsa', '123', NULL, NULL, 'Norte', 'Buenos Aires', '1002', 'Timbre rojo');
+(1, 1, 'DOMICILIO', 'Av. Santa Fe',   '3250', '3',   'B',   'CABA',       'Buenos Aires', 'C1425', 'Timbre 4B'),
+(2, 1, 'COMERCIO',  'Av. 9 de Julio', '880',  NULL, NULL,   'CABA',       'Buenos Aires', 'C1070', 'Local al lado de la panaderia'),
+(3, 2, 'DOMICILIO', 'Calle 12',       '145',  NULL, 'A',   'Avellaneda', 'Buenos Aires', 'B1870', NULL);
 
--- Tabla: veterinarios
+-- 3 veterinarios
 INSERT INTO veterinarios (id_veterinario, id_empleado, especialidad) VALUES
-(1, 1, 'Clinica general'),
-(2, 2, 'Cirugia'),
-(3, 3, 'Dermatologia');
+(1, 2, 'Clinica general y dermatologia'),
+(2, 1, 'Odontologia veterinaria'),
+(3, 3, 'Nutricion y dieta');
 
--- Tabla: mascota
-INSERT INTO mascota (id_mascota, id_cliente, nombre, id_especie, id_raza, sexo, fecha_nacimiento, peso, observaciones) VALUES
-(1, 1, 'Firulais', 1, 1, 'MACHO', '2020-05-10', 25.50, 'Sin observaciones'),
-(2, 1, 'Misu', 2, 2, 'HEMBRA', '2019-11-02', 4.20, NULL),
-(3, 2, 'Rocky', 1, 1, 'MACHO', '2021-07-15', 18.00, 'Alergia a picaduras');
+-- 3 mascotas de clientes (el perro registra 2, el gato 1)
+INSERT INTO mascota (id_mascota, id_cliente, nombre, id_raza, sexo, fecha_nacimiento, peso, observaciones) VALUES
+(1, 1, 'Toby', 1, 'MACHO',  '2021-05-14', 32.50, 'Alergico a ciertos alimentos'),
+(2, 2, 'Mia',  2, 'HEMBRA', '2023-01-09',  4.20, 'Esterilizada'),
+(3, 1, 'Roco', 1, 'MACHO',  '2019-11-02', 28.00, 'En seguimiento por displasia');
 
--- Tabla: pedidos
+-- 3 pedidos en distintos estados
 INSERT INTO pedidos (id_pedido, id_cliente, fecha, estado, subtotal, costo_envio, total) VALUES
-(1, 1, '2026-01-15 10:30:00', 'PENDIENTE', 55000.00, 3000.00, 58000.00),
-(2, 2, '2026-01-16 12:00:00', 'ENVIADO', 30000.00, 2500.00, 32500.00),
-(3, 3, '2026-01-17 09:15:00', 'ENTREGADO', 45000.00, 3500.00, 48500.00);
+(1, 1, '2025-03-10 11:24:00', 'ENTREGADO', 12500.00, 1500.00, 14000.00),
+(2, 2, '2025-04-02 18:05:00', 'ENVIADO',    9800.00, 1500.00, 11300.00),
+(3, 3, '2025-04-15 09:47:00', 'PENDIENTE',  9000.00,    0.00,  9000.00);
 
--- Tabla: adopciones
+-- 3 adopciones (una completada, dos en curso)
 INSERT INTO adopciones (id_adopcion, id_cliente, id_mascota_adopcion, fecha, estado, observacion) VALUES
-(1, 1, 3, '2026-02-01', 'ADOPTADO', 'Adopcion confirmada'),
-(2, 2, 1, '2026-02-05', 'EN ADOPCION', 'En proceso de conocimiento'),
-(3, 3, 2, '2026-02-10', 'EN ADOPCION', 'Pendiente de visita');
+(1, 1, 1, '2024-12-01', 'COMPLETADA', 'Adopcion aprobada tras entrevista'),
+(2, 2, 2, '2025-04-18', 'EN_CURSO',    'Falta verificar documentacion'),
+(3, 3, 3, '2025-04-20', 'EN_CURSO',    'Entrevista programada para el viernes');
 
--- Tabla: inventario
+-- 3 registros de inventario (el ultimo por debajo del minimo)
 INSERT INTO inventario (id_inventario, id_variante, id_sucursal, stock_actual, stock_minimo) VALUES
-(1, 1, 1, 10, 3),
-(2, 2, 1, 5, 2),
-(3, 3, 2, 0, 1);
+(1, 1, 1, 40, 10),
+(2, 2, 2, 25,  8),
+(3, 3, 3,  6, 10);
 
--- Tabla: historial_medico
+/* ---------- NIVEL 5: TABLAS OPERATIVAS Y DE DETALLE ---------- */
+
+-- 3 entradas de historial medico
 INSERT INTO historial_medico (id_historial, id_mascota, id_veterinario, fecha, motivo, diagnostico, observacion) VALUES
-(1, 1, 1, '2026-01-10', 'Control anual', 'Sin novedades', 'Peso estable'),
-(2, 2, 2, '2026-01-12', 'Vacunacion', 'Aplicada sin incidencias', 'Revisar en 30 dias'),
-(3, 3, 3, '2026-01-14', 'Perdida de plumaje', 'Deficit nutricional', 'Ajustar dieta');
+(1, 1, 1, '2025-02-03', 'Control anual',         'Salud general correcta', 'Recomendado el proximo control en 12 meses'),
+(2, 3, 1, '2025-03-22', 'Dificultad para andar', 'Displasia de cadera leve', 'Derivar a radiografia si empeora'),
+(3, 2, 2, '2025-04-01', 'Dientes sucios',        'Tartaro dental grado I', 'Profilaxis recomendada');
 
--- Tabla: tratamientos
+-- 3 tratamientos (uno por historial)
 INSERT INTO tratamientos (id_tratamiento, id_historial, medicamento, dosis, frecuencia, duracion) VALUES
-(1, 1, 'Amoxicilina', '500 mg', 'Cada 12 horas', '7 dias'),
-(2, 2, 'Antiparasitario', '1 comprimido', 'Unica dosis', '1 dia'),
-(3, 3, 'Complejo vitaminico', '1 ml', 'Cada 24 horas', '14 dias');
+(1, 1, 'Antiparasitario',   '1 comprimido', 'Diaria',      '30 dias'),
+(2, 2, 'Condroprotector',   '5 mg',         'Cada 12 hrs', '60 dias'),
+(3, 3, 'Suplemento dental', '1 pastilla',   'Diaria',      '15 dias');
 
--- Tabla: vacunas
+-- 3 filas de vacunas
 INSERT INTO vacunas (id_vacuna, id_mascota, nombre, fecha_aplicacion, fecha_proxima, id_veterinario) VALUES
-(1, 1, 'Antirrabica', '2026-01-20', '2027-01-20', 1),
-(2, 2, 'Trivalente', '2026-01-21', '2027-01-21', 2),
-(3, 3, 'Peste aviar', '2026-01-22', '2026-07-22', 3);
+(1, 1, 'Polivalente anual', '2025-02-03', '2026-02-03', 1),
+(2, 3, 'Rabia',             '2025-03-22', '2026-03-22', 1),
+(3, 2, 'Triple viral',      '2025-04-01', '2026-04-01', 2);
 
--- Tabla: turnos
-INSERT INTO turnos (id_turno, id_cliente, id_mascota, id_servicio, id_sucursal, fecha, hora, motivo, estado, observaciones) VALUES
-(1, 1, 1, 1, 1, '2026-02-15', '09:00:00', 'Control anual', 'CONFIRMADO', 'Primera consulta'),
-(2, 1, 2, 2, 1, '2026-02-16', '10:30:00', 'Vacunacion', 'PENDIENTE', NULL),
-(3, 2, 3, 3, 2, '2026-02-17', '15:00:00', 'Bano y corte', 'CANCELADO', 'Cliente dejo de asistir');
+-- 3 turnos
+INSERT INTO turnos (id_turno, id_cliente, id_mascota, id_servicio, id_sucursal, id_veterinario, fecha, hora, motivo, estado, observaciones, fecha_creacion) VALUES
+(1, 1, 1, 1, 1, 1, '2025-04-25', '10:00:00', 'Control anual',    'CONFIRMADO', 'Traer cartulina de vacunas', '2025-04-20 10:00:00'),
+(2, 2, 2, 3, 2, 2, '2025-04-26', '16:30:00', 'Aplicacion de vacuna', 'PENDIENTE', NULL,                           '2025-04-21 12:15:00'),
+(3, 1, 3, 2, 3, 1, '2025-04-20', '09:00:00', 'Corte de pelo',    'FINALIZADO', 'Sin incidencias',              '2025-04-19 09:30:00');
 
--- Tabla: detalle_pedidos
+-- 3 lineas de detalle de pedido
 INSERT INTO detalle_pedidos (id_detalle_pedido, id_pedido, id_variante, cantidad, precio_unitario, subtotal) VALUES
-(1, 1, 1, 2, 25000.00, 50000.00),
-(2, 2, 2, 1, 30000.00, 30000.00),
-(3, 3, 3, 1, 45000.00, 45000.00);
+(1, 1, 1, 1, 12500.00, 12500.00),
+(2, 2, 2, 1,  9800.00,  9800.00),
+(3, 3, 3, 2,  4500.00,  9000.00);
 
--- Tabla: pagos
+-- 3 pagos
 INSERT INTO pagos (id_pago, id_pedido, metodo_pago, estado_pago) VALUES
-(1, 1, 'EFECTIVO', 'REALIZADO'),
+(1, 1, 'EFECTIVO',      'REALIZADO'),
 (2, 2, 'TRANSFERENCIA', 'REALIZADO'),
-(3, 3, 'CREDITO', 'PENDIENTE');
+(3, 3, 'DEBITO',        'PENDIENTE');
 
--- Tabla: envios
+-- 3 envios
 INSERT INTO envios (id_envio, id_pedido, tipo_entrega, id_direccion, codigo_postal, fecha_estimada, fecha_entrega, estado) VALUES
-(1, 1, 'DOMICILIO', 1, '1000', '2026-01-18', '2026-01-20', 'EN_CAMINO'),
-(2, 2, 'SUCURSAL', 2, '1001', '2026-01-19', NULL, 'EN_CAMINO'),
-(3, 3, 'PROGRAMADO', 3, '1002', '2026-01-20', '2026-01-21', 'ENTREGADO');
+(1, 1, 'DOMICILIO', 1,    'C1425', '2025-03-12', '2025-03-12', 'ENTREGADO'),
+(2, 2, 'DOMICILIO', 3,    'B1870', '2025-04-04', NULL,         'EN_CAMINO'),
+(3, 3, 'SUCURSAL',   NULL, NULL,    NULL,        NULL,         NULL);
+
+COMMIT;
+
+/* ====================================================
+   COMPROBACION FINAL
+   Debe devolver 3 filas en cada tabla.
+   ==================================================== */
+
+SELECT 'sucursales' AS tabla, COUNT(*) AS filas FROM sucursales
+UNION ALL SELECT 'atributos',             COUNT(*) FROM atributos
+UNION ALL SELECT 'permisos',              COUNT(*) FROM permisos
+UNION ALL SELECT 'rol_empleados',         COUNT(*) FROM rol_empleados
+UNION ALL SELECT 'rol_usuario',           COUNT(*) FROM rol_usuario
+UNION ALL SELECT 'especies',              COUNT(*) FROM especies
+UNION ALL SELECT 'categorias_servicios',  COUNT(*) FROM categorias_servicios
+UNION ALL SELECT 'categorias',            COUNT(*) FROM categorias
+UNION ALL SELECT 'marcas',                COUNT(*) FROM marcas
+UNION ALL SELECT 'rol_permiso',           COUNT(*) FROM rol_permiso
+UNION ALL SELECT 'usuarios',              COUNT(*) FROM usuarios
+UNION ALL SELECT 'razas',                 COUNT(*) FROM razas
+UNION ALL SELECT 'servicios',             COUNT(*) FROM servicios
+UNION ALL SELECT 'productos',             COUNT(*) FROM productos
+UNION ALL SELECT 'mascotas_adopcion',     COUNT(*) FROM mascotas_adopcion
+UNION ALL SELECT 'valores_atributo',      COUNT(*) FROM valores_atributo
+UNION ALL SELECT 'variantes',             COUNT(*) FROM variantes
+UNION ALL SELECT 'productos_categorias',  COUNT(*) FROM productos_categorias
+UNION ALL SELECT 'clientes',              COUNT(*) FROM clientes
+UNION ALL SELECT 'empleados',             COUNT(*) FROM empleados
+UNION ALL SELECT 'carrito_items',         COUNT(*) FROM carrito_items
+UNION ALL SELECT 'direcciones',           COUNT(*) FROM direcciones
+UNION ALL SELECT 'veterinarios',          COUNT(*) FROM veterinarios
+UNION ALL SELECT 'mascota',               COUNT(*) FROM mascota
+UNION ALL SELECT 'pedidos',               COUNT(*) FROM pedidos
+UNION ALL SELECT 'adopciones',            COUNT(*) FROM adopciones
+UNION ALL SELECT 'inventario',            COUNT(*) FROM inventario
+UNION ALL SELECT 'historial_medico',      COUNT(*) FROM historial_medico
+UNION ALL SELECT 'tratamientos',          COUNT(*) FROM tratamientos
+UNION ALL SELECT 'vacunas',               COUNT(*) FROM vacunas
+UNION ALL SELECT 'turnos',                COUNT(*) FROM turnos
+UNION ALL SELECT 'detalle_pedidos',       COUNT(*) FROM detalle_pedidos
+UNION ALL SELECT 'pagos',                 COUNT(*) FROM pagos
+UNION ALL SELECT 'envios',                COUNT(*) FROM envios;

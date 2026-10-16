@@ -9,13 +9,14 @@ const ClientesModel = {
   },
   obtenerMascotas: async () => {
     const [rows] = await conexion.query(`
-      SELECT m.id_mascota, m.id_cliente, m.nombre, m.id_especie, es.nombre AS especie,
-             m.id_raza, ra.nombre AS raza, m.sexo, m.fecha_nacimiento, m.peso,
+      SELECT m.id_mascota, m.id_cliente, m.nombre,
+             ra.nombre AS raza, es.nombre AS especie,
+             m.id_raza, m.sexo, m.fecha_nacimiento, m.peso,
              m.observaciones, c.nombre AS propietario
       FROM mascota m
       JOIN clientes c ON c.id_cliente = m.id_cliente
-      JOIN especies es ON es.id_especie = m.id_especie
       JOIN razas ra ON ra.id_raza = m.id_raza
+      LEFT JOIN especies es ON es.id_especie = ra.id_especie
       ORDER BY m.id_mascota
     `);
     return rows;
@@ -48,10 +49,12 @@ const ClientesModel = {
   },
   obtenerMascotasAdopcion: async () => {
     const [rows] = await conexion.query(`
-      SELECT m.id_mascota_adopcion, m.nombre, m.id_especie, e.nombre AS especie,
+      SELECT m.id_mascota_adopcion, m.nombre, m.id_raza,
+             ra.nombre AS raza, es.nombre AS especie,
              m.edad, m.sexo, m.descripcion, m.estado
       FROM mascotas_adopcion m
-      LEFT JOIN especies e ON e.id_especie = m.id_especie
+      LEFT JOIN razas ra ON ra.id_raza = m.id_raza
+      LEFT JOIN especies es ON es.id_especie = ra.id_especie
       ORDER BY m.id_mascota_adopcion
     `);
     return rows;
@@ -84,25 +87,17 @@ const ClientesModel = {
 
     return resultado;
   },
+  // La mascota se identifica solo por su raza: la especie se deduce de la
+  // raza (razas -> especies) y no se escribe. Por eso no hay que validar que
+  // "la raza pertenezca a la especie elegida": ya no hay una especie elegida.
   crearMascotas: async (mascota) => {
-    const [razas] = await conexion.query(
-      'SELECT id_especie FROM razas WHERE id_raza = ?',
-      [mascota.id_raza]
-    );
-    if (!razas.length || Number(razas[0].id_especie) !== Number(mascota.id_especie)) {
-      const error = new Error('La raza seleccionada no pertenece a la especie elegida');
-      error.status = 400;
-      throw error;
-    }
-
     const [resultado] = await conexion.query(`
-      INSERT INTO mascota (id_cliente, nombre, id_especie, id_raza, sexo, fecha_nacimiento, peso, observaciones)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO mascota (id_cliente, nombre, id_raza, sexo, fecha_nacimiento, peso, observaciones)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
       `,
       [
         mascota.id_cliente,
         mascota.nombre,
-        mascota.id_especie,
         mascota.id_raza,
         mascota.sexo ?? 'MACHO',
         mascota.fecha_nacimiento ?? new Date().toISOString().slice(0, 10),
@@ -142,7 +137,7 @@ const ClientesModel = {
 
   obtenerMascotaPorId: async (id) => {
     const [rows] = await conexion.query(
-      `SELECT m.id_mascota, m.id_cliente, m.nombre, m.id_especie, m.id_raza, m.sexo,
+      `SELECT m.id_mascota, m.id_cliente, m.nombre, m.id_raza, m.sexo,
               m.fecha_nacimiento, m.peso, m.observaciones
        FROM mascota m
        WHERE m.id_mascota = ?`,
@@ -151,22 +146,8 @@ const ClientesModel = {
     return rows[0] || null;
   },
 
-  // Verifica que la raza pertenezca a la especie elegida, igual que al crear.
-  // Si la combinacion no coincide, MySQL la aceptaria y dejaria datos inconsistentes.
-  validarRazaDeEspecie: async (idEspecie, idRaza) => {
-    const [razas] = await conexion.query(
-      'SELECT id_especie FROM razas WHERE id_raza = ?',
-      [idRaza]
-    );
-    if (!razas.length || Number(razas[0].id_especie) !== Number(idEspecie)) {
-      const error = new Error('La raza seleccionada no pertenece a la especie elegida');
-      error.status = 400;
-      throw error;
-    }
-  },
-
   actualizarMascota: async (id, datos) => {
-    const permitidos = ['id_cliente', 'nombre', 'id_especie', 'id_raza', 'sexo',
+    const permitidos = ['id_cliente', 'nombre', 'id_raza', 'sexo',
                         'fecha_nacimiento', 'peso', 'observaciones'];
     const columnas = permitidos.filter(campo => datos[campo] !== undefined);
 

@@ -189,6 +189,10 @@
               data-relation="sucursales" data-relation-field="id_sucursal" autocomplete="off">
             <datalist id="turno-sucursales"></datalist></label>
           <input type="hidden" name="id_sucursal" data-relation-value="id_sucursal">
+          <label>Veterinario<input data-modal-field name="veterinario_busqueda" list="turno-veterinarios"
+              data-relation="veterinarios" data-relation-field="id_veterinario" autocomplete="off">
+            <datalist id="turno-veterinarios"></datalist></label>
+          <input type="hidden" name="id_veterinario" data-relation-value="id_veterinario">
           <label>Motivo<input data-modal-field name="motivo"></label><label>Estado<select data-modal-field name="estado">
               <option value="PENDIENTE">Pendiente</option>
               <option value="CONFIRMADO">Confirmado</option>

@@ -94,20 +94,13 @@ module.exports = {
       if (!limpio.nombre) throw errorValidacion('El nombre de la mascota es obligatorio');
     }
 
-    // Especie y raza llegan juntas desde el modal, asi que se validan en bloque.
-    const tocaEspecie = datos.id_especie !== undefined && datos.id_especie !== '';
-    const tocaRaza = datos.id_raza !== undefined && datos.id_raza !== '';
-
-    if (tocaEspecie || tocaRaza) {
-      const idEspecie = Number(datos.id_especie);
+    // La mascota se identifica solo por su raza: la especie se deduce de ella.
+    if (datos.id_raza !== undefined && datos.id_raza !== '') {
       const idRaza = Number(datos.id_raza);
-      if (!Number.isInteger(idEspecie) || idEspecie <= 0 || !Number.isInteger(idRaza) || idRaza <= 0) {
-        throw errorValidacion('Debe seleccionar una especie y una raza válidas');
+      if (!Number.isInteger(idRaza) || idRaza <= 0) {
+        throw errorValidacion('Debe seleccionar una raza válida');
       }
-      limpio.id_especie = idEspecie;
       limpio.id_raza = idRaza;
-      // Delegamos la coherencia al modelo, igual que en crearMascotas.
-      await ClientesModel.validarRazaDeEspecie(idEspecie, idRaza);
     }
 
     if (datos.sexo !== undefined && datos.sexo !== '') {

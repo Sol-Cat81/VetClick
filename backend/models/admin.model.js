@@ -84,7 +84,7 @@ const inserciones = {
   mascotaAdopcion: {
     tabla: 'mascotas_adopcion',
     clave: 'id_mascota_adopcion',
-    campos: ['nombre', 'id_especie', 'edad', 'sexo', 'descripcion', 'estado'],
+    campos: ['nombre', 'id_raza', 'edad', 'sexo', 'descripcion', 'estado'],
     requeridos: ['nombre', 'sexo', 'estado']
   },
   productoCategoria: {
@@ -112,7 +112,7 @@ const inserciones = {
   turno: {
     tabla: 'turnos',
     clave: 'id_turno',
-    campos: ['id_cliente', 'id_mascota', 'id_servicio', 'id_sucursal', 'fecha', 'hora', 'motivo', 'estado', 'observaciones'],
+    campos: ['id_cliente', 'id_mascota', 'id_servicio', 'id_sucursal', 'id_veterinario', 'fecha', 'hora', 'motivo', 'estado', 'observaciones'],
     requeridos: ['id_mascota', 'id_servicio', 'fecha', 'hora']
   },
   historial: {
@@ -243,7 +243,9 @@ const referencias = {
   veterinario: [{ campo: 'id_empleado', tabla: 'empleados', clave: 'id_empleado' }],
   usuario: [{ campo: 'id_rol_usuario', tabla: 'rol_usuario', clave: 'id_rol_usuario' }],
   raza: [{ campo: 'id_especie', tabla: 'especies', clave: 'id_especie' }],
-  mascotaAdopcion: [{ campo: 'id_especie', tabla: 'especies', clave: 'id_especie' }],
+  // La ficha se identifica por su raza, igual que una mascota de cliente. La
+  // especie no se escribe: se deduce de la raza (razas -> especies).
+  mascotaAdopcion: [{ campo: 'id_raza', tabla: 'razas', clave: 'id_raza' }],
   adopcion: [
     { campo: 'id_cliente', tabla: 'clientes', clave: 'id_cliente' },
     { campo: 'id_mascota_adopcion', tabla: 'mascotas_adopcion', clave: 'id_mascota_adopcion' }
@@ -262,7 +264,10 @@ const referencias = {
     { campo: 'id_cliente', tabla: 'clientes', clave: 'id_cliente' },
     { campo: 'id_mascota', tabla: 'mascota', clave: 'id_mascota' },
     { campo: 'id_servicio', tabla: 'servicios', clave: 'id_servicio' },
-    { campo: 'id_sucursal', tabla: 'sucursales', clave: 'id_sucursal' }
+    { campo: 'id_sucursal', tabla: 'sucursales', clave: 'id_sucursal' },
+    // El veterinario es opcional: un turno se puede agendar sin asignar a quien
+    // lo atiende, y el turno tiene que quedar igual de visible.
+    { campo: 'id_veterinario', tabla: 'veterinarios', clave: 'id_veterinario' }
   ],
   historial: [
     { campo: 'id_mascota', tabla: 'mascota', clave: 'id_mascota' },
@@ -322,7 +327,11 @@ const ENUMERACIONES = {
   envio: {
     tipo_entrega: ['DOMICILIO', 'SUCURSAL', 'PROGRAMADO'],
     estado: ['EN_CAMINO', 'ENTREGADO']
-  }
+  },
+  // adopciones.estado es VARCHAR, no ENUM: MySQL no lo restringe. Sin esta
+  // lista el panel podia guardar cualquier texto (incluidos los valores viejos
+  // 'ADOPTADO'/'EN ADOPCION') y el mismo tramite quedaba con dos vocabularios.
+  adopcion: { estado: ['EN_CURSO', 'COMPLETADA', 'CANCELADA'] }
 };
 
 // De las columnas ENUM de una entidad, cual es la que representa el estado por
@@ -555,6 +564,11 @@ const borrados = {
   rol: {
     tabla: 'rol_empleados',
     clave: 'id_rol_empleado',
+    // Que clave foranea recibe el destino de la reasignacion, y como se llama
+    // esa fila en los mensajes. Cada entidad que reasigna declara las suyas:
+    // el rol de un empleado y la sucursal de una no comparten nombre.
+    destinoCampo: 'id_rol_empleado_destino',
+    destinoEtiqueta: 'rol',
     bloqueantes: [],
     // empleados.id_rol_empleado es NOT NULL: un empleado esta obligado a tener
     // rol, asi que no hay desasociacion posible como con el veterinario. Hay
@@ -614,6 +628,40 @@ const borrados = {
     clave: 'id_permiso',
     bloqueantes: [],
     cascada: [{ tabla: 'rol_permiso', clave: 'id_permiso', columna: 'id_permiso', etiqueta: 'asignación de permiso' }]
+  },
+  // ------------------------------------------------------------------
+  // Inventario
+  // ------------------------------------------------------------------
+  // `stock` (inventario) no tiene entrada a proposito: un registro de stock no
+  // se borra, se ajusta. El panel lo declara con data-sin-borrado para que no
+  // ofrezca el boton, y sin esta entrada el DELETE a mano responde 404 en vez
+  // de dejar pasar una operacion que el panel esconde por una razon de negocio.
+  sucursal: {
+    tabla: 'sucursales',
+    clave: 'id_sucursal',
+    destinoCampo: 'id_sucursal_destino',
+    destinoEtiqueta: 'sucursal',
+    // Un turno es una atencion ya tomada. Que el local cierre no convierte ese
+    // turno en un registro sobrante, asi que se bloquea en vez de arrastrarlo.
+    bloqueantes: [
+      { tabla: 'turnos', columna: 'id_sucursal', etiqueta: 'turno' }
+    ],
+    // Un empleado no puede quedarse sin sucursal porque el panel lo decidio por
+    // el: el modal lista con nombre y apellido a quienes hay que mover y exige
+    // elegir destino antes de borrar.
+    reasignar: [{
+      tabla: 'empleados',
+      clave: 'id_empleado',
+      columna: 'id_sucursal',
+      etiqueta: 'empleado',
+      etiquetaSql: "CONCAT(nombre, ' ',apellido)"
+    }],
+    // El stock si es configuracion del local: si la sucursal se va, sus
+    // registros de inventario se van con ella.
+    cascada: [
+      { tabla: 'inventario', clave: 'id_inventario', columna: 'id_sucursal',
+        etiqueta: 'registro de stock' }
+    ]
   }
 };
 
@@ -1092,24 +1140,31 @@ const AdminModel = {
     }
 
     // Reasignar antes de borrar: el destino tiene que existir y ser otro.
+    // Cada entidad declara con que nombre llega el destino (`destinoCampo`) y
+    // como se llama esa fila en los mensajes (`destinoEtiqueta`), porque un rol
+    // y una sucursal no comparten nombre ni tabla.
+    const campoDestino = configuracion.destinoCampo || 'id_rol_empleado_destino';
+    const nombreDestino = configuracion.destinoEtiqueta || 'rol';
     let destino = null;
     for (const pendiente of plan.reasignar) {
-      const idDestino = Number(datos.id_rol_empleado_destino);
+      const idDestino = Number(datos[campoDestino]);
       if (!Number.isInteger(idDestino) || idDestino <= 0) {
         const error = new Error(
           `Este registro tiene ${pendiente.cantidad} ${pendiente.etiqueta}${pendiente.cantidad === 1 ? '' : 's'}: `
-          + 'indicá a qué rol se reasignan antes de eliminar'
+          + `indicá a qué ${nombreDestino} se reasignan antes de eliminar`
         );
         error.status = 400;
         throw error;
       }
       if (idDestino === Number(id)) {
-        const error = new Error('El rol destino debe ser distinto del que se está eliminando');
+        const error = new Error(
+          `El ${nombreDestino} destino debe ser distinto del que se está eliminando`
+        );
         error.status = 400;
         throw error;
       }
       if (!await existeRegistro(configuracion.tabla, configuracion.clave, idDestino, db)) {
-        const error = new Error('El rol destino no existe');
+        const error = new Error(`El ${nombreDestino} destino no existe`);
         error.status = 400;
         throw error;
       }
@@ -1123,9 +1178,10 @@ const AdminModel = {
     try {
       if (propia) await ejecutora.beginTransaction();
 
-      // 1) Reasignar: los empleados con este rol reciben el nuevo.
-      //    Se recorren los nodos de la configuracion, no los del plan: el plan
-      //    es para el frontend y lleva solo etiqueta y cantidad, no las columnas.
+      // 1) Reasignar: las filas que colgaban del registro eliminado reciben el
+      //    destino elegido. Se recorren los nodos de la configuracion, no los del
+      //    plan: el plan es para el frontend y lleva solo etiqueta y cantidad,
+      //    no las columnas.
       for (const nodo of configuracion.reasignar || []) {
         if (!await contarHijos(nodo, id, ejecutora)) continue;
         await ejecutora.query(

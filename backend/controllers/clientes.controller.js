@@ -36,11 +36,10 @@ const crearCliente = async (req, res) => {
 
 const crearMascotas = async(req, res)=>{
   const idCliente = Number(req.body?.id_cliente);
-  const idEspecie = Number(req.body?.id_especie);
   const idRaza = Number(req.body?.id_raza);
-  if (![idCliente, idEspecie, idRaza].every(id => Number.isInteger(id) && id > 0)) {
+  if (![idCliente, idRaza].every(id => Number.isInteger(id) && id > 0)) {
     return res.status(400).json({
-      mensaje: 'Debe seleccionar un propietario, una especie y una raza válidos'
+      mensaje: 'Debe seleccionar un propietario y una raza válidos'
     });
   }
   const nombre = String(req.body?.nombre ?? '').trim();
@@ -56,7 +55,6 @@ const crearMascotas = async(req, res)=>{
     const resultado = await service.crearMascotas({
       ...req.body,
       id_cliente: idCliente,
-      id_especie: idEspecie,
       id_raza: idRaza,
       nombre,
       sexo,

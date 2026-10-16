@@ -237,7 +237,6 @@ document.addEventListener('submit', async (e)=>{
 
   const nombreMascota = formularioMascota.paciente?.value?.trim() || formularioMascota.nombre?.value?.trim();
   const idCliente = Number(formularioMascota.querySelector('[name="id_cliente"]')?.value);
-  const idEspecie = Number(formularioMascota.querySelector('[name="id_especie"]')?.value);
   const idRaza = Number(formularioMascota.querySelector('[name="id_raza"]')?.value);
 
   if (!nombreMascota) {
@@ -249,15 +248,14 @@ document.addEventListener('submit', async (e)=>{
     formularioMascota.querySelector('[name="propietario"]')?.focus();
     return;
   }
-  if (!Number.isInteger(idEspecie) || idEspecie <= 0 || !Number.isInteger(idRaza) || idRaza <= 0) {
-    alert('Selecciona una especie y una raza de las sugerencias.');
+  if (!Number.isInteger(idRaza) || idRaza <= 0) {
+    alert('Selecciona una raza de las sugerencias.');
     return;
   }
 
   const datos = {
     id_cliente: idCliente,
     nombre: nombreMascota,
-    id_especie: idEspecie,
     id_raza: idRaza,
     sexo: formularioMascota.sexo?.value || 'MACHO',
     fecha_nacimiento: formularioMascota.fecha_nacimiento?.value || null,
@@ -367,7 +365,7 @@ async function cargarMascotasAdopcion(){
       <tr data-id="${escaparHtml(mascota.id_mascota_adopcion)}">
         <td>${escaparHtml(mascota.id_mascota_adopcion)}</td>
         <td>${escaparHtml(mascota.nombre)}</td>
-        <td>${escaparHtml(mascota.especie || '—')}</td>
+        <td>${escaparHtml(mascota.raza || '—')}</td>
         <td>${escaparHtml(mascota.edad || '—')}</td>
         <td><span class="status ${mascota.estado === 'ADOPTADO' ? 'success' : 'warning'}">${escaparHtml(mascota.estado || '—')}</span></td>
       </tr>
@@ -454,9 +452,8 @@ async function prepararFormularioMascota(id, modal){
   form.elements.observaciones.value      = mascota.observaciones ?? '';
 
   const opciones = await opcionesParaEditar();
-  await asignarRelacion(opciones, form, 'especie_busqueda', 'id_especie', 'especies', mascota.id_especie);
-  // La raza va después de la especie porque su datalist se filtra por
-  // data-relation-parent="id_especie": al revés se borraría sola.
+  // La mascota se identifica solo por su raza. La especie no se elige: se deduce
+  // de la raza y el listado la muestra ya resuelta.
   await asignarRelacion(opciones, form, 'raza_busqueda', 'id_raza', 'razas', mascota.id_raza);
 
   // El propietario NO usa admin/opciones: su datalist se arma con
@@ -550,7 +547,7 @@ async function prepararFormularioMascotaAdopcion(id, modal){
   form.elements.estado.value      = mascota.estado ?? '';
 
   const opciones = await opcionesParaEditar();
-  await asignarRelacion(opciones, form, 'especie_busqueda', 'id_especie', 'especies', mascota.id_especie);
+  await asignarRelacion(opciones, form, 'raza_busqueda', 'id_raza', 'razas', mascota.id_raza);
 
   try{ await prepararRelaciones(form); }catch(error){ /* no es crítico */ }
 }
@@ -634,7 +631,8 @@ detalleEntidades['adopción'] = {
     { campo: 'cliente', etiqueta: 'Cliente' },
     { campo: 'mascota', etiqueta: 'Mascota' },
     { campo: 'fecha', etiqueta: 'Fecha', fecha: true },
-    { campo: 'estado', etiqueta: 'Estado' },
+    { campo: 'estado', etiqueta: 'Estado', enumeracion: ['EN_CURSO', 'COMPLETADA', 'CANCELADA'],
+      etiquetas: ['En curso', 'Completada', 'Cancelada'] },
     { campo: 'observacion', etiqueta: 'Observación', texto: true }
   ]
 };
@@ -645,6 +643,7 @@ detalleEntidades['mascota en adopción'] = {
   campos: [
     { campo: 'id_mascota_adopcion', etiqueta: 'ID' },
     { campo: 'nombre', etiqueta: 'Nombre' },
+    { campo: 'raza', etiqueta: 'Raza' },
     { campo: 'especie', etiqueta: 'Especie' },
     { campo: 'edad', etiqueta: 'Edad' },
     { campo: 'sexo', etiqueta: 'Sexo', enumeracion: ['MACHO', 'HEMBRA'], etiquetas: ['Macho', 'Hembra'] },
