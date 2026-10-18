@@ -34,6 +34,9 @@ const entidadApi = {
 // pide reasignar, y como se llama esa fila en los textos del modal. El backend
 // usa las mismas dos piezas (`destinoEtiqueta` en `borrados`), asi que el nombre
 // del campo que viaja en el DELETE sale de `confirmarBorrado()`.
+// Marca y atributo ya no reasignan: sus hijas se van en cascada y el modal solo
+// las anuncia. Quedan aca las dos entidades que de verdad exigen un destino,
+// porque la columna de la hija es NOT NULL y no se puede dejar a medio camino.
 const DESTINOS_REASIGNACION = {
   rol: { opciones: 'rolesEmpleados', etiqueta: 'rol', campo: 'id_rol_empleado_destino' },
   sucursal: { opciones: 'sucursales', etiqueta: 'sucursal', campo: 'id_sucursal_destino' }
@@ -667,6 +670,8 @@ async function avanzarEstado(entity, id, fila) {
 
 // Decide qué endpoints debe cargar según las tablas presentes en la vista actual.
 function cargarDatosDeVista() {
+  // El dashboard no tiene data-panel: es una vista sin barra de subsecciones.
+  if (document.querySelector('[data-dash="ventas-total"]')) cargarDashboard();
   if (document.querySelector('[data-panel="clientes"]')) {
     cargarClientes();
     cargarMascotas();
@@ -753,14 +758,18 @@ async function abrirConfirmacionBorrado({ entity, id, plan, fila }) {
     .join('');
 
   // 2) Lo que se suelta pero sobrevive. Own block, own wording: desasociar no
-  //    es borrar, y decirlo con la misma lista roja seria mentir.
+  //    es borrar, y decirlo con la misma lista roja seria mentir. `sobreviven`
+  //    se suma en la misma lista: tambien sobrevive, pero el backend no toca
+  //    la base para anunciarlo (la FK vivia en la fila que se borra).
   const bloqueDesasociar = modal.querySelector('[data-confirmar-desasociar]');
   const listaDesasociar = modal.querySelector('[data-confirmar-lista-desasociar]');
   const sueltos = plan.desasociar || [];
-  bloqueDesasociar.hidden = sueltos.length === 0;
-  listaDesasociar.innerHTML = sueltos
-    .map(item => `<li>${escaparHtml(pluralizar(item.etiqueta, item.cantidad))} sobrevivirá${item.cantidad === 1 ? '' : 'n'}, con su historial intacto</li>`)
-    .join('');
+  const sobreviven = plan.sobreviven || [];
+  bloqueDesasociar.hidden = sueltos.length === 0 && sobreviven.length === 0;
+  listaDesasociar.innerHTML = [
+    ...sueltos.map(item => `<li>${escaparHtml(pluralizar(item.etiqueta, item.cantidad))} sobrevivirá${item.cantidad === 1 ? '' : 'n'}, con su historial intacto</li>`),
+    ...sobreviven.map(item => `<li>${escaparHtml(pluralizar(item.etiqueta, item.cantidad))} sobrevivirá${item.cantidad === 1 ? '' : 'n'}, ya sin vínculo con este registro</li>`)
+  ].join('');
 
   // 3) Lo que hay que resolver antes de poder borrar.
   await prepararReasignacion(modal, entity, id, plan);

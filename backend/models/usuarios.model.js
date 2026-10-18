@@ -8,7 +8,7 @@ class Usuario {
     }
 
     static async traerUsuario(idUsuario) {
-        const query = 'SELECT username, email FROM usuarios WHERE id_usuario = ?;'
+        const query = 'SELECT username, email , img_usuario FROM usuarios WHERE id_usuario = ?;'
         const [usuario] = await db.execute(query, [idUsuario])
         return usuario
     }
@@ -30,6 +30,17 @@ class Usuario {
         const [cliente] = await db.execute(query, [id_usuario])
         return cliente
     }
+
+    static async actualizarImagenUsuario(id_usuario , imagen){
+        try{
+            const query = 'UPDATE usuarios SET img_usuario = ? WHERE id_usuario = ?'
+            const [resultado] = await db.execute(query, [imagen,id_usuario])
+            return true;
+        }catch (error){
+            console.error('error al guardar la imagen del usuario: ' , error)
+            return false;
+        }
+    };
 
     static async guardarCliente(idUsuario, nombre, apellido, telefono) {
         try {
