@@ -4,10 +4,29 @@ const db = require("./../config/database");
 // bcrypt compara y genera hashes sin guardar contraseñas en texto plano.
 const bcrypt = require("bcryptjs");
 
+const cloudinary = require('cloudinary').v2;
+
+const subirImagen = async (archivo, carpeta, nombrePublico) => {
+  if (!archivo) return null;
+  const resultado = await cloudinary.uploader.upload(
+    `data:${archivo.mimetype};base64,${archivo.buffer.toString('base64')}`,
+    {
+      folder: carpeta,
+      resource_type: 'image',
+      public_id: nombrePublico || undefined,
+      invalidate: Boolean(nombrePublico)
+    }
+  );
+  return resultado.secure_url;
+};
+
+const carpetaUsuarios = () => process.env.CLOUDINARY_FOLDER_PERFILES_USUARIOS || 'VetClick/PerfilesUsuario';
+
 const {
   traerInfoUsuario,
   guardarCrearCliente,
-  trerDirecciones
+  trerDirecciones,
+  guardarImagenUsuario
 } = require("../service/usuarios.service");
 
 // Comprueba email y contraseña y devuelve únicamente datos públicos del usuario.
@@ -36,7 +55,7 @@ const verificarUsuario = async (req, res) => {
         // No revelamos si falló el email o la contraseña.
         return res
           .status(401)
-          .json({ mensaje: "El email o la contraseña es incorrecto." });
+          .json({ message: "El email o la contraseña es incorrecto." });
       }
 
       // ACCESS TOKEN Y REFRESH
@@ -74,7 +93,7 @@ const verificarUsuario = async (req, res) => {
       });
 
       res.status(200).json({
-        mensaje: "usuario validado",
+        message: "usuario validado",
         usuario: {
           id: usuarioEncontrado.id_usuario,
           name: usuarioEncontrado.username,
@@ -84,16 +103,16 @@ const verificarUsuario = async (req, res) => {
     } else if (usuarioSession.length > 1) {
       // La columna email debería ser única; más de un resultado indica un problema de datos.
       console.error("Error: Múltiples usuarios con el mismo email");
-      res.status(500).json({ mensaje: "Hubo un error en el servidor" });
+      res.status(500).json({ message: "Hubo un error en el servidor" });
     } else {
       return res
         .status(401)
-        .json({ mensaje: "El email o la contraseña es incorrecto." });
+        .json({ message: "El email o la contraseña es incorrecto." });
     }
   } catch (error) {
-    // Registramos el detalle en backend y damos un mensaje genérico al cliente.
+    // Registramos el detalle en backend y damos un message genérico al cliente.
     console.error("Error en el login:", error);
-    res.status(500).json({ mensaje: "Hubo un error en el servidor" });
+    res.status(500).json({ message: "Hubo un error en el servidor" });
   }
 };
 
@@ -114,13 +133,13 @@ const registrarUsuario = async (req, res) => {
     );
 
     if (usuariosEncontrados.length > 0) {
-      return res.status(400).json({ mensaje: "Este gmail ya esta registrado" });
+      return res.status(400).json({ message: "Este gmail ya esta registrado" });
     }
 
     if (nombreUsuarioEncontrados.length > 0) {
       return res
         .status(400)
-        .json({ mensaje: "Este nombre de usuario ya esta en uso" });
+        .json({ message: "Este nombre de usuario ya esta en uso" });
     }
 
     // Generamos un hash con coste 10; el texto original nunca se guarda.
@@ -132,11 +151,11 @@ const registrarUsuario = async (req, res) => {
       [usuario, gmail, hashPassword, 3],
     );
 
-    res.status(201).json({ mensaje: "Registro exitoso, puede iniciar sesion" });
+    res.status(201).json({ message: "Registro exitoso, puede iniciar sesion" });
   } catch (error) {
     // Informamos el error en logs y no exponemos datos internos.
     console.error("Error en el registro:", error);
-    res.status(500).json({ mensaje: "Hubo un error en el servidor" });
+    res.status(500).json({ message: "Hubo un error en el servidor" });
   }
 };
 
@@ -145,7 +164,7 @@ const detectarsession = async (req, res) => {
   const token = req.cookies.token_veterinaria;
 
   if (!token) {
-    return res.status(401).json({ mensaje: "No hay token" });
+    return res.status(401).json({ message: "No hay token" });
   }
 
   try {
@@ -157,17 +176,17 @@ const detectarsession = async (req, res) => {
     const usuario = decoded.usuario
     const rol = decoded.rol;
 
-    res.json({ mensaje: "Acceso concedido", usuario: decoded });
+    res.json({ message: "Acceso concedido", usuario: decoded });
   } catch (error) {
     // Si el token expiró o fue alterado, lanzará un error
-    res.status(401).json({ mensaje: "Token inválido o expirado" });
+    res.status(401).json({ message: "Token inválido o expirado" });
   }
 };
 
 const logout = async (req, res) => {
   res.clearCookie('token_veterinaria');
   res.clearCookie('refresh_veterinaria');
-  res.status(200).json({ mensaje: "Sesión cerrada correctamente" });
+  res.status(200).json({ message: "Sesión cerrada correctamente" });
 };
 
 const refreshToken = async (req, res) => {
@@ -175,7 +194,7 @@ const refreshToken = async (req, res) => {
 
   if (!refresh) {
     return res.status(401).json({
-      mensaje: "No hay refresh token",
+      message: "No hay refresh token",
     });
   }
 
@@ -203,12 +222,12 @@ const refreshToken = async (req, res) => {
     });
 
     return res.status(200).json({
-      mensaje: "Access token renovado",
+      message: "Access token renovado",
     });
 
   } catch (error) {
     return res.status(401).json({
-      mensaje: "Refresh token inválido o expirado",
+      message: "Refresh token inválido o expirado",
     });
   }
 };
@@ -220,9 +239,9 @@ const guardarCliente = async (req, res) => {
   const resultado = await guardarCrearCliente(idUsuario, nombre, apellido, telefono, username);
 
   if (resultado) {
-    res.status(201).json({ mensaje: "Cliente guardado correctamente" });
+    res.status(201).json({ message: "Cliente guardado correctamente" });
   } else {
-    res.status(401).json({ mensaje: "No se pudo guardar el cliente" })
+    res.status(401).json({ message: "No se pudo guardar el cliente" })
   }
 };
 
@@ -231,7 +250,7 @@ const traerClienteUsuario = async (req, res) => {
   const info = await traerInfoUsuario(idUsuario)
 
   if (!info) {
-    res.status(500).json({ mensaje: "Hubo un error con el sevidor" })
+    res.status(500).json({ message: "Hubo un error con el sevidor" })
   } else {
     res.status(201).json({ info })
   }
@@ -240,12 +259,32 @@ const traerClienteUsuario = async (req, res) => {
 const traerDireccionesCliente = async (req, res) => {
   const idUsuario = req.usuario.id;
   const direcciones = await trerDirecciones(idUsuario);
-  if(!direcciones){
-    res.status(404).json({mensaje: "No hay direcciones registradas"})
-  }else{
+  if (!direcciones) {
+    res.status(404).json({ message: "No hay direcciones registradas" })
+  } else {
     res.status(201).json(direcciones)
   }
 }
+
+const cambiarFotoPerfil = async (req , res)=>{
+  const idUsuario = req.usuario.id;
+  const archivo = req.file;
+
+  if (!archivo){
+    return res.status(400).json({message: 'no recibio ninguna imagen'});
+  }
+
+  const nombreArchivo = `${carpetaUsuarios()}/usuario_${idUsuario}`;
+
+  try{
+    const imagen = await subirImagen(archivo,carpetaUsuarios(),nombreArchivo);
+    await guardarImagenUsuario(idUsuario, imagen);
+    res.json({message: 'foto actualizada correctamente', imagen});
+  }catch(error){
+    console.error('error al cambiar la foto de perfil ', error);
+    res.status(400).json({mensaje: error.message || 'no se pudo guardar la foto'})
+  }
+} 
 
 module.exports = {
   verificarUsuario,
@@ -255,5 +294,6 @@ module.exports = {
   refreshToken,
   guardarCliente,
   traerClienteUsuario,
-  traerDireccionesCliente
+  traerDireccionesCliente,
+  cambiarFotoPerfil
 };

@@ -4,6 +4,18 @@ const abrirAside = document.querySelector('.abrir-aside');
 const cerrarAside = document.querySelector('.cerrar-nav');
 const aside = document.querySelector('#aside')
 
+const FOTO_POR_DEFECTO = '../assets/img/ChatGPT-Image.png';
+const LIMITE_MEGABYTES = 5;
+const TIPOS_ACEPTADOS = ['image/jpeg', 'image/png', 'image/webp'];
+
+const btnCambiarFoto = document.getElementById('btnCambiarFoto');
+const inputFotoUsuario = document.getElementById('inputFotoUsuario');
+const modalFoto = document.getElementById('modalFoto');
+const imagenRecorte = document.getElementById('imagenRecorte');
+const guardarFoto = document.getElementById('guardarFoto');
+const fotoUsuario = document.getElementById('fotoUsuario');
+let recorte = null; 
+
 const navegarHistorial = document.querySelector('.filtrar-historial')
 const contenidoHistorial = document.querySelectorAll('article')
 
@@ -91,6 +103,9 @@ function cargarFormUsuario(info) {
     document.getElementById('nombre').value = info.cliente?.nombre ?? ''
     document.getElementById('apellido').value = info.cliente?.apellido ?? ''
     document.getElementById('telefono').value = info.cliente?.telefono ?? ''
+    // La foto viene en el mismo SELECT que el username y el email. Sin esto, la
+    // de arriba se veria recien despues de guardar una foto nueva.
+    fotoUsuario.src = info.usuario.img_usuario || FOTO_POR_DEFECTO
 }
 
 async function renovarToken() {
@@ -185,3 +200,100 @@ formUsuario.addEventListener('submit', async (evento) => {
     }
 
 })
+
+function abrirModalFoto(){
+    modalFoto.classList.add('abierto');
+    modalFoto.setAttribute('aria-hidden', 'false');
+    guardarFoto.disabled = true;
+}
+
+function cerrarModalFoto(){
+    if(recorte){
+        recorte.destroy(); recorte = null;
+    }
+    modalFoto.classList.remove('abierto');
+    modalFoto.setAttribute('aria-hidden', 'true');
+    inputFotoUsuario.value = '';
+}
+
+btnCambiarFoto.addEventListener('click', () => inputFotoUsuario.click());
+document.getElementById('cancelarFoto').addEventListener('click', cerrarModalFoto);
+document.getElementById('cerrarModalFoto').addEventListener('click', cerrarModalFoto);
+modalFoto.addEventListener('click', (evento) => {
+    if (evento.target === modalFoto) cerrarModalFoto();
+});
+
+inputFotoUsuario.addEventListener('change', ()=>{
+    const archivo = inputFotoUsuario.files[0];
+    if(!archivo)return;
+
+    const extensiones = TIPOS_ACEPTADOS.map(tipo => tipo.split('/')[1]);
+    if(!TIPOS_ACEPTADOS.includes(archivo.type)){
+        mostrarToast(`esa imagen no sirve pe usa ${extensiones.join(', ')}`, 'error');
+        inputFotoUsuario.value = '';
+        return;
+    }
+    if(archivo.size > LIMITE_MEGABYTES * 1024 * 1024){
+        mostrarToast(`la imagen pesa ${(archivo.size / 1024 /1024).toFixed(1)} MB y el macximo es ${LIMITE_MEGABYTES} MB`, 'error');
+        inputFotoUsuario.value = '';
+        return;
+    }
+
+    const lector = new FileReader();
+    lector.onload = () =>{
+        imagenRecorte.src = lector.result;
+        abrirModalFoto();
+        if(recorte) recorte.destroy();
+        recorte = new Cropper(imagenRecorte, {
+            aspectRatio: 1,       // el avatar es un cuadrado de 80px
+            viewMode: 1,
+            autoCropArea: 1,
+            dragMode: 'move',
+            cropperMovable: false, // no se puede encoger el recorte por debajo
+            cropperScalable: false,
+            ready: () => { guardarFoto.disabled = false; }
+        });
+    };
+    lector.readAsDataURL(archivo);
+});
+
+guardarFoto.addEventListener('click', async()=>{
+    if(!recorte) return;
+    guardarFoto.disabled = true;
+
+    recorte.getCroppedCanvas().toBlob(async(blob)=>{
+        if (!blob){guardarFoto.disabled = false; return;}
+
+        const datos = new FormData();
+        datos.append('imagen_usuario', blob, 'perfil.jpg');
+
+        try{
+            let enviar = await fetch(`${apiUsuario}/perfil/foto`,{
+                method:'POST',
+                credentials: 'include',
+                body: datos
+            });
+            if (enviar.status === 401){
+                if (renovarToken()){
+                    enviar = await fetch(`${apiUsuario}/perfil/foto`,{
+                        method: 'POST',
+                        credentials: 'include',
+                        body: datos
+                    });
+                }
+            }
+            const confirmacion = await enviar.json();
+            if (enviar.ok){
+                fotoUsuario.src = `${confirmacion.imagen}?v=${Date.now()}`;
+                cerrarModalFoto();
+                mostrarToast('foto actualizada', 'exito');
+            }else{
+                mostrarToast(confirmacion.mensaje || 'no se pudo guardar la foto', 'error');
+                guardarFoto.disabled = false;
+            }
+        }catch (error){
+            mostrarToast('hubo un problema con el servidor', 'error');
+            guardarFoto.disabled = false;
+        }
+    },'image/jpeg', 0.9);
+});

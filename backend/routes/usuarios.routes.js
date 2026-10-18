@@ -1,5 +1,6 @@
 // Router para login, registro y listado de usuarios.
 const express = require('express');
+const multer = require ('multer');
 const router = express.Router();
 const UsuarioService = require('../service/personal.service')
 const { authMiddleware } = require('./../middlewares/auth')
@@ -11,8 +12,28 @@ const {
     refreshToken, 
     guardarCliente,
     traerClienteUsuario,
-    traerDireccionesCliente
+    traerDireccionesCliente,
+    cambiarFotoPerfil
 } = require('./../controllers/usuarios.controller');
+
+const upload = multer({
+    storage: multer.memoryStorage(),
+    limits:{
+        fileSize: 5 * 1024 * 1024
+    },
+    fileFilter: (req , file , cb)=>{
+        if(file && !file.mimetype.startsWith('image/')){
+            return cb(new Error('el  archivo debe ser una imagen '));
+        }
+        cb (null, true);
+    }
+});
+
+const manejarErrorUpload = (error, req, res, next) => {
+  res.status(400).json({ mensaje: error.message || 'No se pudo procesar el archivo' });
+};
+
+router.post('/perfil/foto', authMiddleware,upload.single('imagen_usuario'),cambiarFotoPerfil);
 
 // El controlador valida las credenciales recibidas en el cuerpo JSON.
 router.post('/iniciarsession', verificarUsuario);
@@ -34,5 +55,7 @@ router.post("/refresh", refreshToken);
 router.post('/guardarcliente', authMiddleware, guardarCliente)
 router.get('/traeruser', authMiddleware, traerClienteUsuario)
 router.get('/direcciones', authMiddleware, traerDireccionesCliente)
+
+router.use(manejarErrorUpload);
 
 module.exports = router;

@@ -30,7 +30,7 @@ const crearProducto = async (req, res) => {
     });
 
     res.status(201).json({
-      mensaje: 'Producto creado correctamente',
+      message: 'Producto creado correctamente',
       id: resultado.insertId,
       imagen
     });

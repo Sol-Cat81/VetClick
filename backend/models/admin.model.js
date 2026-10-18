@@ -516,6 +516,29 @@ const validarLongitudes = (entidad, datos) => {
 // esta tabla es explicita y no se deduce del esquema: `rol_permiso` y
 // `carrito_items` son las unicas tablas con ON DELETE CASCADE en la base, y
 // ninguna de las dos decisiones de abajo podria tomarse solo con el esquema.
+// Lo que cuelga de una raza, compartido por `raza` y por `especie` (a traves de
+// su nodo de razas) para que las dos rutas no puedan divergir sin que se note.
+// Va fuera del objeto porque el mismo arbol se declara en las dos entradas.
+const RAZAS_EN_CASCADA = [
+  { tabla: 'mascota', clave: 'id_mascota', columna: 'id_raza', etiqueta: 'mascota',
+    cascada: [
+      { tabla: 'turnos', clave: 'id_turno', columna: 'id_mascota', etiqueta: 'turno' },
+      { tabla: 'historial_medico', clave: 'id_historial', columna: 'id_mascota',
+        etiqueta: 'historial médico',
+        cascada: [
+          { tabla: 'tratamientos', clave: 'id_tratamiento', columna: 'id_historial',
+            etiqueta: 'tratamiento' }
+        ] },
+      { tabla: 'vacunas', clave: 'id_vacuna', columna: 'id_mascota', etiqueta: 'vacuna' }
+    ] },
+  { tabla: 'mascotas_adopcion', clave: 'id_mascota_adopcion', columna: 'id_raza',
+    etiqueta: 'mascota en adopción',
+    cascada: [
+      { tabla: 'adopciones', clave: 'id_adopcion', columna: 'id_mascota_adopcion',
+        etiqueta: 'adopción' }
+    ] }
+];
+
 const borrados = {
   empleado: {
     tabla: 'empleados',
@@ -662,6 +685,343 @@ const borrados = {
       { tabla: 'inventario', clave: 'id_inventario', columna: 'id_sucursal',
         etiqueta: 'registro de stock' }
     ]
+  },
+  // ------------------------------------------------------------------
+  // Catalogo
+  // ------------------------------------------------------------------
+  // Estas seis entidades tenian el boton de eliminar pero ninguna politica:
+  // el panel pedia el plan y recibia un 404. El modal de confirmacion es el
+  // mismo de siempre; lo que cambia es que se puede decidir por entidad.
+  //
+  // La regla de fondo: una fila que es evidencia de algo que ya paso no se
+  // borra arrastrando (una linea de detalle de un pedido, igual que un pago
+  // realizado). Lo que es configuracion del padre, si.
+  variante: {
+    tabla: 'variantes',
+    clave: 'id_variante',
+    // Una variante que esta en un pedido emitido tiene su precio y su subtotal
+    // grabados en esa linea. Borrarla seria rehacer el historico de una venta.
+    bloqueantes: [
+      { tabla: 'detalle_pedidos', columna: 'id_variante', etiqueta: 'línea de detalle' }
+    ],
+    // El stock es de esta variante y el carrito es su sesion de compra: si la
+    // variante deja de existir, ninguno de los dos tiene a que seguir existiendo.
+    // carrito_items tiene ON DELETE CASCADE en la base, pero se declara igual
+    // para que el modal lo anuncie en vez de que desaparezca en silencio.
+    cascada: [
+      { tabla: 'inventario', clave: 'id_inventario', columna: 'id_variante',
+        etiqueta: 'registro de stock' },
+      { tabla: 'carrito_items', clave: 'id_carrito', columna: 'id_variante',
+        etiqueta: 'ítem de carrito' }
+    ]
+  },
+  producto: {
+    tabla: 'productos',
+    clave: 'id_producto',
+    // Las variantes son hijas directas y se van en cascada, pero no pueden
+    // arrastrar una linea de pedido. El bloqueante declara el camino completo
+    // producto -> variante -> linea de detalle, porque `bloqueantes` solo
+    // miraba hijas directas y habria dejado pasar la venta.
+    bloqueantes: [
+      { tabla: 'detalle_pedidos', columna: 'id_variante', etiqueta: 'línea de detalle',
+        cascada: [
+          { tabla: 'variantes', clave: 'id_variante', columna: 'id_producto' }
+        ] }
+    ],
+    cascada: [
+      { tabla: 'productos_categorias', clave: 'id_producto', columna: 'id_producto',
+        etiqueta: 'asignación de categoría' },
+      { tabla: 'variantes', clave: 'id_variante', columna: 'id_producto',
+        etiqueta: 'variante',
+        cascada: [
+          { tabla: 'inventario', clave: 'id_inventario', columna: 'id_variante',
+            etiqueta: 'registro de stock' },
+          { tabla: 'carrito_items', clave: 'id_carrito', columna: 'id_variante',
+            etiqueta: 'ítem de carrito' }
+        ] }
+    ]
+  },
+  marca: {
+    tabla: 'marcas',
+    clave: 'id_marca',
+    bloqueantes: [
+      // Ruta de tres niveles: marca -> producto -> variante -> linea de pedido.
+      // Sin esto se podria borrar una marca arrastrando productos, variantes y
+      // el detalle economico de ventas ya emitidas.
+      { tabla: 'detalle_pedidos', columna: 'id_variante', etiqueta: 'línea de detalle',
+        cascada: [
+          { tabla: 'productos', clave: 'id_producto', columna: 'id_marca',
+            cascada: [
+              { tabla: 'variantes', clave: 'id_variante', columna: 'id_producto' }
+            ] }
+        ] }
+    ],
+    // Un producto no puede quedarse sin marca, asi que la marca se lleva a los
+    // suyos; y un producto no puede quedarse sin variantes, asi que tambien.
+    cascada: [
+      { tabla: 'productos', clave: 'id_producto', columna: 'id_marca',
+        etiqueta: 'producto',
+        cascada: [
+          { tabla: 'productos_categorias', clave: 'id_producto', columna: 'id_producto',
+            etiqueta: 'asignación de categoría' },
+          { tabla: 'variantes', clave: 'id_variante', columna: 'id_producto',
+            etiqueta: 'variante',
+            cascada: [
+              { tabla: 'inventario', clave: 'id_inventario', columna: 'id_variante',
+                etiqueta: 'registro de stock' },
+              { tabla: 'carrito_items', clave: 'id_carrito', columna: 'id_variante',
+                etiqueta: 'ítem de carrito' }
+            ] }
+        ] }
+    ]
+  },
+  categoria: {
+    tabla: 'categorias',
+    clave: 'id_categoria',
+    bloqueantes: [],
+    // categorias.categoria_padre es ON DELETE CASCADE en la base: borrar un
+    // padre se lleva sus subcategorias sin que nadie lo diga. Se declara
+    // explicitamente para que el modal las nombre antes, y se declaran dos
+    // niveles porque una subcategoria puede tener las suyas. El mismo
+    // auto-borrado de MySQL haria el trabajo igual, pero a ciegas.
+    //
+    // El puente va DENTRO de la subcategoria y tambien por fuera: una
+    // subcategoria tiene sus propias filas puente y hay que soltarlas antes de
+    // borrar la fila, no despues. El recorrido es post-order, asi que el
+    // puente de cada subcategoria cae antes que la subcategoria misma.
+    cascada: [
+      { tabla: 'categorias', clave: 'id_categoria', columna: 'categoria_padre',
+        etiqueta: 'subcategoría',
+        cascada: [
+          { tabla: 'categorias', clave: 'id_categoria', columna: 'categoria_padre',
+            etiqueta: 'subcategoría' },
+          { tabla: 'productos_categorias', clave: 'id_producto', columna: 'id_categoria',
+            etiqueta: 'asignación de categoría' }
+        ] },
+      // La tabla puente no es un dato: es la relacion categoria-producto.
+      { tabla: 'productos_categorias', clave: 'id_producto', columna: 'id_categoria',
+        etiqueta: 'asignación de categoría' }
+    ]
+  },
+  atributo: {
+    tabla: 'atributos',
+    clave: 'id_atributo',
+    bloqueantes: [
+      // atributo -> valor -> variante -> linea de pedido, misma cuenta pendiente
+      // que en la marca.
+      { tabla: 'detalle_pedidos', columna: 'id_variante', etiqueta: 'línea de detalle',
+        cascada: [
+          { tabla: 'valores_atributo', clave: 'id_valor', columna: 'id_atributo',
+            cascada: [
+              { tabla: 'variantes', clave: 'id_variante', columna: 'id_valor_atributo' }
+            ] }
+        ] }
+    ],
+    // Un valor no puede quedarse sin atributo, y una variante no puede quedarse
+    // con un valor que ya no existe. Mismo criterio que la marca: se announce
+    // todo lo que se va antes de confirmar.
+    cascada: [
+      { tabla: 'valores_atributo', clave: 'id_valor', columna: 'id_atributo',
+        etiqueta: 'valor de atributo',
+        cascada: [
+          { tabla: 'variantes', clave: 'id_variante', columna: 'id_valor_atributo',
+            etiqueta: 'variante',
+            cascada: [
+              { tabla: 'inventario', clave: 'id_inventario', columna: 'id_variante',
+                etiqueta: 'registro de stock' },
+              { tabla: 'carrito_items', clave: 'id_carrito', columna: 'id_variante',
+                etiqueta: 'ítem de carrito' }
+            ] }
+        ] }
+    ]
+  },
+  valorAtributo: {
+    tabla: 'valores_atributo',
+    clave: 'id_valor',
+    bloqueantes: [],
+    // variantes.id_valor_atributo admite NULL: una variante sin presentacion es
+    // un producto con un solo precio, que el panel ya contempla. No hay destino
+    // que elegir, asi que se desasocia y el modal lo anuncia como sobrevive.
+    desasociar: [
+      { tabla: 'variantes', columna: 'id_valor_atributo', etiqueta: 'variante' }
+    ],
+    cascada: []
+  },
+  // ------------------------------------------------------------------
+  // Clinica
+  // ------------------------------------------------------------------
+  // Las seis entidades tenian el boton de eliminar y ninguna politica. Se
+  // borran en cascada como un pedido: el modal de confirmacion ya nombra lo que
+  // se va antes de preguntar, asi que no hay nada que bloquear. Lo que no tiene
+  // hijas (turno, tratamiento, vacuna) se borra solo.
+  historial: {
+    tabla: 'historial_medico',
+    clave: 'id_historial',
+    bloqueantes: [],
+    // El tratamiento pertenece a su historial, no al revés: es el mismo
+    // criterio que ya usa el veterinario en Personal, que arrastra historiales
+    // y tratamientos.
+    cascada: [
+      { tabla: 'tratamientos', clave: 'id_tratamiento', columna: 'id_historial',
+        etiqueta: 'tratamiento' }
+    ]
+  },
+  servicio: {
+    tabla: 'servicios',
+    clave: 'id_servicio',
+    bloqueantes: [],
+    // Un turno asignado es una atencion ya tomada. No bloquea: el modal lo
+    // anuncia en "tambien se eliminara" y el usuario decide con eso delante.
+    cascada: [
+      { tabla: 'turnos', clave: 'id_turno', columna: 'id_servicio',
+        etiqueta: 'turno' }
+    ]
+  },
+  categoriaServicio: {
+    tabla: 'categorias_servicios',
+    clave: 'id_categoria_servicio',
+    bloqueantes: [],
+    // El recorrido de cascada es post-order: los turnos salen antes que el
+    // servicio que los tenia asignados, y el servicio antes que la categoria.
+    // Al reves, MySQL rechazaria el borrado por la clave foranea.
+    cascada: [
+      { tabla: 'servicios', clave: 'id_servicio', columna: 'id_categoria_servicio',
+        etiqueta: 'servicio',
+        cascada: [
+          { tabla: 'turnos', clave: 'id_turno', columna: 'id_servicio',
+            etiqueta: 'turno' }
+        ] }
+    ]
+  },
+  turno: {
+    tabla: 'turnos',
+    clave: 'id_turno',
+    // Ninguna tabla apunta a un turno: es una hoja terminal.
+    bloqueantes: [],
+    cascada: []
+  },
+  tratamiento: {
+    tabla: 'tratamientos',
+    clave: 'id_tratamiento',
+    bloqueantes: [],
+    cascada: []
+  },
+  vacuna: {
+    tabla: 'vacunas',
+    clave: 'id_vacuna',
+    bloqueantes: [],
+    cascada: []
+  },
+  // ------------------------------------------------------------------
+  // Clientes
+  // ------------------------------------------------------------------
+  // Es el arbol mas grande del panel: un cliente sostiene a sus mascotas (y las
+  // mascotas sostienen turnos, historial clinico con sus tratamientos y
+  // vacunas), sus direcciones con sus envios, sus pedidos con pagos y lineas de
+  // detalle, y sus adopciones.
+  cliente: {
+    tabla: 'clientes',
+    clave: 'id_cliente',
+    bloqueantes: [],
+    sobreviven: [
+      // La FK esta en la fila que se borra (clientes.id_usuario), no en una
+      // tabla hija: al borrar el cliente la cuenta queda sin dueno sola. Solo
+      // se anuncia, no se toca.
+      { tabla: 'clientes', clave: 'id_cliente', columna: 'id_usuario',
+        etiqueta: 'cuenta de usuario' }
+    ],
+    cascada: [
+      { tabla: 'mascota', clave: 'id_mascota', columna: 'id_cliente', etiqueta: 'mascota',
+        cascada: [
+          { tabla: 'turnos', clave: 'id_turno', columna: 'id_mascota', etiqueta: 'turno' },
+          { tabla: 'historial_medico', clave: 'id_historial', columna: 'id_mascota',
+            etiqueta: 'historial médico',
+            cascada: [
+              { tabla: 'tratamientos', clave: 'id_tratamiento', columna: 'id_historial',
+                etiqueta: 'tratamiento' }
+            ] },
+          { tabla: 'vacunas', clave: 'id_vacuna', columna: 'id_mascota', etiqueta: 'vacuna' }
+        ] },
+      { tabla: 'direcciones', clave: 'id_direccion', columna: 'id_cliente',
+        etiqueta: 'dirección',
+        cascada: [
+          { tabla: 'envios', clave: 'id_envio', columna: 'id_direccion', etiqueta: 'envío' }
+        ] },
+      { tabla: 'pedidos', clave: 'id_pedido', columna: 'id_cliente', etiqueta: 'pedido',
+        cascada: [
+          { tabla: 'pagos', clave: 'id_pago', columna: 'id_pedido', etiqueta: 'pago' },
+          { tabla: 'envios', clave: 'id_envio', columna: 'id_pedido', etiqueta: 'envío' },
+          { tabla: 'detalle_pedidos', clave: 'id_detalle_pedido', columna: 'id_pedido',
+            etiqueta: 'línea de detalle' }
+        ] },
+      { tabla: 'adopciones', clave: 'id_adopcion', columna: 'id_cliente',
+        etiqueta: 'adopción' }
+    ]
+  },
+  mascota: {
+    tabla: 'mascota',
+    clave: 'id_mascota',
+    bloqueantes: [],
+    // La mascota no se va sola: sus turnos, su historia clinica y sus vacunas
+    // son datos suyos. El modal los nombra antes de confirmar.
+    cascada: [
+      { tabla: 'turnos', clave: 'id_turno', columna: 'id_mascota', etiqueta: 'turno' },
+      { tabla: 'historial_medico', clave: 'id_historial', columna: 'id_mascota',
+        etiqueta: 'historial médico',
+        cascada: [
+          { tabla: 'tratamientos', clave: 'id_tratamiento', columna: 'id_historial',
+            etiqueta: 'tratamiento' }
+        ] },
+      { tabla: 'vacunas', clave: 'id_vacuna', columna: 'id_mascota', etiqueta: 'vacuna' }
+    ]
+  },
+  direccion: {
+    tabla: 'direcciones',
+    clave: 'id_direccion',
+    bloqueantes: [],
+    // El envio pertenece a la direccion a la que se entrega. Ojo: envios cuelga
+    // tambien de pedidos, asi que el mismo envio puede alcanzarse por dos ramas
+    // si el cliente se borra entero. El segundo DELETE no encuentra nada y no
+    // pasa nada.
+    cascada: [
+      { tabla: 'envios', clave: 'id_envio', columna: 'id_direccion', etiqueta: 'envío' }
+    ]
+  },
+  especie: {
+    tabla: 'especies',
+    clave: 'id_especie',
+    bloqueantes: [],
+    // El arbol mas profundo del panel: borrar una especie se lleva sus razas,
+    // los pacientes de esas razas con su historia clinica, y las fichas de
+    // adopcion con sus tramites. El modal nombra todo antes de confirmar.
+    cascada: [
+      { tabla: 'razas', clave: 'id_raza', columna: 'id_especie', etiqueta: 'raza',
+        cascada: RAZAS_EN_CASCADA }
+    ]
+  },
+  raza: {
+    tabla: 'razas',
+    clave: 'id_raza',
+    bloqueantes: [],
+    // Una raza no es solo un nombre: es el grupo de pacientes que la usan.
+    cascada: RAZAS_EN_CASCADA
+  },
+  mascotaAdopcion: {
+    tabla: 'mascotas_adopcion',
+    clave: 'id_mascota_adopcion',
+    bloqueantes: [],
+    // La ficha existe para ser adoptada: sus tramites se van con ella.
+    cascada: [
+      { tabla: 'adopciones', clave: 'id_adopcion', columna: 'id_mascota_adopcion',
+        etiqueta: 'adopción' }
+    ]
+  },
+  adopcion: {
+    tabla: 'adopciones',
+    clave: 'id_adopcion',
+    bloqueantes: [],
+    // El vinculo entre un cliente y una ficha en adopcion no tieneyas suyas.
+    cascada: []
   }
 };
 
@@ -678,9 +1038,54 @@ const idsDeHijos = async (nodo, idPadre, db) => {
 };
 
 // Para los bloqueantes solo interesa cuanto hay, no cuales son.
+//
+// Un bloqueante con `cascada` no es una hija directa: hay que bajar por el
+  // subarbol y contar sobre la fila del fondo. Por ejemplo el bloqueante de un
+  // producto son las lineas de detalle de SUS variantes: producto -> variante
+  // -> linea de detalle. Sin esto, un producto cuyas variantes estan en un
+  // pedido se podria borrar arrastrando el comprobante de esa venta.
+//
+// El conteo se hace sobre los ids del ultimo nivel de la cadena, no sobre
+  // todos: los de arriba son ids de otra fila (el id del producto, el de la
+  // marca) y mezclarlos contaria lineas de detalle que no son de esta rama.
+// Para saber cual es el ultimo se baja por la declaracion, porque el
+// recorrido por datos no garantiza el orden entre ramas de distinta profundidad.
+const nivelMasProfundo = (nodos) => {
+  let actual = nodos[nodos.length - 1];
+  while (actual?.cascada?.length) actual = actual.cascada[actual.cascada.length - 1];
+  return actual;
+};
+
 const contarHijos = async (nodo, idPadre, db) => {
+  if (!nodo.cascada) {
+    const [directas] = await db.query(
+      `SELECT COUNT(*) AS cantidad FROM \`${nodo.tabla}\` WHERE \`${nodo.columna}\` = ?`,
+      [idPadre]
+    );
+    return Number(directas[0].cantidad);
+  }
+
+  const fondo = nivelMasProfundo(nodo.cascada);
+  const pasos = await recopilarCascada(nodo.cascada, idPadre, db, []);
+  const ids = [...new Set(pasos.filter(paso => paso.clave === fondo.clave).flatMap(paso => paso.ids))];
+  if (!ids.length) return 0;
+
+  const marcas = ids.map(() => '?').join(', ');
+  const [profundas] = await db.query(
+    `SELECT COUNT(*) AS cantidad FROM \`${nodo.tabla}\` WHERE \`${nodo.columna}\` IN (${marcas})`,
+    ids
+  );
+  return Number(profundas[0].cantidad);
+};
+
+// Para `sobreviven` se cuenta sobre la fila que se va a borrar, no sobre una
+// tabla hija: la pregunta es "esta fila, ¿tiene algo colgado que sobreviva?", no
+// "cuantas cosas la apuntan". El caso real es clientes.id_usuario: se cuenta el
+// cliente que tiene cuenta, no los clientes que compartieran una.
+const contarVinculos = async (nodo, idPadre, db) => {
   const [filas] = await db.query(
-    `SELECT COUNT(*) AS cantidad FROM \`${nodo.tabla}\` WHERE \`${nodo.columna}\` = ?`,
+    `SELECT COUNT(*) AS cantidad FROM \`${nodo.tabla}\``
+    + ` WHERE \`${nodo.clave}\` = ? AND \`${nodo.columna}\` IS NOT NULL`,
     [idPadre]
   );
   return Number(filas[0].cantidad);
@@ -691,9 +1096,23 @@ const contarHijos = async (nodo, idPadre, db) => {
 // deberia decir "2 tratamientos", no dos renglones de 1.
 const agruparPorEtiqueta = (pasos) => {
   const totales = new Map();
+  // Una misma fila puede alcanzarse por dos ramas: un envio cuelga a la vez de
+  // su direccion y de su pedido, asi que al borrar un cliente entero se anuncia
+  // dos veces. Se cuenta por fila (tabla + id), no por aparicion: el modal no
+  // puede decir "2 envios" cuando se borra uno. El DELETE no lo nota, porque la
+  // segunda pasada no encuentra nada.
+  const vistas = new Set();
   for (const paso of pasos) {
-    const actual = totales.get(paso.etiqueta) || 0;
-    totales.set(paso.etiqueta, actual + paso.ids.length);
+    const actuales = new Set();
+    for (const idHijo of paso.ids) {
+      const clave = `${paso.tabla}:${idHijo}`;
+      if (vistas.has(clave)) continue;
+      vistas.add(clave);
+      actuales.add(clave);
+    }
+    if (!actuales.size) continue;
+    const total = totales.get(paso.etiqueta) || 0;
+    totales.set(paso.etiqueta, total + actuales.size);
   }
   return [...totales].map(([etiqueta, cantidad]) => ({ etiqueta, cantidad }));
 };
@@ -1104,7 +1523,22 @@ const AdminModel = {
 
     const cascada = agruparPorEtiqueta(await recopilarCascada(configuracion.cascada, id, db, []));
 
-    return { bloqueantes, sinRequisito, impiden, desasociar, reasignar, cascada };
+    // Lo que sobrevive al borrado y hay que decir. A diferencia de `desasociar`,
+    // aqui NO se toca la base: se cuenta y se anuncia.
+    //
+    // Es para el caso en que la clave foranea vive en la fila que se borra, no
+    // en una tabla hija. El caso real es clientes.id_usuario: al borrar el
+    // cliente, la columna desaparece con la fila y la cuenta de usuario queda
+    // sin dueno sola. No hace falta un UPDATE, y hacerlo seria peor: el UPDATE
+    // de `desasociar` soltaria la cuenta de TODOS los clientes que la
+    // compartieran, no solo del que se esta borrando.
+    const sobreviven = [];
+    for (const nodo of configuracion.sobreviven || []) {
+      const cantidad = await contarVinculos(nodo, id, db);
+      if (cantidad) sobreviven.push({ etiqueta: nodo.etiqueta, cantidad });
+    }
+
+    return { bloqueantes, sinRequisito, impiden, desasociar, reasignar, cascada, sobreviven };
   },
 
   // Borrado. Todo el recorrido va en una transaccion: si algo falla a mitad de
@@ -1221,7 +1655,8 @@ const AdminModel = {
         bloqueantes: [],
         desasociar: plan.desasociar,
         reasignar: plan.reasignar.map(({ etiqueta, cantidad }) => ({ etiqueta, cantidad })),
-        cascada: plan.cascada
+        cascada: plan.cascada,
+        sobreviven: plan.sobreviven
       };
     } catch (error) {
       if (propia) await ejecutora.rollback();
