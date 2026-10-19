@@ -116,8 +116,16 @@
                                 <input type="text" maxlength="30" name="apellido" id="apellido" required>
                             </div>
                         </div>
-                        <button type="submit" class="guardar-cambios">Guardar cambios</button>
+                        <div class="text-end"><button type="submit" class="guardar-cambios">Guardar cambios</button>
+                        </div>
                     </form>
+                    <dialog id="modalSimple">
+                        <div class="contenidoModal"></div>
+                        <div class="pieModal"></div>
+                        <button onclick="document.getElementById('modalSimple').close()">Cerrar</button>
+                    </dialog>
+
+                    <button onclick="document.getElementById('modalSimple').showModal()">Abrir Modal</button>
                 </div>
             </section>
             <section id="direcciones" class="seccion">
@@ -130,48 +138,50 @@
                         </div>
                     </div>
                     <div class="col align-content-end text-end">
-                        <button class="agregar-direccion"><i class="ph ph-plus"></i> Nueva direccion</button>
+                        <button onclick="document.getElementById('modalDireccion').showModal()"
+                            class="agregar-direccion"><i class="ph ph-plus"></i> Nueva direccion</button>
                     </div>
                 </div>
-                <div class="row justify-content-center align-items-center g-2">
-                    <div class="col">
-                        <div class="card" style="width: 18rem;">
-                            <div class="card-body">
-                                <h5 class="card-title">Casa</h5>
-                                <h6 class="card-subtitle mb-2 text-body-secondary">Av. Palermo 254 piso 9</h6>
-                                <p class="card-text">Argentina, Formosa, chubut, 309</p>
-                                <button class="card-link btn-editar-direccion"><b><i
-                                            class="ph-bold ph-pencil-simple-line"></i> Editar</b></button>
-                                <button class="card-link btn-eliminar-direccion">Eliminar</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="card" style="width: 18rem;">
-                            <div class="card-body">
-                                <h5 class="card-title">Casa</h5>
-                                <h6 class="card-subtitle mb-2 text-body-secondary">Av. Palermo 254 piso 9</h6>
-                                <p class="card-text">Argentina, Formosa, chubut, 309</p>
-                                <button class="card-link btn-editar-direccion"><b><i
-                                            class="ph-bold ph-pencil-simple-line"></i> Editar</b></button>
-                                <button class="card-link btn-eliminar-direccion">Eliminar</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="card" style="width: 18rem;">
-                            <div class="card-body">
-                                <h5 class="card-title">Casa</h5>
-                                <h6 class="card-subtitle mb-2 text-body-secondary">Av. Palermo 254 piso 9</h6>
-                                <p class="card-text">Argentina, Formosa, chubut, 309</p>
-                                <button class="card-link btn-editar-direccion"><b><i
-                                            class="ph-bold ph-pencil-simple-line"></i> Editar</b></button>
-                                <button class="card-link btn-eliminar-direccion">Eliminar</button>
-                            </div>
-                        </div>
-                    </div>
+                <div class="row justify-content-center align-items-center g-2 direcciones-contenedor">
                 </div>
-
+                <dialog id="modalDireccion">
+                    <div class="eyebrow">Nueva direccion</div>
+                    <hr>
+                    <form action="" id="formAgregarDireccion">
+                        <div class="row row-cols-1 row-cols-md-2">
+                            <div class="col">
+                                <label for="tipoDirec">Tipo<b class="obligatorio">*</b></label><br>
+                                <select name="tipoDireccion" id="tipoDireccion" required>
+                                    <option selected value="DOMICILIO">Domiciliaria</option>
+                                    <option value="COMERCIO">Laboral</option>
+                                </select><br>
+                                <label for="provincia">Provincia<b class="obligatorio">*</b></label><br>
+                                <input type="text" name="provincia" id="provincia" required><br>
+                                <label for="localidad">Localidad<b class="obligatorio">*</b></label><br>
+                                <input type="text" name="localidad" id="localidad" required><br>
+                                <label for="calle">Calle<b class="obligatorio">*</b></label><br>
+                                <input type="text" name="calle" id="calle" required><br>
+                                <label for="numero">Numero<b class="obligatorio">*</b></label><br>
+                                <input type="number" name="numero" id="numero" required><br>
+                            </div>
+                            <div class="col">
+                                <label for="codigo">Codigo postal<b class="obligatorio">*</b></label><br>
+                                <input type="text" name="codigo" id="codigo" required><br>
+                                <label for="departamento">Departamento</label><br>
+                                <input type="text" name="departamento" id="departamento"><br>
+                                <label for="piso">Piso</label><br>
+                                <input type="text" name="piso" id="piso"><br>
+                                <label for="referencia">Referencia</label><br>
+                                <input type="text" name="referencia" id="referencia"><br>
+                                <div class="pie text-end">
+                                    <button class="cerrar-modal"
+                                        onclick="document.querySelector('#modalDireccion').close()">Cancelar</button>
+                                    <button type="submit" class="guardar-direccion">Guardar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </dialog>
             </section>
             <section id="mascotas" class="seccion">
                 <div class="row row-cols-1 row-cols-md-2">
@@ -186,61 +196,7 @@
                         <button class="agregar-mascota"><i class="ph ph-plus"></i> Agregar mascota</button>
                     </div>
                 </div>
-                <div class="row justify-content-center align-items-center g-2">
-                    <div class="col">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col col-10">
-                                        <div>
-                                            <i class="ph ph-dog avatar-mascota"></i>
-                                        </div>
-                                        <div class="card-resumen-mascota">
-                                            <h5 class="card-title">Firu</h5>
-                                            <h6 class="card-subtitle mb-2 text-body-secondary">Perro mestizo - 4 años
-                                            </h6>
-                                        </div>
-                                    </div>
-                                    <div class="col col-2 text-end">
-                                        <i class="ph ph-pencil-simple-line"></i>
-                                    </div>
-                                </div>
-                                <br>
-                                <button class="card-link btn-editar-direccion">
-                                    <b><i class="ph-bold ph-pencil-simple-line"></i>
-                                        Ver ficha completa >
-                                    </b>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col col-10">
-                                        <div>
-                                            <i class="ph ph-dog avatar-mascota"></i>
-                                        </div>
-                                        <div class="card-resumen-mascota">
-                                            <h5 class="card-title">Firu</h5>
-                                            <h6 class="card-subtitle mb-2 text-body-secondary">Perro mestizo - 4 años
-                                            </h6>
-                                        </div>
-                                    </div>
-                                    <div class="col col-2 text-end">
-                                        <i class="ph ph-pencil-simple-line"></i>
-                                    </div>
-                                </div>
-                                <br>
-                                <button class="card-link btn-editar-direccion">
-                                    <b><i class="ph-bold ph-pencil-simple-line"></i>
-                                        Ver ficha completa >
-                                    </b>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                <div class="row justify-content-center align-items-center g-2 mascotas-contenedor">
                 </div>
             </section>
             <section id="turnos" class="seccion">
@@ -257,27 +213,6 @@
                     </div>
                 </div>
                 <div class="contenedor-turnos">
-                    <div class="card">
-                        <div class="avatar-fecha">
-                            <span class="med">Jun</span>
-                            <span class="dia">18</span>
-                        </div>
-                        <div class="resumen-turno">
-                            <h5 class="card-title motivo-turno">Vecunacion de firulais</h5>
-                            <h6 class="card-subtitle mb-2 text-body-secondary">
-                                <i class="ph ph-clock"></i>
-                                <span class="fecha-turno">Martes, 10:30hs</span>
-                            </h6>
-                            <h6 class="card-subtitle mb-2 text-body-secondary">
-                                <i class="ph ph-user"></i>
-                                <span class="veterinaria-turno">dra. Martines soza</span>
-                            </h6>
-                        </div>
-                        <div class="acciones-turno">
-                            <button class="detalle-turno">Ver mas</button>
-                            <button class="eliminar-turno">Cancelar</button>
-                        </div>
-                    </div>
                 </div>
             </section>
             <section id="historial" class="seccion">
@@ -288,21 +223,21 @@
                 </div>
                 <div class="filtrar-historial">
                     <button class="btn-filtro filtro-activo" data-article="compras">Compras</button>
-                    <button class="btn-filtro" data-article="mascota">Mascotas</button>
+                    <div class="dropdown">
+                        <button class="btn-filtro dropdown-toggle" data-article="mascota" type="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            Mascotas
+                        </button>
+                        <ul class="dropdown-menu" id="dropdownMascotas">
+                            <li class="dropdown-item">kxncsldcs</li>
+                        </ul>
+                    </div>
                 </div>
                 <article id="compras" class="seccion-historial activo">
                     <div class="cabezal-compras">
                         Compras(<span>0</span>)
                     </div>
                     <div class="contenedorCompras">
-                        <div class="compra">
-                            <div class="avatarCompra"><i class="ph ph-basket"></i></div>
-                            <div class="cabezalCompra">
-                                <span class="total-compra">$33.000</span>
-                                <span class="fecha-compra">13 Jun 2026</span>
-                            </div>
-                            <div class="vermas"><i class="ph-bold ph-caret-right"></i></div>
-                        </div>
                     </div>
                 </article>
                 <article id="mascota" class="seccion-historial"></article>

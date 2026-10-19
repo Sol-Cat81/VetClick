@@ -40,6 +40,18 @@ body {
     font-family: "texto-light";
 }
 
+dialog{
+    margin: auto;
+    border: none;
+    padding: 20px;
+    width: fit-content;
+    height: fit-content;
+    border-radius: 15px;
+    max-width: 900px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
 .eyebrow {
     margin: 0;
     color: var(--elem-importantes);
@@ -67,21 +79,27 @@ section {
     overflow-x: hidden;
 }
 
-.aside::-webkit-scrollbar {
+.aside::-webkit-scrollbar,
+dialog::-webkit-scrollbar {
     width: 5px;
     /* Grosor de barra vertical */
     height: 10px;
     /* Grosor de barra horizontal */
 }
 
-.aside::-webkit-scrollbar-track {
+.aside::-webkit-scrollbar-track,
+dialog::-webkit-scrollbar-track {
     background: var(--principal-fondo);
     border-radius: 5px;
 }
 
-.aside::-webkit-scrollbar-thumb {
+.aside::-webkit-scrollbar-thumb,
+dialog::-webkit-scrollbar-thumb {
     background: var(--elem-importantes);
     border-radius: 5px;
+}
+.obligatorio{
+    color: rgb(135, 26, 26);
 }
 
 .abrir-aside {
@@ -277,7 +295,8 @@ section {
     overflow: hidden;
 }
 
-.contenido input:focus {
+.contenido input:focus,
+#formAgregarDireccion input:focus {
     outline: none;
     border: 1px solid var(--elem-secun) !important;
 }
@@ -299,7 +318,8 @@ section {
 
 .btn-cambiar-foto:hover,
 .btn-editar-direccion:hover,
-.btn-filtro:hover {
+.btn-filtro:hover,
+#tipoDireccion:hover {
     border: 0.5px solid #155f7565;
     background-color: #8cf4f41e;
 }
@@ -308,7 +328,8 @@ section {
 .agregar-direccion,
 .agregar-mascota,
 .reservar-turno,
-.detalle-turno {
+.detalle-turno,
+.guardar-direccion {
     margin: 15px;
     padding: 8px 15px;
     border-radius: 10px;
@@ -336,7 +357,8 @@ section {
 }
 
 .btn-eliminar-direccion,
-.eliminar-turno {
+.eliminar-turno,
+.cerrar-modal {
     border: none;
     background-color: transparent;
     padding: 8px 10px;
@@ -346,8 +368,50 @@ section {
 }
 
 .btn-eliminar-direccion:hover,
-.eliminar-turno:hover {
+.eliminar-turno:hover,
+.cerrar-modal:hover {
     background-color: #ebf8fc75;
+}
+
+.direcciones-contenedor p,
+.mascotas-contenedor p,
+.contenedor-turnos p,
+.contenedorCompras p{
+    text-align: center;
+    margin-top: 40px;
+    font-family: 'texto';
+    color: var(--elem-importantes);
+}
+#modalDireccion{
+    width: auto;
+    max-width: 900px;
+}
+
+#formAgregarDireccion input{
+    padding: 3px 10px;
+    border-radius: 10px;
+    border: 1px solid #c8cbcc;
+    width: 95%;
+    margin-bottom: 10px;
+}
+
+#tipoDireccion, ::picker(select){
+    appearance: base-select;
+}
+::picker(select){
+    border: 1px solid #c8cbcc;
+    border-radius: 10px;
+}
+#tipoDireccion{
+    padding: 4px 10px;
+    border-radius: 10px;
+    border: 1px solid #c8cbcc;
+    width: 95%;
+    margin-bottom: 10px;
+}
+
+#formAgregarDireccion select:focus{
+    outline: none;
 }
 
 /* = = = SECCION MASCOTAS = = = */

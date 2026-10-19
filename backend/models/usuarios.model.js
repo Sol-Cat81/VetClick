@@ -13,7 +13,7 @@ class Usuario {
         return usuario
     }
 
-    static async actulizarUsuario(idUsuario, username) {
+    static async actualizarUsuario(idUsuario, username) {
         try {
             const query = 'UPDATE usuarios SET username = ? WHERE id_usuario = ?'
             const [resultado] = await db.execute(query, [username, idUsuario])
@@ -52,8 +52,73 @@ class Usuario {
         return direcciones
     }
 
-    static async traerMascotas(idCliente){
+    static async guardarDireccion(id_cliente, tipo_direccion, calle, numero, ciudad, provincia, codigo_postal, departamento, piso, referencia) {
+        try {
+            const query = `INSERT INTO direcciones(id_cliente, tipo_direccion, calle, numero, localidad, provincia, codigo_postal, departamento, piso, referencia) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+            await db.execute(query, [id_cliente, tipo_direccion, calle, numero, ciudad, provincia, codigo_postal, departamento, piso, referencia])
+            return true
+        } catch (error) {
+            console.error('Error al guardar la dirección:', error)
+            return false
+        }
     }
+
+    static async actualizarDireccion(id_direccion, tipo_direccion, calle, numero, ciudad, provincia, codigo_postal) {
+        try {
+            const query = `UPDATE direcciones SET tipo_direccion = ?, calle = ?, numero = ?, localidad = ?, provincia = ?, codigo_postal = ? WHERE id_direccion = ?`
+            await db.execute(query, [tipo_direccion, calle, numero, ciudad, provincia, codigo_postal, id_direccion])
+            return true
+        } catch (error) {
+            console.error('Error al actualizar la dirección:', error)
+            return false
+        }
+    }
+
+    static async traerMascotas(idCliente){
+        const query = `
+        SELECT
+            m.id_mascota,
+            r.nombre AS raza,
+            m.nombre,
+            m.sexo,
+            m.fecha_nacimiento,
+            m.peso,
+            m.observaciones
+        FROM mascota AS m INNER JOIN
+        razas AS r ON m.id_raza = r.id_raza
+        WHERE m.id_cliente = ?;
+        `
+        const [ results ] = await db.execute(query, [ idCliente ])
+        return results
+    }
+
+    static async traerTurnosGeneral(idCliente){
+        const query = `
+        SELECT
+            t.id_turno,
+            t.fecha,
+            t.hora,
+            t.motivo,
+            s.nombre
+        FROM turnos AS t INNER JOIN  sucursales AS s
+        ON t.id_sucursal = s.id_sucursal
+        WHERE t.id_cliente = ?;`
+        const [ turnos ] = await db.execute(query, [ idCliente ])
+        return turnos
+    }
+
+    static async traerCompras(idCliente){
+        const query = 'SELECT * FROM pedidos WHERE id_cliente = ?;'
+        const [ pedidos ] = await db.execute(query, [ idCliente ])
+        return pedidos
+    }
+
+    static async traerHistorial(idMascota){
+        const query = 'SELECT * FROM historial_medico WHERE id_mascota = ?;'
+        const [ historial ] = await db.execute(query, [ idMascota ])
+        return historial
+    }
+
 }
 
 module.exports = { Usuario }

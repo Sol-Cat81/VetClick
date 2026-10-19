@@ -9,6 +9,10 @@ async function traerInfoUsuario(idUsuario) {
     return { usuario: usuario[0], cliente: cliente[0] ?? null }
 }
 
+async function traerInfoCliente(idUsuario) {
+    return await Usuario.traerCliente(idUsuario)
+}
+
 async function guardarCrearCliente(idUsuario, nombre, apellido, telefono, username) {
     if(!nombre || !apellido || !telefono){
         throw new Error('Todos los campos son obligatorios')
@@ -21,12 +25,43 @@ async function guardarCrearCliente(idUsuario, nombre, apellido, telefono, userna
     return resultado
 }
 
-async function trerDirecciones(idUsuario) {
+async function solicitarDirecciones(idUsuario) {
     return await Usuario.traerDireccion(idUsuario)
 }
 
+async function guardarDireccionCliente(id_cliente, tipo_direccion, calle, numero, ciudad, provincia, codigo_postal, departamento, piso, referencia) {
+    return await Usuario.guardarDireccion(id_cliente, tipo_direccion, calle, numero, ciudad, provincia, codigo_postal, departamento, piso, referencia)
+}
+
+async function actualizarDireccionCliente(id_direccion, tipo_direccion, calle, numero, ciudad, provincia, codigo_postal, departamento, piso, referencia) {
+    return await Usuario.actualizarDireccion(id_direccion, tipo_direccion, calle, numero, ciudad, provincia, codigo_postal, departamento, piso, referencia)
+}
+
+async function solicitarMascotas(idCliente) {
+    return await Usuario.traerMascotas(idCliente)
+}
+
+async function solicitarTurnos(idCliente) {
+    return await Usuario.traerTurnosGeneral(idCliente)
+}
+
+async function solicitarPedidos(idCliente) {
+    return await Usuario.traerCompras(idCliente)
+}
+
+async function solicitarHistorialMascota(idMascota){
+    return await Usuario.traerHistorial(idMascota)
+}
+
 module.exports = {
-    traerInfoUsuario,
     guardarCrearCliente,
-    trerDirecciones
+    traerInfoUsuario,
+    traerInfoCliente,
+    solicitarDirecciones,
+    guardarDireccionCliente,
+    actualizarDireccionCliente,
+    solicitarMascotas,
+    solicitarTurnos,
+    solicitarPedidos,
+    solicitarHistorialMascota
 }

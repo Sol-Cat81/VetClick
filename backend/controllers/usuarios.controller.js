@@ -5,9 +5,16 @@ const db = require("./../config/database");
 const bcrypt = require("bcryptjs");
 
 const {
-  traerInfoUsuario,
   guardarCrearCliente,
-  trerDirecciones
+  traerInfoUsuario,
+  traerInfoCliente,
+  solicitarDirecciones,
+  guardarDireccionCliente,
+  actualizarDireccionCliente,
+  solicitarMascotas,
+  solicitarTurnos,
+  solicitarPedidos,
+  solicitarHistorialMascota
 } = require("../service/usuarios.service");
 
 // Comprueba email y contraseña y devuelve únicamente datos públicos del usuario.
@@ -226,24 +233,32 @@ const guardarCliente = async (req, res) => {
   }
 };
 
-const traerClienteUsuario = async (req, res) => {
+const deshboard = async (req, res) => {
   const idUsuario = req.usuario.id;
-  const info = await traerInfoUsuario(idUsuario)
+  const usuario = await traerInfoUsuario(idUsuario)
 
-  if (!info) {
-    res.status(500).json({ mensaje: "Hubo un error con el sevidor" })
-  } else {
-    res.status(201).json({ info })
+  if(usuario.cliente.id_cliente){
+    const direcciones = await solicitarDirecciones(usuario.cliente.id_cliente)
+    const mascotas = await solicitarMascotas(usuario.cliente.id_cliente)
+    const turnos = await solicitarTurnos(usuario.cliente.id_cliente)
+    const pedidos = await solicitarPedidos(usuario.cliente.id_cliente)
+
+    res.status(200).json({ usuario, direcciones, mascotas, turnos, pedidos })
+  }else{
+    res.status(200).json({ usuario, direcciones: [], mascotas: [], turnos: [], pedidos: [] })
   }
 }
 
-const traerDireccionesCliente = async (req, res) => {
+const guardarDireccion = async (req, res) => {
   const idUsuario = req.usuario.id;
-  const direcciones = await trerDirecciones(idUsuario);
-  if(!direcciones){
-    res.status(404).json({mensaje: "No hay direcciones registradas"})
+  const { tipo_direccion, calle, numero, ciudad, provincia, codigo_postal, departamento, piso, referencia } = req.body
+  const cliente = await traerInfoCliente(idUsuario)
+  const enviado = await guardarDireccionCliente(cliente[0].id_cliente, tipo_direccion, calle, numero, ciudad, provincia, codigo_postal, departamento, piso, referencia)
+
+  if(enviado){
+    res.status(201).json({mensaje: "Se ah guardado la direccion correctamente."})
   }else{
-    res.status(201).json(direcciones)
+    res.status(500).json({mensaje: "Hubo un problema, intentalo de nuevo mas tarde."})
   }
 }
 
@@ -254,6 +269,6 @@ module.exports = {
   logout,
   refreshToken,
   guardarCliente,
-  traerClienteUsuario,
-  traerDireccionesCliente
+  deshboard,
+  guardarDireccion
 };

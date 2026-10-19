@@ -10,8 +10,8 @@ const {
     logout, 
     refreshToken, 
     guardarCliente,
-    traerClienteUsuario,
-    traerDireccionesCliente
+    deshboard,
+    guardarDireccion
 } = require('./../controllers/usuarios.controller');
 
 // El controlador valida las credenciales recibidas en el cuerpo JSON.
@@ -32,7 +32,7 @@ router.post("/refresh", refreshToken);
 /* rutas configuracion cuenta */
 
 router.post('/guardarcliente', authMiddleware, guardarCliente)
-router.get('/traeruser', authMiddleware, traerClienteUsuario)
-router.get('/direcciones', authMiddleware, traerDireccionesCliente)
+router.get('/deshboard', authMiddleware, deshboard)
+router.post('/guardardireccion', authMiddleware, guardarDireccion)
 
 module.exports = router;

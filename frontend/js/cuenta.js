@@ -9,9 +9,15 @@ const contenidoHistorial = document.querySelectorAll('article')
 
 /* Form usuario */
 const formUsuario = document.getElementById('formUsuario')
+const formDireccion = document.getElementById('formAgregarDireccion')
 
 const apiUsuario = 'http://127.0.0.1:3000/api/usuarios';
 const refresh = "http://127.0.0.1:3000/api/usuarios/refresh"
+const MESES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+const DIAS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+
+/* acciones */
+const btnAgregarDireccion = document.querySelector('.agregar-direccion')
 
 contenedorOpcione.querySelectorAll('.opcion').forEach(opcion => {
     opcion.addEventListener('click', (evento) => {
@@ -77,6 +83,36 @@ function mostrarToast(mensaje, tipo = 'exito') {
     toast.show();
 }
 
+async function renovarToken() {
+    const actu = await fetch(refresh, {
+        method: 'POST',
+        credentials: 'include'
+    })
+    if (!actu.ok) {
+        return false
+    }
+    return true
+}
+
+const formatearNumero = (numero) => {
+    const decimales = numero % 1 === 0 ? 0 : 2;
+
+    return new Intl.NumberFormat('es-AR', {
+        minimumFractionDigits: decimales,
+        maximumFractionDigits: decimales
+    }).format(numero);
+}
+
+function contenidoModal(contenido, acciones) {
+    const contenidoModal = document.querySelector('.contenidoModal')
+    const pieModal = document.querySelector('.pieModal')
+    contenidoModal.innerHTML = ""
+    contenidoModal.innerHTML = contenido;
+    pieModal.innerHTML = ""
+    pieModal.innerHTML = acciones;
+    document.getElementById('modalSimple').showModal();
+}
+
 function cargarFormUsuario(info) {
     const alertaUsu = document.querySelector('.alerta')
     if (info.cliente === null) {
@@ -93,24 +129,189 @@ function cargarFormUsuario(info) {
     document.getElementById('telefono').value = info.cliente?.telefono ?? ''
 }
 
-async function renovarToken() {
-    const actu = await fetch(refresh, {
-        method: 'POST',
-        credentials: 'include'
-    })
-    if (!actu.ok) {
-        return false
+function cargarDirecciones(direcciones) {
+    const contenedorDirecciones = document.querySelector('.direcciones-contenedor')
+    contenedorDirecciones.innerHTML = ''
+    if (direcciones.length === 0) {
+        contenedorDirecciones.innerHTML = '<p>No hay direcciones registradas.</p>'
     }
-    return true
+    direcciones.forEach(direccion => {
+        const div = document.createElement('div')
+        div.classList.add('col')
+        div.innerHTML = `
+            <div class="card" style="width: 18rem;">
+                <div class="card-body">
+                    <h5 class="card-title">${direccion.calle}, ${direccion.numero}</h5>
+                    <h6 class="card-subtitle mb-2 text-body-secondary">
+                        ${direccion.provincia},
+                        ${direccion.localidad}
+                    </h6>
+                    <div class="card-text">
+                        ${direccion.codigo_postal}
+                    </div>
+                    <button onclick="editarDireccion(${direccion.id_direccion})" class="card-link btn-editar-direccion">
+                        <b><iclass="ph-bold ph-pencil-simple-line"></i> Editar</b>
+                    </button>
+                    <button onclick="eliminarDireccion(${direccion.id_direccion})" class="card-link btn-eliminar-direccion">Eliminar</button>
+                </div>
+            </div>`
+        contenedorDirecciones.appendChild(div)
+    })
+}
+
+function eliminarDireccion(id) {
+    console.log('direccion Borrada, ', id)
+}
+
+function editarDireccion(id) {
+    const modalDireccion = document.querySelector('#modalDireccion');
+
+    const infoDireccion = await fetch(a)
+    console.log('direccion editada, ', id)
+}
+
+function calcularEdadMascota(fechaNacimientoServidor) {
+    const [year, month, day] = fechaNacimientoServidor.split('-').map(Number);
+    const fechaNac = new Date(year, month - 1, day); // Meses en JS van de 0 a 11
+    const hoy = new Date();
+
+    // Validar si la fecha recibida es válida
+    if (isNaN(fechaNac.getTime())) {
+        return 'Fecha inválida';
+    }
+    // 1. Calcular diferencia base en años
+    let anos = hoy.getFullYear() - fechaNac.getFullYear();
+    let mesesDiferencia = hoy.getMonth() - fechaNac.getMonth();
+    let diasDiferencia = hoy.getDate() - fechaNac.getDate();
+    console.log(anos + " - " + mesesDiferencia + " - " + diasDiferencia)
+
+    // Ajustar si aún no ha cumplido meses/años este período
+    if (diasDiferencia < 0) {
+        mesesDiferencia--;
+    }
+    if (mesesDiferencia < 0) {
+        anos--;
+        mesesDiferencia += 12;
+    }
+    // 2. Determinar si mostrar en meses o en años
+    if (anos < 1) {
+        // Total de meses para cachorro / mascota menor a 1 año
+        const totalMeses = (hoy.getFullYear() - fechaNac.getFullYear()) * 12 + hoy.getMonth() - fechaNac.getMonth() + (diasDiferencia < 0 ? -1 : 0);
+
+        if (totalMeses <= 0) {
+            return 'Recién nacido';
+        }
+        return `${totalMeses} ${totalMeses === 1 ? 'mes' : 'meses'}`;
+    }
+    if (anos >= 1 && mesesDiferencia > 0) {
+        return `${anos} ${anos === 1 ? 'año' : 'años'} y ${mesesDiferencia} ${mesesDiferencia === 1 ? 'mes' : 'meses'}`;
+    }
+    // Mascota de 1 año o más
+    return `${anos} ${anos === 1 ? 'año' : 'años'}`;
+}
+
+function cargarMascotas(mascotas) {
+    const contenedorMascotas = document.querySelector('.mascotas-contenedor')
+    contenedorMascotas.innerHTML = ''
+    if (mascotas.length === 0) {
+        contenedorMascotas.innerHTML = '<p>No hay mascotas registradas.</p>'
+    }
+    mascotas.forEach(mascota => {
+        const div = document.createElement('div')
+        div.classList.add('col')
+        div.innerHTML = `
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col col-10">
+                            <div>
+                                <i class="ph ph-dog avatar-mascota"></i>
+                            </div>
+                            <div class="card-resumen-mascota">
+                                <h5 class="card-title">${mascota.nombre}</h5>
+                                <h6 class="card-subtitle mb-2 text-body-secondary">
+                                ${mascota.raza} · ${calcularEdadMascota(mascota.fecha_nacimiento)}
+                                </h6>
+                            </div>
+                        </div>
+                        <div class="col col-2 text-end">
+                            <i class="ph ph-pencil-simple-line" onclick="editarMascota(${mascota.id_mascota})"></i>
+                        </div>
+                    </div>
+                    <br>
+                    <button class="card-link btn-editar-direccion" onclick="verInfoMascota(${mascota.id_mascota})">
+                        <b><i class="ph-bold ph-pencil-simple-line"></i>
+                        Ver ficha completa >
+                        </b>
+                    </button>
+                </div>
+            </div>`
+        contenedorMascotas.appendChild(div)
+    })
+}
+
+function cargarTurnos(turnos) {
+    const contenedorTunos = document.querySelector('.contenedor-turnos')
+    contenedorTunos.innerHTML = ''
+    if (turnos.length === 0) {
+        contenedorTunos.innerHTML = '<p>Los turnos que tengas agendados apareceran aqui.</p>'
+    }
+    turnos.forEach(turno => {
+        const horas = turno.hora.getHours().toString().padStart(2, '0');
+        const minutos = turno.hora.getMinutes().toString().padStart(2, '0');
+        const div = document.createElement('div')
+        div.classList.add('card')
+        div.innerHTML = `
+            <div class="avatar-fecha">
+                <span class="med">${MESES[turno.fecha.getMonth()]}</span>
+                <span class="dia">${turno.fecha.getDate()}</span>
+            </div>
+            <div class="resumen-turno">
+                <h5 class="card-title motivo-turno">${turno.motivo}</h5>
+                <h6 class="card-subtitle mb-2 text-body-secondary">
+                    <i class="ph ph-clock"></i>
+                    <span class="fecha-turno">${DIAS[turno.fecha.getDay()]}, ${horas}:${minutos}hs</span>
+                </h6>
+                <h6 class="card-subtitle mb-2 text-body-secondary">
+                    <i class="ph ph-storefront"></i>
+                    <span class="veterinaria-turno">${turno.nombre}</span>
+                </h6>
+            </div>
+            <div class="acciones-turno">
+                <button class="detalle-turno" onclick="detalleTurno(${turno.id_turno})">Ver mas</button>
+                <button class="eliminar-turno">Cancelar</button>
+            </div>`
+        contenedorTunos.appendChild(div)
+    })
+}
+
+function cargarPedidos(pedidos) {
+    const contenedorCompras = document.querySelector('.contenedorCompras')
+    contenedorCompras.innerHTML = ''
+    if (pedidos.length === 0) {
+        contenedorCompras.innerHTML = '<p>Los pedidos/compras que realices apareceran aqui.</p>'
+    }
+    pedidos.forEach(pedido => {
+        const div = document.createElement('div')
+        div.classList.add('compra')
+        div.innerHTML = `
+            <div class="avatarCompra"><i class="ph ph-basket"></i></div>
+            <div class="cabezalCompra">
+                <span class="total-compra">${formatearNumero(Number(pedido.total))}</span>
+                <span class="fecha-compra">${pedido.fecha.getDate} ${MESES[pedido.fecha.getMonth]} ${pedido.fecha.getFullYear}</span>
+            </div>
+            <div class="vermas" onclick="detalleCompra(${pedido.id_pedido})"><i class="ph-bold ph-caret-right"></i></div>`
+        contenedorCompras.appendChild(div)
+    })
 }
 
 window.addEventListener('load', async () => {
     try {
-        let reqUsu = await fetch(`${apiUsuario}/traeruser`, { method: 'GET', credentials: 'include' })
+        let deshboard = await fetch(`${apiUsuario}/deshboard`, { method: 'GET', credentials: 'include' })
 
-        if (reqUsu.status === 401) {
+        if (deshboard.status === 401) {
             if (renovarToken()) {
-                reqUsu = await fetch(`${apiUsuario}/traeruser`, { credentials: 'include' })
+                deshboard = await fetch(`${apiUsuario}/traeruser`, { credentials: 'include' })
             } else {
                 mostrarToast("Su sesion a expirado, vuelva a iniciar sesion.", 'error')
                 setTimeout(() => {
@@ -118,10 +319,15 @@ window.addEventListener('load', async () => {
                 }, 3000)
             }
         }
-        const info = await reqUsu.json()
+        const info = await deshboard.json()
 
-        if (reqUsu.ok) {
-            cargarFormUsuario(info.info)
+        if (deshboard.ok) {
+            cargarFormUsuario(info.usuario)
+            cargarDirecciones(info.direcciones)
+            cargarMascotas(info.mascotas)
+            cargarTurnos(info.turnos)
+            cargarPedidos(info.pedidos)
+            console.log(info)
         }
     } catch (error) {
         console.log(error)
@@ -185,3 +391,63 @@ formUsuario.addEventListener('submit', async (evento) => {
     }
 
 })
+
+formDireccion.addEventListener('submit', async (evento) => {
+    evento.preventDefault();
+
+    const tipoDireccion = document.querySelector('#tipoDireccion').value;
+    const calle = document.querySelector('#calle').value;
+    const numero = document.querySelector('#numero').value;
+    const localidad = document.querySelector('#localidad').value;
+    const provincia = document.querySelector('#provincia').value;
+    const codigoPostal = document.querySelector('#codigo').value;
+
+    const departamento = document.querySelector('#departamento').value;
+    const piso = document.querySelector('#piso').value;
+    const referencia = document.querySelector('#referencia').value;
+
+    if (!tipoDireccion || !calle || !numero || !localidad || !provincia || !codigoPostal) {
+        mostrarToast('Complete todos los campos que estan marcados.')
+        return
+    }
+
+    const datos = {
+        tipo_direccion: tipoDireccion,
+        calle: calle,
+        numero: numero,
+        ciudad: localidad,
+        provincia: provincia,
+        codigo_postal: codigoPostal,
+        departamento: departamento,
+        piso: piso,
+        referencia: referencia
+    }
+
+    try {
+        const enviarDireccion = await fetch(`${apiUsuario}/guardardireccion`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify(datos),
+        },)
+
+        const exito = await enviarDireccion.json();
+
+        if (enviarDireccion.ok) {
+            mostrarToast(exito.mensaje || 'Se ha guardado la direccion correctamente', 'exito')
+            setTimeout(() => {
+                window.location.reload();
+            }, 3000)
+        }
+    } catch (error) {
+        console.log(error)
+        mostrarToast('Hubo un problema en el registro de la direccion, intentelo de nuevo mas tarde', 'error')
+    }
+})
+
+
+// un gimnacio requiere un programa para registrar el pase mensual de sus solicitarTurnos
+/*requisitos:
+nombre, dni, tipo de pase(socio estandar o vip), calcular el monto total y mostrar el resultado */
