@@ -74,10 +74,10 @@ class Usuario {
         }
     }
 
-    static async actualizarDireccion(id_direccion, tipo_direccion, calle, numero, ciudad, provincia, codigo_postal) {
+    static async actualizarDireccion(id_direccion, id_cliente, tipo_direccion, calle, numero, provincia, localidad, codigo_postal, departamento, piso, referencia) {
         try {
-            const query = `UPDATE direcciones SET tipo_direccion = ?, calle = ?, numero = ?, localidad = ?, provincia = ?, codigo_postal = ? WHERE id_direccion = ?`
-            await db.execute(query, [tipo_direccion, calle, numero, ciudad, provincia, codigo_postal, id_direccion])
+            const query = `UPDATE direcciones SET tipo_direccion = ?, calle = ?, numero = ?, provincia = ?, localidad = ?, codigo_postal = ?, departamento = ?, piso = ?, referencia = ? WHERE id_direccion = ? AND id_cliente = ?`
+            await db.execute(query, [tipo_direccion, calle, numero, provincia, localidad, codigo_postal, departamento, piso, referencia, id_direccion, id_cliente])
             return true
         } catch (error) {
             console.error('Error al actualizar la dirección:', error)
@@ -85,10 +85,16 @@ class Usuario {
         }
     }
 
-    static async traerDireccionEspecifica(idDireccion){
-        const [ query ] = 'SELECT * FROM direcciones WHERE id_direccion = ?;'
-        const [ resultado ] = await db.execute(query, [ idDireccion ])
+    static async traerDireccionEspecifica(idDireccion, idCliente){
+        const query = 'SELECT * FROM direcciones WHERE id_direccion = ? AND id_cliente = ?;'
+        const [ resultado ] = await db.execute(query, [ idDireccion, idCliente ])
         return resultado[0]
+    }
+
+    static async eliminarDireccion(idDireccion, idCliente){
+        const query = 'DELETE FROM direcciones WHERE id_direccion = ? AND id_cliente = ?;'
+        const [ resultado ] = await db.execute(query, [ idDireccion, idCliente ])
+        return resultado.affectedRows > 0
     }
 
     static async traerMascotas(idCliente){

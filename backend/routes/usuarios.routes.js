@@ -14,6 +14,8 @@ const {
     deshboard,
     guardarDireccion,
     traerDireccionEspecifica,
+    actualizarDireccion,
+    eliminarDireccionUsuario,
     cambiarFotoPerfil
 } = require('./../controllers/usuarios.controller');
 
@@ -56,6 +58,9 @@ router.post("/refresh", refreshToken);
 router.post('/guardarcliente', authMiddleware, guardarCliente)
 router.get('/deshboard', authMiddleware, deshboard)
 router.post('/guardardireccion', authMiddleware, guardarDireccion)
-router.get('/traerdireccion', authMiddleware, traerDireccionEspecifica)
+router.post('/traerdireccion', authMiddleware, traerDireccionEspecifica)
+router.put('/actualizardireccion/:id', authMiddleware, actualizarDireccion)
+router.delete('/eliminardireccion/:id', authMiddleware, eliminarDireccionUsuario)
+router.post('/cambiarfotoperfil', authMiddleware, upload.single('imagen_usuario'), manejarErrorUpload, cambiarFotoPerfil)
 
 module.exports = router;

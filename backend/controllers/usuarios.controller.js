@@ -32,6 +32,7 @@ const {
   guardarDireccionCliente,
   actualizarDireccionCliente,
   traerDireccion,
+  eliminarDireccion,
 
   solicitarMascotas,
   solicitarTurnos,
@@ -282,12 +283,82 @@ const guardarDireccion = async (req, res) => {
 }
 
 const traerDireccionEspecifica = async (req, res) => {
-  const { idDireccion } = req.id;
-  const direccion = await traerDireccion(idDireccion);
+  const cliente = await traerInfoCliente(req.usuario.id);
+  if (!cliente) {
+    return res.status(404).json({ message: "Cliente no encontrado" });
+  }
+  const { id_direccion } = req.body;
+  if (!Number.isInteger(Number(id_direccion)) || Number(id_direccion) < 1) {
+    return res.status(400).json({ message: "Identificador de dirección inválido" });
+  }
+  const direccion = await traerDireccion(id_direccion, cliente.id_cliente);
   if (!direccion) {
     return res.status(404).json({ message: "Dirección no encontrada" });
   }
   res.status(200).json(direccion);
+}
+
+const actualizarDireccion = async (req, res) => {
+  const cliente = await traerInfoCliente(req.usuario.id);
+  if (!cliente) {
+    return res.status(404).json({ message: "Cliente no encontrado" });
+  }
+
+  const idDireccion = Number(req.params.id);
+  if (!Number.isInteger(idDireccion) || idDireccion < 1) {
+    return res.status(400).json({ message: "Identificador de dirección inválido" });
+  }
+
+  const { tipo_direccion, calle, numero, provincia, localidad, codigo_postal, departamento, piso, referencia } = req.body;
+  if (!tipo_direccion || !calle || !numero || !provincia || !localidad || !codigo_postal) {
+    return res.status(400).json({ message: "Completa todos los campos obligatorios" });
+  }
+
+  const direccion = await traerDireccion(idDireccion, cliente.id_cliente);
+  if (!direccion) {
+    return res.status(404).json({ message: "Dirección no encontrada" });
+  }
+
+  const actualizado = await actualizarDireccionCliente(
+    idDireccion,
+    cliente.id_cliente,
+    tipo_direccion,
+    calle,
+    numero,
+    provincia,
+    localidad,
+    codigo_postal,
+    departamento,
+    piso,
+    referencia
+  );
+  if (!actualizado) {
+    return res.status(500).json({ message: "No se pudo actualizar la dirección" });
+  }
+  res.status(200).json({ message: "Dirección actualizada correctamente" });
+}
+
+const eliminarDireccionUsuario = async (req, res) => {
+  const cliente = await traerInfoCliente(req.usuario.id);
+  if (!cliente) {
+    return res.status(404).json({ message: "Cliente no encontrado" });
+  }
+
+  const idDireccion = Number(req.params.id);
+  if (!Number.isInteger(idDireccion) || idDireccion < 1) {
+    return res.status(400).json({ message: "Identificador de dirección inválido" });
+  }
+
+  const direccion = await traerDireccion(idDireccion, cliente.id_cliente);
+  if (!direccion) {
+    return res.status(404).json({ message: "Dirección no encontrada" });
+  }
+
+  const eliminado = await eliminarDireccion(idDireccion, cliente.id_cliente);
+  if (!eliminado) {
+    return res.status(500).json({ message: "No se pudo eliminar la dirección" });
+  }
+  res.status(200).json({ message: "Dirección eliminada correctamente" });
 }
 
 const cambiarFotoPerfil = async (req, res) => {
@@ -320,5 +391,7 @@ module.exports = {
   deshboard,
   guardarDireccion,
   traerDireccionEspecifica,
+  actualizarDireccion,
+  eliminarDireccionUsuario,
   cambiarFotoPerfil
 };

@@ -143,19 +143,18 @@
                         </div>
                     </div>
                     <div class="col align-content-end text-end">
-                        <button onclick="document.getElementById('modalDireccion').showModal()"
-                            class="agregar-direccion"><i class="ph ph-plus"></i> Nueva direccion</button>
+                        <button type="button" class="agregar-direccion"><i class="ph ph-plus"></i> Nueva direccion</button>
                     </div>
                 </div>
                 <div class="row justify-content-center align-items-center g-2 direcciones-contenedor">
                 </div>
                 <dialog id="modalDireccion">
-                    <div class="eyebrow">Nueva direccion</div>
+                    <div class="eyebrow" id="tituloModalDireccion">Nueva direccion</div>
                     <hr>
                     <form action="" id="formAgregarDireccion">
                         <div class="row row-cols-1 row-cols-md-2">
                             <div class="col">
-                                <label for="tipoDirec">Tipo<b class="obligatorio">*</b></label><br>
+                                <label for="tipoDireccion">Tipo<b class="obligatorio">*</b></label><br>
                                 <select name="tipoDireccion" id="tipoDireccion" required>
                                     <option selected value="DOMICILIO">Domiciliaria</option>
                                     <option value="COMERCIO">Laboral</option>
@@ -179,9 +178,9 @@
                                 <label for="referencia">Referencia</label><br>
                                 <input type="text" name="referencia" id="referencia"><br>
                                 <div class="pie text-end">
-                                    <button class="cerrar-modal"
+                                <button type="button" class="cerrar-modal"
                                         onclick="document.querySelector('#modalDireccion').close()">Cancelar</button>
-                                    <button type="submit" class="guardar-direccion">Guardar</button>
+                                <button type="submit" class="guardar-direccion" id="guardarDireccion">Guardar</button>
                                 </div>
                             </div>
                         </div>

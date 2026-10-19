@@ -22,6 +22,9 @@ const contenidoHistorial = document.querySelectorAll('article')
 /* Form usuario */
 const formUsuario = document.getElementById('formUsuario')
 const formDireccion = document.getElementById('formAgregarDireccion')
+const modalDireccion = document.getElementById('modalDireccion')
+const btnAgregarDireccion = document.querySelector('.agregar-direccion')
+let idDireccionEnEdicion = null
 
 const apiUsuario = 'http://127.0.0.1:3000/api/usuarios';
 const refresh = "http://127.0.0.1:3000/api/usuarios/refresh"
@@ -29,7 +32,6 @@ const MESES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'O
 const DIAS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
 
 /* acciones */
-const btnAgregarDireccion = document.querySelector('.agregar-direccion')
 
 contenedorOpcione.querySelectorAll('.opcion').forEach(opcion => {
     opcion.addEventListener('click', (evento) => {
@@ -174,15 +176,87 @@ function cargarDirecciones(direcciones) {
     })
 }
 
-function eliminarDireccion(id) {
-    console.log('direccion Borrada, ', id)
+async function eliminarDireccion(id) {
+    const confirmacion = confirm('¿Estás seguro de que deseas eliminar esta dirección?');
+    if (!confirmacion) return;
+
+    let respuesta = await fetch(`${apiUsuario}/eliminardireccion/${id}`, {
+        method: 'DELETE',
+        credentials: 'include'
+    });
+    const resultado = await respuesta.json();
+    if (!respuesta.ok) {
+        mostrarToast(resultado.message || resultado.mensaje || 'No se pudo eliminar la dirección.', 'error');
+        return;
+    }
+    mostrarToast('Dirección eliminada correctamente.', 'success');
+    // Recargar las direcciones para reflejar el cambio
+    setTimeout(() => {
+        window.location.reload();
+    }, 1000);
 }
 
-function editarDireccion(id) {
-    const modalDireccion = document.querySelector('#modalDireccion');
-    
-    console.log('direccion editada, ', id)
+async function editarDireccion(id) {
+    try {
+        let respuesta = await fetch(`${apiUsuario}/traerdireccion`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include',
+            body: JSON.stringify({ id_direccion: id })
+        });
+
+        if (respuesta.status === 401 && await renovarToken()) {
+            respuesta = await fetch(`${apiUsuario}/traerdireccion`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify({ id_direccion: id })
+            });
+        }
+
+        const resultado = await respuesta.json();
+        if (!respuesta.ok) {
+            mostrarToast(resultado.message || resultado.mensaje || 'No se pudo cargar la dirección.', 'error');
+            return;
+        }
+
+        idDireccionEnEdicion = id;
+        document.getElementById('tituloModalDireccion').textContent = 'Editar direccion';
+        document.getElementById('guardarDireccion').textContent = 'Guardar cambios';
+        document.getElementById('tipoDireccion').value = resultado.tipo_direccion;
+        document.getElementById('calle').value = resultado.calle ?? '';
+        document.getElementById('numero').value = resultado.numero ?? '';
+        document.getElementById('provincia').value = resultado.provincia ?? '';
+        document.getElementById('localidad').value = resultado.localidad ?? '';
+        document.getElementById('codigo').value = resultado.codigo_postal ?? '';
+        document.getElementById('departamento').value = resultado.departamento ?? '';
+        document.getElementById('piso').value = resultado.piso ?? '';
+        document.getElementById('referencia').value = resultado.referencia ?? '';
+        modalDireccion.showModal();
+    } catch (error) {
+        console.error('Error al cargar la dirección para editar:', error);
+        mostrarToast('No se pudo cargar la dirección.', 'error');
+    }
 }
+
+btnAgregarDireccion.addEventListener('click', () => {
+    idDireccionEnEdicion = null;
+    formDireccion.reset();
+    document.getElementById('tituloModalDireccion').textContent = 'Nueva direccion';
+    document.getElementById('guardarDireccion').textContent = 'Guardar';
+    modalDireccion.showModal();
+});
+
+modalDireccion.addEventListener('close', () => {
+    idDireccionEnEdicion = null;
+    formDireccion.reset();
+    document.getElementById('tituloModalDireccion').textContent = 'Nueva direccion';
+    document.getElementById('guardarDireccion').textContent = 'Guardar';
+});
 
 function calcularEdadMascota(fechaNacimientoServidor) {
     const [year, month, day] = fechaNacimientoServidor.split('-').map(Number);
@@ -435,39 +509,38 @@ formDireccion.addEventListener('submit', async (evento) => {
         piso: piso,
         referencia: referencia,
     }
-    console.log(datos)
-
-    let enviar = await fetch(`${apiUsuario}/guardardireccion`, {
-        method: "POST",
+    const url = idDireccionEnEdicion
+        ? `${apiUsuario}/actualizardireccion/${idDireccionEnEdicion}`
+        : `${apiUsuario}/guardardireccion`;
+    const opciones = {
+        method: idDireccionEnEdicion ? 'PUT' : 'POST',
         headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         },
-        credentials: "include",
+        credentials: 'include',
         body: JSON.stringify(datos),
-    });
+    };
 
-    if (enviar.status === 401) {
-        if (renovarToken()) {
-            enviar = await fetch(`${apiUsuario}/guardardireccion`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                credentials: "include",
-                body: JSON.stringify(datos),
-            });
+    try {
+        let enviar = await fetch(url, opciones);
+        if (enviar.status === 401 && await renovarToken()) {
+            enviar = await fetch(url, opciones);
         }
-    }
 
-    const confirmacion = await enviar.json();
+        const confirmacion = await enviar.json();
 
-    if (enviar.ok) {
-        mostrarToast('Dirección guardada correctamente.', 'exito');
-        setTimeout(() => {
-            window.location.reload();
-        }, 3000);
-    } else {
-        mostrarToast(confirmacion.mensaje || 'Hubo un problema, intentelo de nuevo mas tarde.', 'error');
+        if (enviar.ok) {
+            mostrarToast(idDireccionEnEdicion ? 'Dirección actualizada correctamente.' : 'Dirección guardada correctamente.', 'exito');
+            modalDireccion.close();
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        } else {
+            mostrarToast(confirmacion.message || confirmacion.mensaje || 'Hubo un problema, intentelo de nuevo mas tarde.', 'error');
+        }
+    } catch (error) {
+        console.error('Error al guardar la dirección:', error);
+        mostrarToast('No se pudo guardar la dirección.', 'error');
     }
 })
 

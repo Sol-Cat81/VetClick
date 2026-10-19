@@ -48,12 +48,23 @@ async function guardarDireccionCliente(id_cliente, tipo_direccion, calle, numero
     return await Usuario.guardarDireccion(id_cliente, tipo_direccion, calle, numero, provincia, localidad, codigo_postal, departamento, piso, referencia)
 }
 
-async function actualizarDireccionCliente(id_direccion, tipo_direccion, calle, numero, ciudad, provincia, codigo_postal, departamento, piso, referencia) {
-    return await Usuario.actualizarDireccion(id_direccion, tipo_direccion, calle, numero, ciudad, provincia, codigo_postal, departamento, piso, referencia)
+async function actualizarDireccionCliente(id_direccion, id_cliente, tipo_direccion, calle, numero, provincia, localidad, codigo_postal, departamento, piso, referencia) {
+    departamento = departamento || null
+    piso = piso || null
+    referencia = referencia || null
+    return await Usuario.actualizarDireccion(id_direccion, id_cliente, tipo_direccion, calle, numero, provincia, localidad, codigo_postal, departamento, piso, referencia)
 }
 
-async function traerDireccion(idDireccion) {
-    return Usuario.traerDireccionEspecifica(idDireccion)
+async function traerDireccion(idDireccion, idCliente) {
+    return Usuario.traerDireccionEspecifica(idDireccion, idCliente)
+}
+
+async function eliminarDireccion(idDireccion, idCliente) {
+    const resultado = await Usuario.eliminarDireccion(idDireccion, idCliente)
+    if (!resultado) {
+        throw new Error('No se pudo eliminar la dirección')
+    }
+    return resultado
 }
 
 async function solicitarMascotas(idCliente) {
@@ -82,6 +93,7 @@ module.exports = {
     guardarDireccionCliente,
     actualizarDireccionCliente,
     traerDireccion,
+    eliminarDireccion,
 
     solicitarMascotas,
     solicitarTurnos,
