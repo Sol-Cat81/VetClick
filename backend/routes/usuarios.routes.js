@@ -13,6 +13,7 @@ const {
     guardarCliente,
     deshboard,
     guardarDireccion,
+    traerDireccionEspecifica,
     cambiarFotoPerfil
 } = require('./../controllers/usuarios.controller');
 
@@ -54,5 +55,7 @@ router.post("/refresh", refreshToken);
 
 router.post('/guardarcliente', authMiddleware, guardarCliente)
 router.get('/deshboard', authMiddleware, deshboard)
+router.post('/guardardireccion', authMiddleware, guardarDireccion)
+router.get('/traerdireccion', authMiddleware, traerDireccionEspecifica)
 
 module.exports = router;

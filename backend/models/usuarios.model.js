@@ -63,10 +63,10 @@ class Usuario {
         return direcciones
     }
 
-    static async guardarDireccion(id_cliente, tipo_direccion, calle, numero, ciudad, provincia, codigo_postal, departamento, piso, referencia) {
+    static async guardarDireccion(id_cliente, tipo_direccion, calle, numero, provincia, localidad, codigo_postal, departamento, piso, referencia) {
         try {
-            const query = `INSERT INTO direcciones(id_cliente, tipo_direccion, calle, numero, localidad, provincia, codigo_postal, departamento, piso, referencia) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-            await db.execute(query, [id_cliente, tipo_direccion, calle, numero, ciudad, provincia, codigo_postal, departamento, piso, referencia])
+            const query = `INSERT INTO direcciones(id_cliente, tipo_direccion, calle, numero, provincia, localidad, codigo_postal, departamento, piso, referencia) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
+            await db.execute(query, [id_cliente, tipo_direccion, calle, numero, provincia, localidad, codigo_postal, departamento, piso, referencia])
             return true
         } catch (error) {
             console.error('Error al guardar la dirección:', error)
@@ -83,6 +83,12 @@ class Usuario {
             console.error('Error al actualizar la dirección:', error)
             return false
         }
+    }
+
+    static async traerDireccionEspecifica(idDireccion){
+        const [ query ] = 'SELECT * FROM direcciones WHERE id_direccion = ?;'
+        const [ resultado ] = await db.execute(query, [ idDireccion ])
+        return resultado[0]
     }
 
     static async traerMascotas(idCliente){

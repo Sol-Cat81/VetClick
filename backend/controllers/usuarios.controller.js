@@ -31,6 +31,7 @@ const {
   solicitarDirecciones,
   guardarDireccionCliente,
   actualizarDireccionCliente,
+  traerDireccion,
 
   solicitarMascotas,
   solicitarTurnos,
@@ -267,12 +268,26 @@ const deshboard = async (req, res) => {
 
 const guardarDireccion = async (req, res) => {
   const idUsuario = req.usuario.id;
-  const direcciones = await trerDirecciones(idUsuario);
-  if (!direcciones) {
-    res.status(404).json({ mensaje: "No hay direcciones registradas" })
-  } else {
-    res.status(201).json(direcciones)
+  const cliente = await traerInfoCliente(idUsuario);
+  if (!cliente) {
+    return res.status(404).json({ message: "Cliente no encontrado" });
   }
+  const { tipo_direccion, calle, numero, provincia, localidad, codigo_postal, departamento, piso, referencia } = req.body;
+  const resultado = await guardarDireccionCliente(cliente.id_cliente, tipo_direccion, calle, numero, provincia, localidad, codigo_postal, departamento, piso, referencia);
+  if (resultado) {
+    res.status(201).json({ message: "Dirección guardada correctamente" });
+  } else {
+    res.status(500).json({ message: "No se pudo guardar la dirección" });
+  }
+}
+
+const traerDireccionEspecifica = async (req, res) => {
+  const { idDireccion } = req.id;
+  const direccion = await traerDireccion(idDireccion);
+  if (!direccion) {
+    return res.status(404).json({ message: "Dirección no encontrada" });
+  }
+  res.status(200).json(direccion);
 }
 
 const cambiarFotoPerfil = async (req, res) => {
@@ -304,5 +319,6 @@ module.exports = {
   guardarCliente,
   deshboard,
   guardarDireccion,
+  traerDireccionEspecifica,
   cambiarFotoPerfil
 };

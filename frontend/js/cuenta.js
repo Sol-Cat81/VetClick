@@ -406,6 +406,71 @@ formUsuario.addEventListener('submit', async (evento) => {
 
 })
 
+formDireccion.addEventListener('submit', async (evento) => {
+    evento.preventDefault();
+
+    const tipoDireccion = document.getElementById('tipoDireccion').value;
+    const calle = document.getElementById('calle').value;
+    const numero = document.getElementById('numero').value;
+    const provincia = document.getElementById('provincia').value;
+    const localidad = document.getElementById('localidad').value;
+    const codigoPostal = document.getElementById('codigo').value;
+    const departamento = document.getElementById('departamento').value;
+    const piso = document.getElementById('piso').value;
+    const referencia = document.getElementById('referencia').value;
+
+    if (!tipoDireccion || !calle || !numero || !provincia || !codigoPostal) {
+        mostrarToast('Llena todos los campos obligatorios correctamente!', 'error')
+        return;
+    }
+
+    const datos = {
+        tipo_direccion: tipoDireccion,
+        calle: calle,
+        numero: numero,
+        provincia: provincia,
+        localidad: localidad,
+        codigo_postal: codigoPostal,
+        departamento: departamento,
+        piso: piso,
+        referencia: referencia,
+    }
+    console.log(datos)
+
+    let enviar = await fetch(`${apiUsuario}/guardardireccion`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(datos),
+    });
+
+    if (enviar.status === 401) {
+        if (renovarToken()) {
+            enviar = await fetch(`${apiUsuario}/guardardireccion`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: "include",
+                body: JSON.stringify(datos),
+            });
+        }
+    }
+
+    const confirmacion = await enviar.json();
+
+    if (enviar.ok) {
+        mostrarToast('Dirección guardada correctamente.', 'exito');
+        setTimeout(() => {
+            window.location.reload();
+        }, 3000);
+    } else {
+        mostrarToast(confirmacion.mensaje || 'Hubo un problema, intentelo de nuevo mas tarde.', 'error');
+    }
+})
+
 function abrirModalFoto(){
     modalFoto.classList.add('abierto');
     modalFoto.setAttribute('aria-hidden', 'false');

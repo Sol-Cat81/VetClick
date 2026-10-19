@@ -10,7 +10,8 @@ async function traerInfoUsuario(idUsuario) {
 }
 
 async function traerInfoCliente(idUsuario) {
-    return await Usuario.traerCliente(idUsuario)
+    const clientes = await Usuario.traerCliente(idUsuario)
+    return clientes[0] ?? null
 }
 
 async function guardarCrearCliente(idUsuario, nombre, apellido, telefono, username) {
@@ -40,12 +41,19 @@ async function solicitarDirecciones(idUsuario) {
     return await Usuario.traerDireccion(idUsuario)
 }
 
-async function guardarDireccionCliente(id_cliente, tipo_direccion, calle, numero, ciudad, provincia, codigo_postal, departamento, piso, referencia) {
-    return await Usuario.guardarDireccion(id_cliente, tipo_direccion, calle, numero, ciudad, provincia, codigo_postal, departamento, piso, referencia)
+async function guardarDireccionCliente(id_cliente, tipo_direccion, calle, numero, provincia, localidad, codigo_postal, departamento, piso, referencia) {
+    departamento = departamento || null
+    piso = piso || null
+    referencia = referencia || null
+    return await Usuario.guardarDireccion(id_cliente, tipo_direccion, calle, numero, provincia, localidad, codigo_postal, departamento, piso, referencia)
 }
 
 async function actualizarDireccionCliente(id_direccion, tipo_direccion, calle, numero, ciudad, provincia, codigo_postal, departamento, piso, referencia) {
     return await Usuario.actualizarDireccion(id_direccion, tipo_direccion, calle, numero, ciudad, provincia, codigo_postal, departamento, piso, referencia)
+}
+
+async function traerDireccion(idDireccion) {
+    return Usuario.traerDireccionEspecifica(idDireccion)
 }
 
 async function solicitarMascotas(idCliente) {
@@ -73,7 +81,8 @@ module.exports = {
     solicitarDirecciones,
     guardarDireccionCliente,
     actualizarDireccionCliente,
-    
+    traerDireccion,
+
     solicitarMascotas,
     solicitarTurnos,
     solicitarPedidos,
