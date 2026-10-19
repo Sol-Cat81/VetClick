@@ -11,8 +11,9 @@ const {
     logout, 
     refreshToken, 
     guardarCliente,
-    traerClienteUsuario,
-    traerDireccionesCliente
+    deshboard,
+    guardarDireccion,
+    cambiarFotoPerfil
 } = require('./../controllers/usuarios.controller');
 
 const upload = multer({
@@ -52,7 +53,6 @@ router.post("/refresh", refreshToken);
 /* rutas configuracion cuenta */
 
 router.post('/guardarcliente', authMiddleware, guardarCliente)
-router.get('/traeruser', authMiddleware, traerClienteUsuario)
-router.get('/direcciones', authMiddleware, traerDireccionesCliente)
+router.get('/deshboard', authMiddleware, deshboard)
 
 module.exports = router;

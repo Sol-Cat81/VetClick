@@ -23,8 +23,19 @@ const subirImagen = async (archivo, carpeta, nombrePublico) => {
 const carpetaUsuarios = () => process.env.CLOUDINARY_FOLDER_PERFILES_USUARIOS || 'VetClick/PerfilesUsuario';
 
 const {
+  traerInfoUsuario,
+  traerInfoCliente,
+  guardarImagenUsuario,
   guardarCrearCliente,
-  trerDirecciones
+
+  solicitarDirecciones,
+  guardarDireccionCliente,
+  actualizarDireccionCliente,
+
+  solicitarMascotas,
+  solicitarTurnos,
+  solicitarPedidos,
+  solicitarHistorialMascota
 } = require("../service/usuarios.service");
 
 // Comprueba email y contraseña y devuelve únicamente datos públicos del usuario.
@@ -145,8 +156,8 @@ const registrarUsuario = async (req, res) => {
 
     // Insertamos usando parámetros para evitar inyección SQL.
     const [nuevoUsuario] = await db.query(
-      "INSERT INTO usuarios(username, email, password_hash, id_rol_usuario) VALUES (?, ?, ?, ?)",
-      [usuario, gmail, hashPassword, 3],
+      "INSERT INTO usuarios(username, email, password_hash, id_rol_usuario, img_usuario) VALUES (?, ?, ?, ?, ?);",
+      [usuario, gmail, hashPassword, 3, "null"],
     );
 
     res.status(201).json({ message: "Registro exitoso, puede iniciar sesion" });
@@ -246,43 +257,43 @@ const guardarCliente = async (req, res) => {
 const deshboard = async (req, res) => {
   const idUsuario = req.usuario.id;
   const usuario = await traerInfoUsuario(idUsuario)
-
-  if (!info) {
-    res.status(500).json({ mensaje: "Hubo un error con el sevidor" })
-  } else {
-    res.status(201).json({ info })
-  }
+  const direcciones = await solicitarDirecciones(idUsuario)
+  const mascotas = await solicitarMascotas(idUsuario)
+  const turnos = await solicitarTurnos(idUsuario)
+  const pedidos = await solicitarPedidos(idUsuario)
+  
+  res.status(200).json({ usuario, direcciones, mascotas, turnos, pedidos })
 }
 
 const guardarDireccion = async (req, res) => {
   const idUsuario = req.usuario.id;
   const direcciones = await trerDirecciones(idUsuario);
-  if(!direcciones){
-    res.status(404).json({mensaje: "No hay direcciones registradas"})
-  }else{
+  if (!direcciones) {
+    res.status(404).json({ mensaje: "No hay direcciones registradas" })
+  } else {
     res.status(201).json(direcciones)
   }
 }
 
-const cambiarFotoPerfil = async (req , res)=>{
+const cambiarFotoPerfil = async (req, res) => {
   const idUsuario = req.usuario.id;
   const archivo = req.file;
 
-  if (!archivo){
-    return res.status(400).json({message: 'no recibio ninguna imagen'});
+  if (!archivo) {
+    return res.status(400).json({ message: 'no recibio ninguna imagen' });
   }
 
   const nombreArchivo = `${carpetaUsuarios()}/usuario_${idUsuario}`;
 
-  try{
-    const imagen = await subirImagen(archivo,carpetaUsuarios(),nombreArchivo);
+  try {
+    const imagen = await subirImagen(archivo, carpetaUsuarios(), nombreArchivo);
     await guardarImagenUsuario(idUsuario, imagen);
-    res.json({message: 'foto actualizada correctamente', imagen});
-  }catch(error){
+    res.json({ message: 'foto actualizada correctamente', imagen });
+  } catch (error) {
     console.error('error al cambiar la foto de perfil ', error);
-    res.status(400).json({mensaje: error.message || 'no se pudo guardar la foto'})
+    res.status(400).json({ mensaje: error.message || 'no se pudo guardar la foto' })
   }
-} 
+}
 
 module.exports = {
   verificarUsuario,
@@ -291,6 +302,7 @@ module.exports = {
   logout,
   refreshToken,
   guardarCliente,
-  traerClienteUsuario,
-  traerDireccionesCliente
+  deshboard,
+  guardarDireccion,
+  cambiarFotoPerfil
 };

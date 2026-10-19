@@ -65,6 +65,17 @@ async function solicitarHistorialMascota(idMascota){
 }
 
 module.exports = {
+    traerInfoUsuario,
+    traerInfoCliente,
+    guardarImagenUsuario,
     guardarCrearCliente,
-    trerDirecciones
+
+    solicitarDirecciones,
+    guardarDireccionCliente,
+    actualizarDireccionCliente,
+    
+    solicitarMascotas,
+    solicitarTurnos,
+    solicitarPedidos,
+    solicitarHistorialMascota,
 }

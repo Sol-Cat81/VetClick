@@ -180,8 +180,7 @@ function eliminarDireccion(id) {
 
 function editarDireccion(id) {
     const modalDireccion = document.querySelector('#modalDireccion');
-
-    const infoDireccion = await fetch(a)
+    
     console.log('direccion editada, ', id)
 }
 
@@ -326,7 +325,7 @@ window.addEventListener('load', async () => {
 
         if (deshboard.status === 401) {
             if (renovarToken()) {
-                deshboard = await fetch(`${apiUsuario}/traeruser`, { credentials: 'include' })
+                deshboard = await fetch(`${apiUsuario}/deshboard`, { credentials: 'include' })
             } else {
                 mostrarToast("Su sesion a expirado, vuelva a iniciar sesion.", 'error')
                 setTimeout(() => {
@@ -406,3 +405,100 @@ formUsuario.addEventListener('submit', async (evento) => {
     }
 
 })
+
+function abrirModalFoto(){
+    modalFoto.classList.add('abierto');
+    modalFoto.setAttribute('aria-hidden', 'false');
+    guardarFoto.disabled = true;
+}
+
+function cerrarModalFoto(){
+    if(recorte){
+        recorte.destroy(); recorte = null;
+    }
+    modalFoto.classList.remove('abierto');
+    modalFoto.setAttribute('aria-hidden', 'true');
+    inputFotoUsuario.value = '';
+}
+
+btnCambiarFoto.addEventListener('click', () => inputFotoUsuario.click());
+document.getElementById('cancelarFoto').addEventListener('click', cerrarModalFoto);
+document.getElementById('cerrarModalFoto').addEventListener('click', cerrarModalFoto);
+modalFoto.addEventListener('click', (evento) => {
+    if (evento.target === modalFoto) cerrarModalFoto();
+});
+
+inputFotoUsuario.addEventListener('change', ()=>{
+    const archivo = inputFotoUsuario.files[0];
+    if(!archivo)return;
+
+    const extensiones = TIPOS_ACEPTADOS.map(tipo => tipo.split('/')[1]);
+    if(!TIPOS_ACEPTADOS.includes(archivo.type)){
+        mostrarToast(`esa imagen no sirve pe usa ${extensiones.join(', ')}`, 'error');
+        inputFotoUsuario.value = '';
+        return;
+    }
+    if(archivo.size > LIMITE_MEGABYTES * 1024 * 1024){
+        mostrarToast(`la imagen pesa ${(archivo.size / 1024 /1024).toFixed(1)} MB y el macximo es ${LIMITE_MEGABYTES} MB`, 'error');
+        inputFotoUsuario.value = '';
+        return;
+    }
+
+    const lector = new FileReader();
+    lector.onload = () =>{
+        imagenRecorte.src = lector.result;
+        abrirModalFoto();
+        if(recorte) recorte.destroy();
+        recorte = new Cropper(imagenRecorte, {
+            aspectRatio: 1,       // el avatar es un cuadrado de 80px
+            viewMode: 1,
+            autoCropArea: 1,
+            dragMode: 'move',
+            cropperMovable: false, // no se puede encoger el recorte por debajo
+            cropperScalable: false,
+            ready: () => { guardarFoto.disabled = false; }
+        });
+    };
+    lector.readAsDataURL(archivo);
+});
+
+guardarFoto.addEventListener('click', async()=>{
+    if(!recorte) return;
+    guardarFoto.disabled = true;
+
+    recorte.getCroppedCanvas().toBlob(async(blob)=>{
+        if (!blob){guardarFoto.disabled = false; return;}
+
+        const datos = new FormData();
+        datos.append('imagen_usuario', blob, 'perfil.jpg');
+
+        try{
+            let enviar = await fetch(`${apiUsuario}/perfil/foto`,{
+                method:'POST',
+                credentials: 'include',
+                body: datos
+            });
+            if (enviar.status === 401){
+                if (renovarToken()){
+                    enviar = await fetch(`${apiUsuario}/perfil/foto`,{
+                        method: 'POST',
+                        credentials: 'include',
+                        body: datos
+                    });
+                }
+            }
+            const confirmacion = await enviar.json();
+            if (enviar.ok){
+                fotoUsuario.src = `${confirmacion.imagen}?v=${Date.now()}`;
+                cerrarModalFoto();
+                mostrarToast('foto actualizada', 'exito');
+            }else{
+                mostrarToast(confirmacion.mensaje || 'no se pudo guardar la foto', 'error');
+                guardarFoto.disabled = false;
+            }
+        }catch (error){
+            mostrarToast('hubo un problema con el servidor', 'error');
+            guardarFoto.disabled = false;
+        }
+    },'image/jpeg', 0.9);
+});
