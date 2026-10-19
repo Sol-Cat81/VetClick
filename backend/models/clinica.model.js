@@ -3,14 +3,17 @@ const ClinicaModel = {
   obtenerTurnos: async () => {
     const [rows] = await conexion.query(`
       SELECT t.id_turno, t.id_cliente, t.id_mascota, t.id_servicio, t.id_sucursal,
-             t.fecha, t.hora, m.nombre AS mascota,
+             t.id_veterinario, t.fecha, t.hora, m.nombre AS mascota,
              CONCAT(c.nombre, ' ', c.apellido) AS cliente,
              s.nombre AS servicio, su.nombre AS sucursal,
+             CONCAT(e.nombre, ' ', e.apellido) AS veterinario,
              t.motivo, t.estado, t.observaciones
       FROM turnos t JOIN mascota m ON m.id_mascota = t.id_mascota
       JOIN servicios s ON s.id_servicio = t.id_servicio
       LEFT JOIN clientes c ON c.id_cliente = t.id_cliente
       LEFT JOIN sucursales su ON su.id_sucursal = t.id_sucursal
+      LEFT JOIN veterinarios v ON v.id_veterinario = t.id_veterinario
+      LEFT JOIN empleados e ON e.id_empleado = v.id_empleado
       ORDER BY t.fecha, t.hora`);
     return rows;
   },

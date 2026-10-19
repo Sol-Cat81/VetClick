@@ -25,6 +25,17 @@ async function guardarCrearCliente(idUsuario, nombre, apellido, telefono, userna
     return resultado
 }
 
+async function guardarImagenUsuario(idUsuario,imagen){
+    if(!imagen){
+        throw new Error('la imagen es obligatoria')
+    }
+    const resultado = await Usuario.actualizarImagenUsuario(idUsuario, imagen)
+    if(!resultado){
+        throw new Error ('error al guardar la imagen del usuario')
+    }
+    return resultado
+}
+
 async function solicitarDirecciones(idUsuario) {
     return await Usuario.traerDireccion(idUsuario)
 }
@@ -55,13 +66,5 @@ async function solicitarHistorialMascota(idMascota){
 
 module.exports = {
     guardarCrearCliente,
-    traerInfoUsuario,
-    traerInfoCliente,
-    solicitarDirecciones,
-    guardarDireccionCliente,
-    actualizarDireccionCliente,
-    solicitarMascotas,
-    solicitarTurnos,
-    solicitarPedidos,
-    solicitarHistorialMascota
+    trerDirecciones
 }

@@ -23,6 +23,17 @@ const swiper = new Swiper(".swiper-hero", {
   },
 });
 
+function escaparHTML(valor) {
+    // Reemplaza los caracteres que pueden modificar el marcado de las cards.
+    return String(valor ?? "").replace(/[&<>"']/g, (caracter) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[caracter]);
+}
+
 const swiperBeneficios = new Swiper(".swiper-cards-beneficios", {
   slidesPerView: "auto",
   spaceBetween: 20,
@@ -165,10 +176,12 @@ function cargarMarcas(marcas){
     const parametros = new URLSearchParams({ categoria: marca.id_marca });
     cardMarca.classList.add("col");
     cardMarca.innerHTML = `
-      <div class="card-marcas mx-auto" onclick="window.location.href='catalogo.html?${parametros.toString()}'">
-        <img src="${marca.imagen || imagen404}" alt="..." />
+      <div class="card-marca mx-auto" onclick="window.location.href='catalogo.html?${parametros.toString()}'">
+        <div class="card-marcas"> 
+          <img src="${escaparHTML(marca.imagen_marca) || imagen404}"onerror="this.onerror=null;this.src='${imagen404}';" alt="..." />
+        </div>
         <div class="card-body">
-          <div class="card-title">${marca.nombre}</div>
+          <div class="card-title">${escaparHTML(marca.nombre)}</div>
         </div>
       </div>
     `;

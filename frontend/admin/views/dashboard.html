@@ -4,39 +4,39 @@
       <h1>Panel administrativo</h1>
       <p>Resumen general de Vet Click</p>
     </div>
-    <div class="page-date">Hoy, 19 de septiembre de 2026</div>
+    <div class="page-date" data-dash="fecha">—</div>
   </div>
 
   <div class="grid stats-grid">
     <article class="card stat-card">
       <div>
         <div class="stat-label">Ventas</div>
-        <div class="stat-value">$59.500</div>
-        <div class="stat-note">2 pedidos registrados</div>
+        <div class="stat-value" data-dash="ventas-total">—</div>
+        <div class="stat-note" data-dash="ventas-nota">&nbsp;</div>
       </div>
       <div class="stat-icon">$</div>
     </article>
     <article class="card stat-card">
       <div>
-        <div class="stat-label">Turnos de hoy</div>
-        <div class="stat-value">2</div>
-        <div class="stat-note">1 confirmado · 1 pendiente</div>
+        <div class="stat-label">Turnos pendientes</div>
+        <div class="stat-value" data-dash="pendientes">—</div>
+        <div class="stat-note" data-dash="pendientes-nota">&nbsp;</div>
       </div>
       <div class="stat-icon">✚</div>
     </article>
     <article class="card stat-card">
       <div>
         <div class="stat-label">Clientes</div>
-        <div class="stat-value">3</div>
-        <div class="stat-note">Registrados en el sistema</div>
+        <div class="stat-value" data-dash="clientes">—</div>
+        <div class="stat-note" data-dash="clientes-nota">&nbsp;</div>
       </div>
       <div class="stat-icon">◉</div>
     </article>
     <article class="card stat-card">
       <div>
         <div class="stat-label">Alertas</div>
-        <div class="stat-value">1</div>
-        <div class="stat-note">Requiere revisión</div>
+        <div class="stat-value" data-dash="alertas">—</div>
+        <div class="stat-note" data-dash="alertas-nota">&nbsp;</div>
       </div>
       <div class="stat-icon">!</div>
     </article>
@@ -45,7 +45,7 @@
   <div class="grid dashboard-grid">
     <article class="card table-card">
       <div class="card-head">
-        <h2>Estado de turnos</h2><span>Turnos programados</span>
+        <h2>Turnos pendientes</h2><span>Sin confirmar</span>
       </div>
       <div class="table-wrap">
         <table>
@@ -57,19 +57,8 @@
               <th>Estado</th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <td><strong>10:00</strong></td>
-              <td><strong>Thor</strong><br><small>Juan Pérez</small></td>
-              <td>Consulta General</td>
-              <td><span class="status success">Confirmado</span></td>
-            </tr>
-            <tr>
-              <td><strong>15:30</strong></td>
-              <td><strong>Toby</strong><br><small>María López</small></td>
-              <td>Corte y Baño</td>
-              <td><span class="status warning">Pendiente</span></td>
-            </tr>
+          <tbody data-dash="tabla-turnos">
+            <tr><td colspan="4">Cargando…</td></tr>
           </tbody>
         </table>
       </div>
@@ -77,12 +66,10 @@
 
     <article class="card">
       <div class="card-head">
-        <h2>Personal en turno</h2><span>3 activos</span>
+        <h2>Personal en turno</h2><span data-dash="personal-total">—</span>
       </div>
-      <div class="card-body">
-        <div class="info-row"><b>Dr. Carlos Gómez</b><span>Veterinario</span></div>
-        <div class="info-row"><b>Dra. Laura Martínez</b><span>Veterinaria</span></div>
-        <div class="info-row"><b>Sofía Rodríguez</b><span>Recepción</span></div>
+      <div class="card-body" data-dash="personal">
+        <div class="detalle-vacio">Cargando…</div>
       </div>
     </article>
 
@@ -90,13 +77,8 @@
       <div class="card-head">
         <h2>Alertas de inventario</h2><span>Revisión</span>
       </div>
-      <div class="card-body alert-list">
-        <div class="alert danger"><b>!</b>
-          <div><strong>Revisar stock</strong><small>Producto por debajo del umbral configurado</small></div>
-        </div>
-        <div class="alert success"><b>✓</b>
-          <div><strong>Stock correcto</strong><small>Resto de productos dentro del mínimo</small></div>
-        </div>
+      <div class="card-body alert-list" data-dash="alertas-lista">
+        <div class="detalle-vacio">Cargando…</div>
       </div>
     </article>
 
@@ -105,17 +87,6 @@
       <h3>Añadir cita</h3>
       <p>Registrar un nuevo turno para un paciente</p>
       <button class="btn btn-primary" data-modal-action="create" data-modal-entity="turno">Añadir cita</button>
-    </article>
-
-    <article class="card">
-      <div class="card-head">
-        <h2>Últimas actividades</h2><span>Reciente</span>
-      </div>
-      <div class="card-body">
-        <div class="info-row"><b>Pedido #2</b><span>Preparando</span></div>
-        <div class="info-row"><b>Pago #2</b><span>Pendiente</span></div>
-        <div class="info-row"><b>Envío #2</b><span>En camino</span></div>
-      </div>
     </article>
 
     <article class="card quick-card">

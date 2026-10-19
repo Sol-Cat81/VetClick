@@ -9,6 +9,10 @@
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous" />
     <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2"></script>
     <link rel="stylesheet" href="../css/cuenta.css" />
+    <!-- El CSS de Cropper va en el head y antes del script que lo usa: Cropper
+         mide el contenedor con este estilo aplicado para calcular el encuadre.
+         Cargado despues, el recorte se arma sobre medidas equivocadas. -->
+    <link href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css" rel="stylesheet">
     <title>VetClick - Mi cuenta</title>
 </head>
 
@@ -88,11 +92,12 @@
                     <form action="" id="formUsuario">
                         <div class="row row-cols-1 row-cols-md-2 align-items-center">
                             <div class="col">
-                                <img src="../assets/img/ChatGPT-Image.png" alt="">
+                                <img id="fotoUsuario" src="../assets/img/ChatGPT-Image.png" alt="Foto de perfil"
+                                    onerror="this.onerror=null;this.src='../assets/img/ChatGPT-Image.png'">
                                 <span>Juan Castellano</span>
                             </div>
                             <div class="col text-end">
-                                <button class="btn-cambiar-foto">
+                                <button type="button" class="btn-cambiar-foto" id="btnCambiarFoto">
                                     <i class="ph ph-pencil-simple-line"></i>
                                     Cambiar foto
                                 </button>
@@ -243,6 +248,32 @@
                 <article id="mascota" class="seccion-historial"></article>
             </section>
         </div>
+        <input type="file" id="inputFotoUsuario" accept="image/png,image/jpeg,image/webp" hidden>
+
+        <div class="modal-foto" id="modalFoto" aria-hidden="true">
+            <div class="modal-foto-caja">
+                <div class="modal-foto-cabecera">
+                    <h3>Cambiar foto</h3>
+                    <button type="button" class="modal-foto-cerrar" id="cerrarModalFoto" aria-label="Cerrar">
+                        <i class="ph ph-x"></i>
+                    </button>
+                </div>
+                <div class="modal-foto-cuerpo">
+                    <img id="imagenRecorte" alt="Recorte de la foto">
+                </div>
+                <p class="modal-foto-aviso">
+                    <i class="ph ph-warning-circle"></i>
+                    Máximo 5 MB. Formatos: JPG, PNG o WEBP. La foto se recorta a formato
+                    cuadrado y se guarda en el servidor: una vez guardada, la anterior no se
+                    puede recuperar.
+                </p>
+                <div class="modal-foto-pie">
+                    <button type="button" class="btn-cancelar" id="cancelarFoto">Cancelar</button>
+                    <button type="button" class="btn-guardar" id="guardarFoto">Guardar foto</button>
+                </div>
+            </div>
+        </div>
+
         <div class="toast-container position-fixed botton-0 end-0 p-3" style="z-index: 1055">
             <div id="miToast" class="toast align-items-center text-bg-success border-0" role="alert"
                 aria-live="assertive" aria-atomic="true">
@@ -254,6 +285,7 @@
             </div>
         </div>
     </main>
+    <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"></script>
     <script src="../js/cuenta.js"></script>
     <script src="../js/navbar.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"

@@ -4,6 +4,18 @@ const abrirAside = document.querySelector('.abrir-aside');
 const cerrarAside = document.querySelector('.cerrar-nav');
 const aside = document.querySelector('#aside')
 
+const FOTO_POR_DEFECTO = '../assets/img/ChatGPT-Image.png';
+const LIMITE_MEGABYTES = 5;
+const TIPOS_ACEPTADOS = ['image/jpeg', 'image/png', 'image/webp'];
+
+const btnCambiarFoto = document.getElementById('btnCambiarFoto');
+const inputFotoUsuario = document.getElementById('inputFotoUsuario');
+const modalFoto = document.getElementById('modalFoto');
+const imagenRecorte = document.getElementById('imagenRecorte');
+const guardarFoto = document.getElementById('guardarFoto');
+const fotoUsuario = document.getElementById('fotoUsuario');
+let recorte = null; 
+
 const navegarHistorial = document.querySelector('.filtrar-historial')
 const contenidoHistorial = document.querySelectorAll('article')
 
@@ -127,6 +139,9 @@ function cargarFormUsuario(info) {
     document.getElementById('nombre').value = info.cliente?.nombre ?? ''
     document.getElementById('apellido').value = info.cliente?.apellido ?? ''
     document.getElementById('telefono').value = info.cliente?.telefono ?? ''
+    // La foto viene en el mismo SELECT que el username y el email. Sin esto, la
+    // de arriba se veria recien despues de guardar una foto nueva.
+    fotoUsuario.src = info.usuario.img_usuario || FOTO_POR_DEFECTO
 }
 
 function cargarDirecciones(direcciones) {
@@ -391,63 +406,3 @@ formUsuario.addEventListener('submit', async (evento) => {
     }
 
 })
-
-formDireccion.addEventListener('submit', async (evento) => {
-    evento.preventDefault();
-
-    const tipoDireccion = document.querySelector('#tipoDireccion').value;
-    const calle = document.querySelector('#calle').value;
-    const numero = document.querySelector('#numero').value;
-    const localidad = document.querySelector('#localidad').value;
-    const provincia = document.querySelector('#provincia').value;
-    const codigoPostal = document.querySelector('#codigo').value;
-
-    const departamento = document.querySelector('#departamento').value;
-    const piso = document.querySelector('#piso').value;
-    const referencia = document.querySelector('#referencia').value;
-
-    if (!tipoDireccion || !calle || !numero || !localidad || !provincia || !codigoPostal) {
-        mostrarToast('Complete todos los campos que estan marcados.')
-        return
-    }
-
-    const datos = {
-        tipo_direccion: tipoDireccion,
-        calle: calle,
-        numero: numero,
-        ciudad: localidad,
-        provincia: provincia,
-        codigo_postal: codigoPostal,
-        departamento: departamento,
-        piso: piso,
-        referencia: referencia
-    }
-
-    try {
-        const enviarDireccion = await fetch(`${apiUsuario}/guardardireccion`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            credentials: "include",
-            body: JSON.stringify(datos),
-        },)
-
-        const exito = await enviarDireccion.json();
-
-        if (enviarDireccion.ok) {
-            mostrarToast(exito.mensaje || 'Se ha guardado la direccion correctamente', 'exito')
-            setTimeout(() => {
-                window.location.reload();
-            }, 3000)
-        }
-    } catch (error) {
-        console.log(error)
-        mostrarToast('Hubo un problema en el registro de la direccion, intentelo de nuevo mas tarde', 'error')
-    }
-})
-
-
-// un gimnacio requiere un programa para registrar el pase mensual de sus solicitarTurnos
-/*requisitos:
-nombre, dni, tipo de pase(socio estandar o vip), calcular el monto total y mostrar el resultado */
