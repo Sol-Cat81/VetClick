@@ -127,7 +127,7 @@ CREATE TABLE mascotas_adopcion (
     edad VARCHAR(20),
     sexo ENUM('MACHO', 'HEMBRA') NOT NULL,
     descripcion VARCHAR(120),
-    estado ENUM('ADOPTADO', 'EN_ADOPCION'),
+    estado ENUM('EN_ADOPCION','EN_TRAMITE','ADOPTADO'),
     img_masc_adop TEXT,
 
     FOREIGN KEY (id_raza) REFERENCES razas(id_raza)

@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Logo -->
+  <link rel="shortcut icon" href="../assets/icons/ChatGPT-Image-Logo.png" type="image/x-icon" />
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous" />
+  <!-- Phosphor icons -->
+  <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2"></script>
+  <!-- CSS -->
+  <link rel="stylesheet" href="../css/adopciones.css" />
+  <title>VetClick - Adopciones</title>
+</head>
+
+<body>
+  <!-- BARRA DE NAVEGACION -->
+  <mi-navbar ruta-base="../" pagina-actual="adopciones"></mi-navbar>
+
+  <main class="adopciones-main">
+    <!-- SECCION HERO -->
+    <section id="adopciones-hero">
+      <div class="hero-bloque">
+        <p class="eyebrow">Adopciones</p>
+        <h1>Una mascota te está esperando</h1>
+        <p>
+          Conocé a las mascotas que buscan un hogar. Todas están cuidadas,
+          desparasitadas y esperando a la persona correcta.
+        </p>
+        <a href="#adopciones" class="btn-hero-adopciones">Ver mascotas</a>
+      </div>
+      <div class="hero-imagen">
+        <img src="../assets/img/ChatGPT-Image.png" alt="Huellas de mascotas" />
+      </div>
+    </section>
+
+    <!-- SECCION ADOPCIONES -->
+    <section id="adopciones">
+      <div class="container">
+        <h2>Mascotas en adopción</h2>
+        <p class="seccion-subtitulo">
+          Cada ficha es una mascota real que espera por su familia. Si te gustó alguna,
+          envianos tu motivo y te contactamos.
+        </p>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4 contenedor-adopciones">
+        </div>
+        <div class="estado-vacio" id="estadoVacio" hidden>
+          <i class="ph ph-paw-print"></i>
+          <p>Ahora mismo no hay mascotas esperando un hogar. ¡Volvé a mirarnos pronto!</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL DE ADOPCION -->
+  <div class="modal-backdrop" id="modalAdopcion" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalAdopcionTitulo">
+      <div class="modal-head">
+        <div>
+          <span class="modal-kicker">Adopción</span>
+          <h2 id="modalAdopcionTitulo">Adoptar a <span id="nombreMascotaModal">la mascota</span></h2>
+        </div>
+        <button class="modal-close" type="button" id="cerrarModalAdopcion" aria-label="Cerrar">×</button>
+      </div>
+      <form id="formAdopcion">
+        <div class="modal-cuerpo">
+          <p class="modal-descripcion">
+            Contanos por qué querés adoptar a esta mascota. Tu motivo nos ayuda a
+            encontrar el mejor hogar para ella.
+          </p>
+          <label for="motivoAdopcion">Motivo de la adopción</label>
+          <textarea id="motivoAdopcion" name="observacion" rows="5" maxlength="120"
+            placeholder="Ej: Vivo solo, tengo un jardín grande y siempre quise tener una mascota."
+            required></textarea>
+          <div class="contador-motivo">
+            <span id="contadorMotivo">0</span>/120
+          </div>
+        </div>
+        <div class="modal-acciones">
+          <button class="btn-cancelar" type="button" id="cancelarAdopcion">Cancelar</button>
+          <button class="btn-enviar" type="submit" id="enviarAdopcion">Enviar solicitud</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- z-index 1080: por encima del modal de adopcion (1060), para que el
+       toast se vea aunque el modal siga abierto. -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1080">
+    <div id="miToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive"
+      aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body" id="toast-mensaje">¡Operación exitosa!</div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+          aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PIE DE PAGINA -->
+  <footer>
+    <div class="container-fluid">
+      <div class="row justify-content-center">
+        <div class="col-md-4 justify-content-center">
+          <img src="../assets/icons/ChatGPT-Image-Logo.png" alt="" />
+        </div>
+        <div class="col-md-4">
+          <h3>Nosotros</h3>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">Nosotros</li>
+            <li class="list-group-item">Contacto</li>
+            <li class="list-group-item">Sucursales</li>
+            <li class="list-group-item">Politicas de privacidad</li>
+          </ul>
+        </div>
+        <div class="col-md-4">
+          <h3>Social</h3>
+          <div class="social">
+            <i class="ph ph-linkedin-logo"></i>
+            <i class="ph ph-instagram-logo"></i>
+            <i class="ph ph-facebook-logo"></i>
+            <i class="ph ph-x-logo"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+    crossorigin="anonymous"></script>
+
+  <script src="../js/adopciones.js"></script>
+  <script src="../js/navbar.js" defer></script>
+</body>
+
+</html>

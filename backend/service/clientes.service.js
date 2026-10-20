@@ -17,6 +17,72 @@ module.exports = {
 
   crearCliente: (data) => ClientesModel.crearCliente(data),
   crearMascotas: (data) => ClientesModel.crearMascotas(data),
+
+  // Solicitud de adopcion que hace un cliente desde la pagina publica.
+  // idUsuario sale del token (nunca del body): el cliente no puede pedir una
+  // adopcion en nombre de otro.
+  solicitarAdopcion: async (idUsuario, idMascotaAdopcion, motivo) => {
+    const idMascota = Number(idMascotaAdopcion);
+    if (!Number.isInteger(idMascota) || idMascota <= 0) {
+      throw errorValidacion('La mascota no es valida');
+    }
+
+    // observacion es VARCHAR(120): se recorta el limite de la columna para no
+    // dejar que MySQL rechace el INSERT con un error de longitud.
+    const observacion = String(motivo ?? '').trim();
+    if (!observacion) {
+      throw errorValidacion('Contanos por que queres adoptar a esta mascota');
+    }
+    if (observacion.length > 120) {
+      throw errorValidacion('El motivo no puede superar los 120 caracteres');
+    }
+
+    // Sin fila en clientes no hay id_cliente, y adopciones.id_cliente es
+    // obligatorio: por eso se avisa antes de tocar la base.
+    const cliente = await ClientesModel.obtenerClientePorUsuario(idUsuario);
+    if (!cliente) {
+      throw errorValidacion('Completa tu perfil de cliente para poder adoptar');
+    }
+
+    const mascota = await ClientesModel.obtenerMascotaAdopcionPorId(idMascota);
+    if (!mascota) {
+      throw errorValidacion('La mascota no existe', 404);
+    }
+
+    // La ficha tiene 3 estados: disponible, en tramite y adoptada. Solo se
+    // puede pedir la de las disponibles, y el mensaje dice en que estado esta
+    // para que el cliente entienda por que no puede seguir.
+    const estadoMascota = String(mascota.estado).toUpperCase();
+    if (estadoMascota === 'ADOPTADO') {
+      throw errorValidacion('Esta mascota ya fue adoptada');
+    }
+    if (estadoMascota === 'EN_TRAMITE') {
+      throw errorValidacion('Esta mascota tiene una adopcion en curso');
+    }
+    if (estadoMascota !== 'EN_ADOPCION') {
+      throw errorValidacion('Esta mascota no esta disponible para adopcion');
+    }
+
+    if (await ClientesModel.existeAdopcionEnCurso(cliente.id_cliente, idMascota)) {
+      throw errorValidacion('Ya enviaste tu solicitud para esta mascota');
+    }
+
+    const resultado = await ClientesModel.crearAdopcion({
+      id_cliente: cliente.id_cliente,
+      id_mascota_adopcion: idMascota,
+      fecha: new Date().toISOString().slice(0, 10),
+      estado: 'EN_CURSO',
+      observacion
+    });
+
+    return {
+      id_adopcion: resultado.insertId,
+      id_mascota_adopcion: idMascota,
+      mascota: mascota.nombre,
+      estado: 'EN_CURSO'
+    };
+  },
+
   obtenerClientesPorId: async (id)=>{
     const cliente = await ClientesModel.obtenerClientesPorId(id);
     if (!cliente) throw errorValidacion('El cliente no existe', 404);

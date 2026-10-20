@@ -1,4 +1,17 @@
 const AdminModel = require('../models/admin.model');
+const cloudinary = require('cloudinary').v2;
+
+// Sube la imagen a Cloudinary y devuelve la URL. Sin archivo devuelve null.
+const subirImagen = async (archivo, carpeta) => {
+  if (!archivo) return null;
+  const resultado = await cloudinary.uploader.upload(
+    `data:${archivo.mimetype};base64,${archivo.buffer.toString('base64')}`,
+    { folder: carpeta, resource_type: 'image' }
+  );
+  return resultado.secure_url;
+};
+
+const carpetaAdopcion = () => process.env.CLOUDINARY_FOLDER_ADOPCIONES || 'VetClick/adopciones';
 
 module.exports = {
   opciones: async (req, res) => {
@@ -11,7 +24,12 @@ module.exports = {
   },
   crear: async (req, res) => {
     try {
-      const resultado = await AdminModel.crear(req.params.entidad, req.body || {});
+      const entidad = req.params.entidad;
+      const datos = { ...(req.body || {}) };
+      if (entidad === 'mascotaAdopcion' && req.file) {
+        datos.img_masc_adop = await subirImagen(req.file, carpetaAdopcion());
+      }
+      const resultado = await AdminModel.crear(entidad, datos);
       res.status(201).json({ mensaje: 'Registro creado correctamente', id: resultado.insertId });
     } catch (error) {
       console.error(`Error al crear ${req.params.entidad}:`, error);
@@ -24,7 +42,12 @@ module.exports = {
       return res.status(400).json({ mensaje: 'ID de registro inválido' });
     }
     try {
-      await AdminModel.actualizar(req.params.entidad, id, req.body || {});
+      const entidad = req.params.entidad;
+      const datos = { ...(req.body || {}) };
+      if (entidad === 'mascotaAdopcion' && req.file) {
+        datos.img_masc_adop = await subirImagen(req.file, carpetaAdopcion());
+      }
+      await AdminModel.actualizar(entidad, id, datos);
       res.json({ mensaje: 'Registro actualizado correctamente', id });
     } catch (error) {
       console.error(`Error al actualizar ${req.params.entidad}:`, error);

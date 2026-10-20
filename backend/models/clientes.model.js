@@ -1,4 +1,5 @@
 const conexion = require('../config/database');
+const { sincronizarEstadoMascota } = require('../config/adopciones');
 
 const ClientesModel = {
   obtenerClientes: async () => {
@@ -51,7 +52,10 @@ const ClientesModel = {
     const [rows] = await conexion.query(`
       SELECT m.id_mascota_adopcion, m.nombre, m.id_raza,
              ra.nombre AS raza, es.nombre AS especie,
-             m.edad, m.sexo, m.descripcion, m.estado
+             m.edad, m.sexo, m.descripcion, m.estado, m.img_masc_adop,
+             (SELECT COUNT(*) FROM adopciones a
+               WHERE a.id_mascota_adopcion = m.id_mascota_adopcion
+                 AND a.estado = 'EN_CURSO') AS interesados
       FROM mascotas_adopcion m
       LEFT JOIN razas ra ON ra.id_raza = m.id_raza
       LEFT JOIN especies es ON es.id_especie = ra.id_especie
@@ -71,6 +75,69 @@ const ClientesModel = {
       ORDER BY a.id_adopcion
     `);
     return rows;
+  },
+  // El cliente se identifica por su usuario: es el salto que hace el token
+  // (que trae id_usuario) para llegar al id_cliente que pide la tabla
+  // adopciones. Devuelve null si el usuario todavia no completo su perfil.
+  obtenerClientePorUsuario: async (idUsuario) => {
+    const [rows] = await conexion.query(
+      'SELECT id_cliente FROM clientes WHERE id_usuario = ?',
+      [idUsuario]
+    );
+    return rows[0] || null;
+  },
+  obtenerMascotaAdopcionPorId: async (id) => {
+    const [rows] = await conexion.query(
+      'SELECT id_mascota_adopcion, nombre, estado FROM mascotas_adopcion WHERE id_mascota_adopcion = ?',
+      [id]
+    );
+    return rows[0] || null;
+  },
+  // Una misma persona no puede tener dos solicitudes en curso para la misma
+  // mascota: el segundo POST debe avisarle, no duplicar la fila.
+  existeAdopcionEnCurso: async (idCliente, idMascotaAdopcion) => {
+    const [rows] = await conexion.query(
+      `SELECT id_adopcion FROM adopciones
+       WHERE id_cliente = ? AND id_mascota_adopcion = ? AND estado = 'EN_CURSO'
+       LIMIT 1`,
+      [idCliente, idMascotaAdopcion]
+    );
+    return rows.length > 0;
+  },
+  // Registrar la solicitud y mover la ficha de la mascota a EN_TRAMITE, para
+  // que deje de ofrecerse en la pagina publica. Va en transaccion: si la
+  // actualizacion de la mascota fallara, tampoco puede quedar la solicitud.
+  crearAdopcion: async (adopcion) => {
+    const transaccion = await conexion.getConnection();
+    try {
+      await transaccion.beginTransaction();
+
+      const [resultado] = await transaccion.query(`
+        INSERT INTO adopciones (id_cliente, id_mascota_adopcion, fecha, estado, observacion)
+        VALUES (?, ?, ?, ?, ?)`,
+        [
+          adopcion.id_cliente,
+          adopcion.id_mascota_adopcion,
+          adopcion.fecha,
+          adopcion.estado,
+          adopcion.observacion
+        ]
+      );
+
+      await sincronizarEstadoMascota(
+        transaccion,
+        adopcion.estado,
+        adopcion.id_mascota_adopcion
+      );
+
+      await transaccion.commit();
+      return resultado;
+    } catch (error) {
+      await transaccion.rollback();
+      throw error;
+    } finally {
+      transaccion.release();
+    }
   },
   crearCliente: async (cliente) => {
     const [resultado] = await conexion.query(`

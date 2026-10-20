@@ -398,6 +398,21 @@ td small {
   color: #bd7d00
 }
 
+/* Miniatura de la foto en la tabla de mascotas en adopcion. */
+.miniatura {
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: var(--blue-soft);
+  display: block
+}
+
+.miniatura-vacia {
+  color: var(--muted);
+  font-size: 14px
+}
+
 .status.danger {
   background: var(--red-soft);
   color: #cf4048

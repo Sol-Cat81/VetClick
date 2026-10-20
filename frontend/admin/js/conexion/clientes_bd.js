@@ -355,6 +355,28 @@ async function cargarRazas(){
   }
 }
 
+// Dibuja la miniatura de la mascota en adopcion. La URL de la foto llega desde
+// la columna img_masc_adop. Las fichas viejas tienen 'https:fotochida', que no
+// es una URL valida: por eso se valida antes de meterla en el src, para no
+// romper la imagen con un onerror en cada fila.
+function miniaturaMascota(url){
+  const esUrl = typeof url === 'string' && /^https?:\/\//i.test(url);
+  if(!esUrl) return '<span class="miniatura-vacia">—</span>';
+  return `<img class="miniatura" src="${escaparHtml(url)}" alt="Foto de la mascota"
+    onerror="this.outerHTML='<span class=&quot;miniatura-vacia&quot;>—</span>'">`;
+}
+
+// Color del chip de estado de la ficha de la mascota. La ficha tiene 3
+// estados: disponible (verde), en tramite (amarillo) y adoptada (rojo).
+function colorEstadoMascota(estado){
+  switch(String(estado ?? '').toUpperCase()){
+    case 'EN_ADOPCION': return 'success';
+    case 'EN_TRAMITE': return 'warning';
+    case 'ADOPTADO': return 'danger';
+    default: return '';
+  }
+}
+
 async function cargarMascotasAdopcion(){
   try{
     const mascotas = await obtenerDatos('clientes/mascotas-adopcion');
@@ -364,10 +386,11 @@ async function cargarMascotasAdopcion(){
     tbody.innerHTML = (mascotas || []).map(mascota => `
       <tr data-id="${escaparHtml(mascota.id_mascota_adopcion)}">
         <td>${escaparHtml(mascota.id_mascota_adopcion)}</td>
+        <td>${miniaturaMascota(mascota.img_masc_adop)}</td>
         <td>${escaparHtml(mascota.nombre)}</td>
         <td>${escaparHtml(mascota.raza || '—')}</td>
         <td>${escaparHtml(mascota.edad || '—')}</td>
-        <td><span class="status ${mascota.estado === 'ADOPTADO' ? 'success' : 'warning'}">${escaparHtml(mascota.estado || '—')}</span></td>
+        <td><span class="status ${colorEstadoMascota(mascota.estado)}">${escaparHtml(mascota.estado || '—')}</span></td>
       </tr>
     `).join('');
   }catch(error){
@@ -642,13 +665,15 @@ detalleEntidades['mascota en adopción'] = {
   registro: mascotasAdopcionPorId,
   campos: [
     { campo: 'id_mascota_adopcion', etiqueta: 'ID' },
+    { campo: 'img_masc_adop', etiqueta: 'Foto', imagen: true },
     { campo: 'nombre', etiqueta: 'Nombre' },
     { campo: 'raza', etiqueta: 'Raza' },
     { campo: 'especie', etiqueta: 'Especie' },
     { campo: 'edad', etiqueta: 'Edad' },
     { campo: 'sexo', etiqueta: 'Sexo', enumeracion: ['MACHO', 'HEMBRA'], etiquetas: ['Macho', 'Hembra'] },
     { campo: 'descripcion', etiqueta: 'Descripción', texto: true },
-    { campo: 'estado', etiqueta: 'Estado', enumeracion: ['EN_ADOPCION', 'ADOPTADO'], etiquetas: ['En adopción', 'Adoptado'] }
+    { campo: 'estado', etiqueta: 'Estado', enumeracion: ['EN_ADOPCION', 'EN_TRAMITE', 'ADOPTADO'],
+      etiquetas: ['En adopción', 'En trámite', 'Adoptado'] }
   ]
 };
 
@@ -699,9 +724,10 @@ document.addEventListener('submit', async (e) => {
     return;
   }
 
-  // Los campos *_busqueda son solo el input visible del datalist: el id real
-  // viaja en el hidden. El modelo ignora los campos que no declara.
-  const datos = Object.fromEntries(new FormData(form));
+  // mascotaAdopcion usa multipart para subir la imagen; las demás siguen con JSON.
+  const esMascotaAdopcion = nombreEntidad === 'mascotaAdopcion';
+  const formData = new FormData(form);
+  const datos = esMascotaAdopcion ? formData : Object.fromEntries(formData);
 
   const url = editando
     ? `${API_BASE_URL}/admin/${nombreEntidad}/${idRegistro}`
@@ -710,8 +736,8 @@ document.addEventListener('submit', async (e) => {
   try {
     const respuesta = await fetch(url, {
       method: editando ? 'PUT' : 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(datos)
+      ...(esMascotaAdopcion ? {} : { headers: { 'Content-Type': 'application/json' } }),
+      body: esMascotaAdopcion ? datos : JSON.stringify(datos)
     });
 
     const cuerpo = await respuesta.json().catch(() => ({}));

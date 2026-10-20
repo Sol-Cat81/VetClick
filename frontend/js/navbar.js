@@ -333,6 +333,7 @@ class MiNavbar extends HTMLElement {
             <li><a href="${ruta}pages/servicios.html" class="ofcanvas-nav">Servicios</a></li>
             <li><a href="${ruta}pages/turnos.html" class="ofcanvas-nav">Turnos</a></li>
             <li><a href="${ruta}pages/productos.html" class="ofcanvas-nav">Productos</a></li>
+            <li><a href="${ruta}pages/adopciones.html" class="ofcanvas-nav">Adopciones</a></li>
           </ul>
           
           <details class="desplegar-categoria">
