@@ -7,7 +7,7 @@ const authMiddleware = (req, res, next) => {
   // Si no existe, no está autenticado
   if (!token) {
     return res.status(401).json({
-      mensaje: "No estás autenticado",
+      mensaje: "Iniciar sesion primero ",
     });
   }
 

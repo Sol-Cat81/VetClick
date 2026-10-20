@@ -1,3 +1,15 @@
+// Reemplaza los caracteres que pueden modificar el marcado. Se usa en todo
+// lo que se arma con innerHTML: sin esto, un nombre con "<" rompe la pagina.
+function escaparHTML(valor) {
+    return String(valor ?? "").replace(/[&<>"']/g, (caracter) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[caracter]);
+}
+
 const secciones = [...document.querySelectorAll(".turno-seccion")];
 const indicadores = [...document.querySelectorAll("[data-step-indicator]")];
 const siguiente = document.querySelector("#siguiente");
@@ -86,7 +98,11 @@ function formatoFecha(fecha) {
 }
 
 function fechaClave(fecha) {
-  return fecha.toISOString().split("T")[0];
+  // Formato local, no toISOString(): ese pasa la fecha a UTC y en Argentina
+  // (UTC-3) un dia a la tarde se convierte en el dia siguiente.
+  const mes = String(fecha.getMonth() + 1).padStart(2, "0");
+  const dia = String(fecha.getDate()).padStart(2, "0");
+  return `${fecha.getFullYear()}-${mes}-${dia}`;
 }
 
 function renderCalendario() {
@@ -172,7 +188,7 @@ function actualizarResumen() {
   resumen.innerHTML = datos
     .map(
       ([titulo, valor]) =>
-        `<div><dt>${titulo}</dt><dd>${valor || "Pendiente"}</dd></div>`,
+        `<div><dt>${escaparHTML(titulo)}</dt><dd>${escaparHTML(valor || "Pendiente")}</dd></div>`,
     )
     .join("");
 }
@@ -214,10 +230,19 @@ anterior.addEventListener("click", () =>
 
 document.querySelector("#datos-form").addEventListener("submit", (evento) => {
   evento.preventDefault();
+
+  // Sin fecha u hora, formatoFecha(new Date("T12:00:00")) tira RangeError
+  // (Invalid time value) y deja la pagina con un error no controlado.
+  if (!reserva.fecha || !reserva.hora) {
+    mensaje.textContent = "Elegí una fecha y un horario antes de confirmar.";
+    return;
+  }
+
   const datos = new FormData(evento.currentTarget);
   const nombre = datos.get("nombre");
+  const fechaLegible = formatoFecha(new Date(`${reserva.fecha}T12:00:00`));
   document.querySelector('.turno-seccion[data-step="6"]').innerHTML =
-    `<div class="turno-confirmado"><p class="eyebrow">Reserva confirmada</p><h2>¡Te esperamos, ${nombre}!</h2><p>Tu turno para ${reserva.sucursal} quedó reservado para el ${formatoFecha(new Date(`${reserva.fecha}T12:00:00`))} a las ${reserva.hora}.</p></div>`;
+    `<div class="turno-confirmado"><p class="eyebrow">Reserva confirmada</p><h2>¡Te esperamos, ${escaparHTML(nombre)}!</h2><p>Tu turno para ${escaparHTML(reserva.sucursal)} quedó reservado para el ${escaparHTML(fechaLegible)} a las ${escaparHTML(reserva.hora)}.</p></div>`;
   document.querySelector(".turnos-navegacion").hidden = true;
 });
 
