@@ -12,6 +12,7 @@ CREATE TABLE sucursales (
     localidad VARCHAR(80),
     telefono VARCHAR(80),
     horario VARCHAR(80),
+    img_sucuersal TEXT,
     activo BOOLEAN DEFAULT TRUE
 );
 

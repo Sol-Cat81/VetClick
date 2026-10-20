@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.css" />
   <!-- CSS -->
   <link rel="stylesheet" href="../css/turnos.css" />
-  <title>VetClick - Shop</title>
+  <title>VetClick - Turnos</title>
 </head>
 
 <body>
@@ -196,7 +196,9 @@
       </div>
     </div>
   </main>
-  <div class="toast-container position-fixed botton-0 end-0 p-3" style="z-index: 1055">
+  <!-- bottom-0 (no "botton-0", que no existe en Bootstrap y dejaba el toast
+       sin anclar) y z-index 1080 para que quede por encima del contenido. -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1080">
     <div id="miToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive"
       aria-atomic="true">
       <div class="d-flex">
