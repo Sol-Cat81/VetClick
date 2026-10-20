@@ -474,12 +474,27 @@ async function abrirDetalle(entity, row){
   const completo = { ...registro, ...(carga.pedido || {}) };
 
   modal.querySelector('[data-detalle-titulo]').textContent = `${esquema.titulo} #${id}`;
-  contenedor.innerHTML = esquema.campos.map(campo => `
-    <div class="info-row${campo.texto ? ' detalle-texto' : ''}">
-      <span>${escaparHtml(campo.etiqueta)}</span>
-      <strong>${escaparHtml(valorDetalle(campo, completo, opciones))}</strong>
-    </div>
-  `).join('');
+  contenedor.innerHTML = esquema.campos.map(campo => {
+    // Un campo marcado como 'imagen' se dibuja como miniatura en vez de como
+    // texto: mostrar la URL cruda no le dice nada al usuario.
+    if (campo.imagen){
+      const valor = completo[campo.campo];
+      const esUrl = typeof valor === 'string' && /^https?:\/\//i.test(valor);
+      return `
+        <div class="info-row">
+          <span>${escaparHtml(campo.etiqueta)}</span>
+          <strong>${esUrl
+            ? `<img class="miniatura" src="${escaparHtml(valor)}" alt="${escaparHtml(campo.etiqueta)}"
+                 onerror="this.outerHTML='—'">`
+            : '—'}</strong>
+        </div>`;
+    }
+    return `
+      <div class="info-row${campo.texto ? ' detalle-texto' : ''}">
+        <span>${escaparHtml(campo.etiqueta)}</span>
+        <strong>${escaparHtml(valorDetalle(campo, completo, opciones))}</strong>
+      </div>`;
+  }).join('');
 
   modal.querySelector('[data-detalle-listas]').innerHTML = detalleDeListas(esquema.listas, carga, opciones);
 
@@ -619,7 +634,7 @@ document.addEventListener('change', event => {
 // Entidades cuyo boton "Cambiar estado" ya llama a la API. Se listan una por una
 // a proposito: conectarlas todas de golpe seria tocar seis secciones, y las
 // demas siguen con el ciclo visual de antes.
-const ENTIDADES_CON_ESTADO = new Set(['pedido', 'pago', 'envio']);
+const ENTIDADES_CON_ESTADO = new Set(['pedido', 'pago', 'envio', 'mascotaAdopcion']);
 
 // El ciclo visual de siempre. Solo se usa para las entidades que todavia no
 // estan conectadas; rota el texto del .status sin tocar la base.

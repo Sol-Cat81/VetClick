@@ -1,5 +1,6 @@
 const conexion = require('../config/database');
 const bcrypt = require('bcryptjs');
+const { ESTADO_MASCOTA_SEGUN_ADOPCION, sincronizarEstadoMascota } = require('../config/adopciones');
 
 const consultasOpciones = {
   clientes: `SELECT id_cliente AS id, CONCAT(nombre, ' ', apellido, ' (ID: ', id_cliente, ')') AS etiqueta FROM clientes ORDER BY nombre, apellido`,
@@ -84,7 +85,7 @@ const inserciones = {
   mascotaAdopcion: {
     tabla: 'mascotas_adopcion',
     clave: 'id_mascota_adopcion',
-    campos: ['nombre', 'id_raza', 'edad', 'sexo', 'descripcion', 'estado'],
+    campos: ['nombre', 'id_raza', 'edad', 'sexo', 'descripcion', 'estado', 'img_masc_adop'],
     requeridos: ['nombre', 'sexo', 'estado']
   },
   productoCategoria: {
@@ -331,7 +332,11 @@ const ENUMERACIONES = {
   // adopciones.estado es VARCHAR, no ENUM: MySQL no lo restringe. Sin esta
   // lista el panel podia guardar cualquier texto (incluidos los valores viejos
   // 'ADOPTADO'/'EN ADOPCION') y el mismo tramite quedaba con dos vocabularios.
-  adopcion: { estado: ['EN_CURSO', 'COMPLETADA', 'CANCELADA'] }
+  adopcion: { estado: ['EN_CURSO', 'COMPLETADA', 'CANCELADA'] },
+  // La ficha de la mascota tiene su propio estado, con 3 valores. El orden es
+  // el que recorre el boton "Cambiar estado": disponible -> en tramite ->
+  // adoptada -> disponible.
+  mascotaAdopcion: { estado: ['EN_ADOPCION', 'EN_TRAMITE', 'ADOPTADO'] }
 };
 
 // De las columnas ENUM de una entidad, cual es la que representa el estado por
@@ -345,7 +350,10 @@ const ESTADOS = {
   turno: { tabla: 'turnos', clave: 'id_turno', campo: 'estado' },
   pedido: { tabla: 'pedidos', clave: 'id_pedido', campo: 'estado' },
   pago: { tabla: 'pagos', clave: 'id_pago', campo: 'estado_pago' },
-  envio: { tabla: 'envios', clave: 'id_envio', campo: 'estado' }
+  envio: { tabla: 'envios', clave: 'id_envio', campo: 'estado' },
+  // La ficha de la mascota en adopcion tambien avanza de estado con el boton
+  // del panel, y el valor valido lo decide el backend (no el frontend).
+  mascotaAdopcion: { tabla: 'mascotas_adopcion', clave: 'id_mascota_adopcion', campo: 'estado' }
 };
 
 const validarEnumeraciones = (entidad, datos) => {
@@ -1265,11 +1273,39 @@ const AdminModel = {
     const placeholders = configuracion.campos.map(() => '?').join(', ');
 
     if (!configuracion.detalle) {
-      const [resultado] = await conexion.query(
-        `INSERT INTO \`${configuracion.tabla}\` (${columnas}) VALUES (${placeholders})`,
-        valores
-      );
-      return resultado;
+      // Una adopcion que nace con cualquier estado tambien tiene que mover el
+      // estado de la mascota: si no, la pagina publica seguiria ofreciendo una
+      // mascota que ya tiene dueño (o que ya tiene un tramite en curso). Va en
+      // transaccion por lo mismo.
+      const estadoAdopcion = entidad === 'adopcion' && datos.estado
+        ? String(datos.estado).toUpperCase()
+        : null;
+      const sincronizaMascota = Boolean(ESTADO_MASCOTA_SEGUN_ADOPCION[estadoAdopcion]);
+
+      if (!sincronizaMascota) {
+        const [resultado] = await conexion.query(
+          `INSERT INTO \`${configuracion.tabla}\` (${columnas}) VALUES (${placeholders})`,
+          valores
+        );
+        return resultado;
+      }
+
+      const transaccion = await conexion.getConnection();
+      try {
+        await transaccion.beginTransaction();
+        const [resultado] = await transaccion.query(
+          `INSERT INTO \`${configuracion.tabla}\` (${columnas}) VALUES (${placeholders})`,
+          valores
+        );
+        await sincronizarEstadoMascota(transaccion, estadoAdopcion, datos.id_mascota_adopcion);
+        await transaccion.commit();
+        return resultado;
+      } catch (error) {
+        await transaccion.rollback();
+        throw error;
+      } finally {
+        transaccion.release();
+      }
     }
 
     const conexionTransaccion = await conexion.getConnection();
@@ -1402,11 +1438,53 @@ const AdminModel = {
       throw error;
     }
 
-    const [resultado] = await conexion.query(
-      `UPDATE \`${configuracion.tabla}\` SET ${sets} WHERE \`${configuracion.clave}\` = ?`,
-      [...valores, id]
-    );
-    return resultado;
+    // La adopcion y el estado de la mascota van juntos: cuando una adopcion se
+    // completa, la mascota deja de estar disponible y desaparece de la pagina
+    // publica de adopciones. Se hace en una transaccion para que no queden una
+    // adopcion COMPLETADA con la mascota todavia EN_ADOPCION.
+    const estadoAdopcion = entidad === 'adopcion' && datos.estado
+      ? String(datos.estado).toUpperCase()
+      : null;
+    const sincronizaMascota = Boolean(ESTADO_MASCOTA_SEGUN_ADOPCION[estadoAdopcion]);
+
+    if (!sincronizaMascota) {
+      const [resultado] = await conexion.query(
+        `UPDATE \`${configuracion.tabla}\` SET ${sets} WHERE \`${configuracion.clave}\` = ?`,
+        [...valores, id]
+      );
+      return resultado;
+    }
+
+    const transaccion = await conexion.getConnection();
+    try {
+      await transaccion.beginTransaction();
+
+      const [resultado] = await transaccion.query(
+        `UPDATE \`${configuracion.tabla}\` SET ${sets} WHERE \`${configuracion.clave}\` = ?`,
+        [...valores, id]
+      );
+
+      // La mascota puede venir en los datos o no: si el admin solo cambia el
+      // estado, se busca la que ya tiene la adopcion.
+      let idMascota = Number(datos.id_mascota_adopcion);
+      if (!Number.isInteger(idMascota) || idMascota <= 0) {
+        const [adopciones] = await transaccion.query(
+          'SELECT id_mascota_adopcion FROM adopciones WHERE id_adopcion = ?',
+          [id]
+        );
+        idMascota = Number(adopciones[0]?.id_mascota_adopcion);
+      }
+
+      await sincronizarEstadoMascota(transaccion, estadoAdopcion, idMascota);
+
+      await transaccion.commit();
+      return resultado;
+    } catch (error) {
+      await transaccion.rollback();
+      throw error;
+    } finally {
+      transaccion.release();
+    }
   },
 
   // Avanza el estado de un registro al siguiente valor de su ENUM.

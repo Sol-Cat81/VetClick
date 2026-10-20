@@ -175,6 +175,7 @@
           <thead>
             <tr>
               <th>ID</th>
+              <th>Imagen</th>
               <th>Nombre</th>
               <th>Raza</th>
               <th>Edad</th>
@@ -367,8 +368,10 @@
           <label>Descripción<textarea data-modal-field name="descripcion" rows="2" maxlength="120"></textarea></label>
           <label>Estado<select data-modal-field name="estado" required>
               <option value="EN_ADOPCION">En adopción</option>
+              <option value="EN_TRAMITE">En trámite</option>
               <option value="ADOPTADO">Adoptado</option>
             </select></label>
+          <label>Imagen<input type="file" data-modal-field name="img_masc_adop" accept="image/*"></label>
         </div>
         <div class="modal-actions"><button class="btn btn-secondary" type="button"
             data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar mascota</button>

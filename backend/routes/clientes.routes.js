@@ -1,5 +1,6 @@
 const express = require('express');
 const controller = require('../controllers/clientes.controller');
+const { authMiddleware } = require('../middlewares/auth');
 
 const router = express.Router();
 
@@ -14,6 +15,10 @@ router.get('/especies', controller.especies);
 router.get('/razas', controller.razas);
 router.get('/mascotas-adopcion', controller.mascotasAdopcion);
 router.get('/adopciones', controller.adopciones);
+
+// Solicitud de adopcion desde la pagina publica: necesita sesion porque la
+// adopcion se guarda a nombre del cliente logueado. Va antes de /:id_cliente.
+router.post('/adopciones', authMiddleware, controller.solicitarAdopcion);
 
 // Mascota tiene su propio id: va antes que /:id_cliente para que Express
 // no interprete "mascotas" como un id de cliente.

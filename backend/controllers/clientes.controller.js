@@ -106,6 +106,30 @@ const actualizarCliente = async (req, res) => {
   }
 };
 
+const solicitarAdopcion = async (req, res) => {
+  // El usuario sale del token, nunca del body: el cliente no puede pedir una
+  // adopcion en nombre de otro.
+  const idUsuario = req.usuario.id;
+
+  try {
+    const resultado = await service.solicitarAdopcion(
+      idUsuario,
+      req.body?.id_mascota_adopcion,
+      req.body?.observacion
+    );
+
+    res.status(201).json({
+      mensaje: 'Tu solicitud de adopcion fue enviada. Te contactaremos pronto.',
+      ...resultado
+    });
+  } catch (error) {
+    console.error('Error al solicitar adopcion:', error);
+    res.status(error.status || 500).json({
+      mensaje: error.status ? error.message : 'No se pudo enviar la solicitud de adopcion'
+    });
+  }
+};
+
 const obtenerMascota = async (req, res) => {
   const id = Number(req.params.id_mascota);
   if (!Number.isInteger(id) || id <= 0) {
@@ -150,6 +174,7 @@ module.exports = {
 
   crearCliente,
   crearMascotas,
+  solicitarAdopcion,
 
   obtenerCliente,
   actualizarCliente,
