@@ -12,7 +12,7 @@ module.exports = {
     return rows;
   },
   sucursales: async () => {
-    const [rows] = await conexion.query('SELECT id_sucursal,nombre,direccion,localidad,telefono,horario,activo FROM sucursales ORDER BY id_sucursal');
+    const [rows] = await conexion.query('SELECT id_sucursal,nombre,direccion,localidad,telefono,horario,img_sucursal,activo FROM sucursales ORDER BY id_sucursal');
     return rows;
   }
 };

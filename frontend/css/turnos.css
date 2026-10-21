@@ -207,11 +207,16 @@ footer .list-group li {
   color: var(--elem-importantes);
   font-size: 1.2rem;
 }
+/* La card muestra direccion y horario: el min-height evita que una linea
+   sola (direccion corta) desalinee los botones entre cards. */
 .sucursal-card p {
-  min-height: 38px;
-  margin: 0 0 18px;
+  min-height: 20px;
+  margin: 0 0 6px;
   color: var(--texto);
   font-size: 0.92rem;
+}
+.sucursal-card p:last-of-type {
+  margin-bottom: 18px;
 }
 .sucursal-card p i {
   color: var(--elem-secun);
@@ -270,6 +275,29 @@ footer .list-group li {
   color: var(--elem-secun);
   font-size: 1.3rem;
 }
+/* Nombre y descripcion del servicio, a la izquierda. */
+.tipo-opcion-datos {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.tipo-opcion-datos strong {
+  font-size: 1.05rem;
+}
+.tipo-opcion-datos small {
+  color: #668080;
+  font-size: 0.85rem;
+  line-height: 1.35;
+}
+/* Precio del servicio, a la derecha. */
+.tipo-opcion-precio {
+  color: var(--elem-importantes);
+  font-size: 1.15rem;
+  font-weight: bold;
+  white-space: nowrap;
+  margin-left: 16px;
+}
 .avatar {
   display: grid;
   place-items: center;
@@ -280,6 +308,14 @@ footer .list-group li {
   color: var(--elem-importantes);
   font-weight: bold;
   font-size: 1.2rem;
+  /* Las iniciales pegadas se leen mejor con un poco de aire entre ellas. */
+  letter-spacing: 0.5px;
+}
+/* Con un solo profesional, la card queda en la primera de tres columnas y
+   quedan dos huecos al lado: se estira para no dejar el espacio vacio. */
+.profesionales-grid:has(.profesional-card:only-child) {
+  grid-template-columns: 1fr;
+  max-width: 420px;
 }
 .agenda-grid {
   display: grid;
@@ -413,6 +449,59 @@ footer .list-group li {
 }
 .campo-ancho {
   grid-column: 1/-1;
+}
+/* El boton de "agregar otra mascota": parece un enlace, no un boton. */
+.boton-enlace {
+  grid-column: 1/-1;
+  justify-self: start;
+  margin-top: -6px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--elem-secun);
+  font: inherit;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.boton-enlace:hover {
+  color: var(--elem-importantes);
+}
+/* El alta rapida de una mascota: un bloque aparte, con su propio fondo. */
+.alta-mascota {
+  grid-column: 1/-1;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 14px;
+  padding: 18px;
+  border: 1px dashed #bdd6d3;
+  border-radius: 10px;
+  background: #f4fbfa;
+}
+.alta-mascota[hidden] {
+  display: none;
+}
+.alta-mascota-titulo {
+  grid-column: 1/-1;
+  margin: 0;
+  color: var(--elem-importantes);
+  font-weight: bold;
+}
+.alta-mascota-nota {
+  grid-column: 1/-1;
+  margin: 0;
+  color: #668080;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+.alta-mascota .boton-primario {
+  grid-column: 1/-1;
+  justify-self: start;
+}
+/* Nota al pie de la confirmacion del turno. */
+.turno-confirmado-nota {
+  color: #668080;
+  font-size: 0.9rem;
 }
 .resumen-turno {
   padding: 22px;

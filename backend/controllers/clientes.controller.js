@@ -130,6 +130,37 @@ const solicitarAdopcion = async (req, res) => {
   }
 };
 
+// Las mascotas del cliente logueado. El id del cliente sale del token: no se
+// acepta uno por parametro, asi que nadie puede ver las mascotas de otro.
+const misMascotas = async (req, res) => {
+  try {
+    const mascotas = await service.listarMisMascotas(req.usuario.id);
+    res.json({ mascotas });
+  } catch (error) {
+    console.error('Error al obtener las mascotas del cliente:', error);
+    res.status(error.status || 500).json({
+      mensaje: error.status ? error.message : 'No se pudieron obtener tus mascotas'
+    });
+  }
+};
+
+// Alta de una mascota propia, desde la pagina de turnos. El cliente sale del
+// token: nadie puede registrar una mascota a nombre de otro.
+const crearMiMascota = async (req, res) => {
+  try {
+    const resultado = await service.crearMiMascota(req.usuario.id, req.body || {});
+    res.status(201).json({
+      mensaje: 'Mascota registrada correctamente',
+      ...resultado
+    });
+  } catch (error) {
+    console.error('Error al registrar la mascota:', error);
+    res.status(error.status || 500).json({
+      mensaje: error.status ? error.message : 'No se pudo registrar la mascota'
+    });
+  }
+};
+
 const obtenerMascota = async (req, res) => {
   const id = Number(req.params.id_mascota);
   if (!Number.isInteger(id) || id <= 0) {
@@ -174,6 +205,8 @@ module.exports = {
 
   crearCliente,
   crearMascotas,
+  misMascotas,
+  crearMiMascota,
   solicitarAdopcion,
 
   obtenerCliente,

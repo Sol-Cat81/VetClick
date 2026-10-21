@@ -86,7 +86,10 @@
           <label>Teléfono<input data-modal-field name="telefono"></label>
           <label>Horario<input data-modal-field name="horario"></label>
           <label>Estado<select data-modal-field name="activo"><option value="true">Activa</option>
-              <option value="false">Inactiva</option></select></label></div>
+              <option value="false">Inactiva</option></select></label>
+          <!-- La foto es opcional: si no se sube, la sucursal se queda sin
+               img_sucursal y la pagina publica usa la imagen por defecto. -->
+          <label>Imagen<input type="file" data-modal-field name="img_sucursal" accept="image/*"></label></div>
         <div class="modal-actions"><button class="btn btn-secondary" type="button"
             data-modal-close>Cancelar</button><button class="btn btn-primary" type="submit">Guardar sucursal</button>
         </div>

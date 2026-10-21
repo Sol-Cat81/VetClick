@@ -196,7 +196,7 @@ const inserciones = {
   sucursal: {
     tabla: 'sucursales',
     clave: 'id_sucursal',
-    campos: ['nombre', 'direccion', 'localidad', 'telefono', 'horario', 'activo'],
+    campos: ['nombre', 'direccion', 'localidad', 'telefono', 'horario', 'img_sucursal', 'activo'],
     requeridos: ['nombre']
   }
 };

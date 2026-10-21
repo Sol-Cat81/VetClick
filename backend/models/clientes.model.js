@@ -93,6 +93,29 @@ const ClientesModel = {
     );
     return rows[0] || null;
   },
+  // Las mascotas de un cliente, con su raza y especie. La especie no es una
+  // columna de mascota: se deduce de la raza (razas -> especies).
+  obtenerMascotasDeCliente: async (idCliente) => {
+    const [rows] = await conexion.query(
+      `SELECT m.id_mascota, m.nombre, m.id_raza, m.sexo,
+              ra.nombre AS raza, es.nombre AS especie
+       FROM mascota m
+       LEFT JOIN razas ra ON ra.id_raza = m.id_raza
+       LEFT JOIN especies es ON es.id_especie = ra.id_especie
+       WHERE m.id_cliente = ?
+       ORDER BY m.nombre`,
+      [idCliente]
+    );
+    return rows;
+  },
+  // La raza tiene que existir: es la clave foranea de mascota.id_raza.
+  obtenerRaza: async (idRaza) => {
+    const [rows] = await conexion.query(
+      'SELECT id_raza, nombre FROM razas WHERE id_raza = ?',
+      [idRaza]
+    );
+    return rows[0] || null;
+  },
   // Una misma persona no puede tener dos solicitudes en curso para la misma
   // mascota: el segundo POST debe avisarle, no duplicar la fila.
   existeAdopcionEnCurso: async (idCliente, idMascotaAdopcion) => {
@@ -167,7 +190,10 @@ const ClientesModel = {
         mascota.nombre,
         mascota.id_raza,
         mascota.sexo ?? 'MACHO',
-        mascota.fecha_nacimiento ?? new Date().toISOString().slice(0, 10),
+        // La fecha de nacimiento queda en NULL si no se manda: es un dato
+        // opcional y MySQL rechaza '' en una columna DATE. Antes se completaba
+        // con la fecha de hoy, que decia que la mascota habia nacido hoy.
+        mascota.fecha_nacimiento || null,
         Number(mascota.peso ?? 0),
         mascota.observaciones ?? ''
       ]
