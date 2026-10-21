@@ -698,6 +698,27 @@ td small {
   padding: 18px
 }
 
+/* Foto de la sucursal en su tarjeta del panel: el admin ve si tiene foto
+   antes de editarla. */
+.sucursal-miniatura {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: var(--radius);
+  display: block;
+  margin: 0 0 13px
+}
+
+.sucursal-sin-foto {
+  margin: 0 0 13px;
+  padding: 22px 0;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+  text-align: center;
+  color: var(--muted);
+  font-size: 11px
+}
+
 .info-card h3 {
   margin: 0 0 13px;
   font-size: 14px

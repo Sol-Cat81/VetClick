@@ -20,6 +20,11 @@ router.get('/adopciones', controller.adopciones);
 // adopcion se guarda a nombre del cliente logueado. Va antes de /:id_cliente.
 router.post('/adopciones', authMiddleware, controller.solicitarAdopcion);
 
+// Mascotas del cliente logueado y alta de una propia. El id del cliente sale
+// del token en los dos casos. Van antes de /mascotas/:id_mascota.
+router.get('/mis-mascotas', authMiddleware, controller.misMascotas);
+router.post('/mis-mascotas', authMiddleware, controller.crearMiMascota);
+
 // Mascota tiene su propio id: va antes que /:id_cliente para que Express
 // no interprete "mascotas" como un id de cliente.
 router.get('/mascotas/:id_mascota', controller.obtenerMascota);

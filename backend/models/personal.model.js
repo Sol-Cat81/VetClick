@@ -15,7 +15,11 @@ module.exports = {
     // LEFT JOIN, no JOIN: al desasociar un empleado la ficha tiene
     // id_empleado NULL y debe seguir apareciendo en la tabla. El nombre
     // concatenado se arma aca porque desde el WHERE no se puede.
-    const [rows] = await conexion.query(`SELECT v.id_veterinario,CONCAT(e.nombre,' ',e.apellido) AS veterinario,v.especialidad,v.id_empleado,(SELECT COUNT(*) FROM historial_medico h WHERE h.id_veterinario=v.id_veterinario) AS historiales_asociados,(SELECT COUNT(*) FROM vacunas va WHERE va.id_veterinario=v.id_veterinario) AS vacunas_asociadas FROM veterinarios v LEFT JOIN empleados e ON e.id_empleado=v.id_empleado ORDER BY v.id_veterinario`);
+    //
+    // La sucursal se trae del empleado: cada veterinario atiende en una sola
+    // sucursal, y la pagina de turnos filtra los profesionales por la
+    // sucursal que el cliente elige.
+    const [rows] = await conexion.query(`SELECT v.id_veterinario,CONCAT(e.nombre,' ',e.apellido) AS veterinario,v.especialidad,v.id_empleado,e.id_sucursal,s.nombre AS sucursal,(SELECT COUNT(*) FROM historial_medico h WHERE h.id_veterinario=v.id_veterinario) AS historiales_asociados,(SELECT COUNT(*) FROM vacunas va WHERE va.id_veterinario=v.id_veterinario) AS vacunas_asociadas FROM veterinarios v LEFT JOIN empleados e ON e.id_empleado=v.id_empleado LEFT JOIN sucursales s ON s.id_sucursal=e.id_sucursal ORDER BY v.id_veterinario`);
     return rows;
   },
   usuarios: async () => {

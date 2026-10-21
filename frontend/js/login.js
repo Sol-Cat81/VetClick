@@ -198,6 +198,14 @@ formInicio.addEventListener("submit", async (evento) => {
       localStorage.setItem("usuario", JSON.stringify(confirmBackend.usuario));
 
       setTimeout(() => {
+        // La pagina que pidio el login se pasa por parametro (?volver=...),
+        // para que el cliente vuelva a donde estaba y no pierda lo que habia
+        // elegido. Sin parametro, el admin va a su panel y el resto a la home.
+        const volver = new URLSearchParams(window.location.search).get('volver');
+        if (volver) {
+          window.location.href = volver;
+          return;
+        }
         if (Number(confirmBackend.usuario.rol) === 1) {
           window.location.href = "./admin/index.html";
         } else {

@@ -12,6 +12,7 @@ const subirImagen = async (archivo, carpeta) => {
 };
 
 const carpetaAdopcion = () => process.env.CLOUDINARY_FOLDER_ADOPCIONES || 'VetClick/adopciones';
+const carpetaSucursal = () => process.env.CLOUDINARY_FOLDER_SUCURSALES || 'VetClick/sucursales';
 
 module.exports = {
   opciones: async (req, res) => {
@@ -28,6 +29,9 @@ module.exports = {
       const datos = { ...(req.body || {}) };
       if (entidad === 'mascotaAdopcion' && req.file) {
         datos.img_masc_adop = await subirImagen(req.file, carpetaAdopcion());
+      }
+      if (entidad === 'sucursal' && req.file) {
+        datos.img_sucursal = await subirImagen(req.file, carpetaSucursal());
       }
       const resultado = await AdminModel.crear(entidad, datos);
       res.status(201).json({ mensaje: 'Registro creado correctamente', id: resultado.insertId });
@@ -46,6 +50,9 @@ module.exports = {
       const datos = { ...(req.body || {}) };
       if (entidad === 'mascotaAdopcion' && req.file) {
         datos.img_masc_adop = await subirImagen(req.file, carpetaAdopcion());
+      }
+      if (entidad === 'sucursal' && req.file) {
+        datos.img_sucursal = await subirImagen(req.file, carpetaSucursal());
       }
       await AdminModel.actualizar(entidad, id, datos);
       res.json({ mensaje: 'Registro actualizado correctamente', id });

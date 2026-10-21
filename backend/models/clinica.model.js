@@ -67,6 +67,105 @@ const ClinicaModel = {
       'SELECT id_categoria_servicio, nombre FROM categorias_servicios ORDER BY id_categoria_servicio'
     );
     return rows;
+  },
+  // La fila del cliente, a partir del usuario del token. El salto es el mismo
+  // que usa la solicitud de adopcion: el token trae id_usuario y la tabla
+  // turnos pide id_cliente.
+  obtenerClientePorUsuario: async (idUsuario) => {
+    const [rows] = await conexion.query(
+      'SELECT id_cliente, nombre, apellido, telefono FROM clientes WHERE id_usuario = ?',
+      [idUsuario]
+    );
+    return rows[0] || null;
+  },
+  // La mascota con su raza y especie. La especie no es una columna de
+  // mascota: se deduce de la raza (razas -> especies).
+  obtenerMascotaParaTurno: async (idMascota) => {
+    const [rows] = await conexion.query(
+      `SELECT m.id_mascota, m.id_cliente, m.nombre, m.id_raza,
+              ra.nombre AS raza, es.nombre AS especie
+       FROM mascota m
+       LEFT JOIN razas ra ON ra.id_raza = m.id_raza
+       LEFT JOIN especies es ON es.id_especie = ra.id_especie
+       WHERE m.id_mascota = ?`,
+      [idMascota]
+    );
+    return rows[0] || null;
+  },
+  // El servicio tiene que estar activo: uno dado de baja no se agenda.
+  obtenerServicio: async (idServicio) => {
+    const [rows] = await conexion.query(
+      'SELECT id_servicio, nombre, activo FROM servicios WHERE id_servicio = ?',
+      [idServicio]
+    );
+    return rows[0] || null;
+  },
+  // El profesional, con la sucursal donde atiende. Permite validar que el
+  // profesional elegido sea de la sucursal que el cliente eligio.
+  obtenerVeterinarioParaTurno: async (idVeterinario) => {
+    const [rows] = await conexion.query(
+      `SELECT v.id_veterinario, v.id_empleado, e.id_sucursal,
+              CONCAT(e.nombre, ' ', e.apellido) AS veterinario
+       FROM veterinarios v
+       LEFT JOIN empleados e ON e.id_empleado = v.id_empleado
+       WHERE v.id_veterinario = ?`,
+      [idVeterinario]
+    );
+    return rows[0] || null;
+  },
+  // Si el horario sigue libre. Entre que el cliente lo elige y confirma,
+  // otro puede tomarlo: por eso se revalida antes de guardar el turno.
+  horarioOcupado: async (fecha, hora, idSucursal, idVeterinario) => {
+    const [rows] = await conexion.query(
+      `SELECT id_turno FROM turnos
+       WHERE fecha = ? AND hora = ? AND estado <> 'CANCELADO'
+         AND (id_sucursal = ? OR id_veterinario = ?)
+       LIMIT 1`,
+      [fecha, hora, idSucursal, idVeterinario]
+    );
+    return rows.length > 0;
+  },
+  crearTurno: async (turno) => {
+    // El estado lo pone el backend: el cliente agenda, no decide como queda.
+    const [resultado] = await conexion.query(
+      `INSERT INTO turnos (id_cliente, id_mascota, id_servicio, id_sucursal,
+                          id_veterinario, fecha, hora, motivo, estado)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'PENDIENTE')`,
+      [
+        turno.id_cliente,
+        turno.id_mascota,
+        turno.id_servicio,
+        turno.id_sucursal,
+        turno.id_veterinario,
+        turno.fecha,
+        turno.hora,
+        turno.motivo
+      ]
+    );
+    return resultado;
+  },
+  // La sucursal con su horario de atencion. Es el texto que el panel muestra
+  // ("Lun a Sab 09:00 a 20:00") y que el service parsea para saber que dias y
+  // que franja atienden.
+  obtenerSucursal: async (idSucursal) => {
+    const [rows] = await conexion.query(
+      'SELECT id_sucursal, nombre, horario FROM sucursales WHERE id_sucursal = ?',
+      [idSucursal]
+    );
+    return rows[0] || null;
+  },
+  // Los horarios ya tomados para una fecha. Un turno cancelado no ocupa el
+  // horario: el cliente lo libera para que otro lo pueda tomar.
+  horariosOcupados: async (fecha, idSucursal, idVeterinario) => {
+    const [rows] = await conexion.query(
+      `SELECT hora FROM turnos
+       WHERE fecha = ? AND estado <> 'CANCELADO'
+         AND (id_sucursal = ? OR id_veterinario = ?)`,
+      [fecha, idSucursal, idVeterinario]
+    );
+    // MySQL devuelve la hora como "09:00:00": se recorta a "09:00" para
+    // compararla con los horarios que arma el service.
+    return rows.map((fila) => String(fila.hora).slice(0, 5));
   }
 };
 module.exports = ClinicaModel;

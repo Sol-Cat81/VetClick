@@ -18,6 +18,57 @@ module.exports = {
   crearCliente: (data) => ClientesModel.crearCliente(data),
   crearMascotas: (data) => ClientesModel.crearMascotas(data),
 
+  // Las mascotas del cliente logueado, con su raza y especie. El id del
+  // cliente sale del token: no se acepta uno por parametro.
+  listarMisMascotas: async (idUsuario) => {
+    const cliente = await ClientesModel.obtenerClientePorUsuario(idUsuario);
+    if (!cliente) {
+      throw errorValidacion('Completa tu perfil de cliente para registrar tus mascotas', 404);
+    }
+    return ClientesModel.obtenerMascotasDeCliente(cliente.id_cliente);
+  },
+
+  // Alta de una mascota propia desde la pagina de turnos. El cliente sale del
+  // token, asi que nadie puede registrar una mascota a nombre de otro.
+  //
+  // La raza es obligatoria porque es la clave foranea de mascota.id_raza, y
+  // el sexo tambien (NOT NULL). La especie se deduce de la raza: no se pide.
+  // La fecha de nacimiento y el peso quedan vacios a proposito: se pueden
+  // completar despues desde la seccion de cuenta.
+  crearMiMascota: async (idUsuario, datos) => {
+    const cliente = await ClientesModel.obtenerClientePorUsuario(idUsuario);
+    if (!cliente) {
+      throw errorValidacion('Completa tu perfil de cliente para registrar tus mascotas');
+    }
+
+    const nombre = String(datos.nombre ?? '').trim();
+    if (!nombre) throw errorValidacion('El nombre de la mascota es obligatorio');
+    if (nombre.length > 50) {
+      throw errorValidacion('El nombre de la mascota admite máximo 50 caracteres');
+    }
+
+    const idRaza = Number(datos.id_raza);
+    if (!Number.isInteger(idRaza) || idRaza <= 0) {
+      throw errorValidacion('Elegí la raza de la mascota');
+    }
+    const raza = await ClientesModel.obtenerRaza(idRaza);
+    if (!raza) throw errorValidacion('La raza elegida no es válida');
+
+    const sexo = String(datos.sexo ?? '').toUpperCase();
+    if (!['MACHO', 'HEMBRA'].includes(sexo)) {
+      throw errorValidacion('El sexo debe ser MACHO o HEMBRA');
+    }
+
+    const resultado = await ClientesModel.crearMascotas({
+      id_cliente: cliente.id_cliente,
+      nombre,
+      id_raza: idRaza,
+      sexo
+    });
+
+    return { id_mascota: resultado.insertId, nombre, raza: raza.nombre };
+  },
+
   // Solicitud de adopcion que hace un cliente desde la pagina publica.
   // idUsuario sale del token (nunca del body): el cliente no puede pedir una
   // adopcion en nombre de otro.
