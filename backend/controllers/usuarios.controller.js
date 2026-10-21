@@ -35,9 +35,18 @@ const {
   eliminarDireccion,
 
   solicitarMascotas,
+  solicitarRazas,
+  guardarMascota,
+  traerMascota,
+  actualizarMascota,
+  eliminarMascota,
+  traerFichaMascota,
+
   solicitarTurnos,
+  cancelarTurno,
+  traerTurno,
   solicitarPedidos,
-  solicitarHistorialMascota
+  traerDetallePedido
 } = require("../service/usuarios.service");
 
 // Comprueba email y contraseña y devuelve únicamente datos públicos del usuario.
@@ -258,14 +267,179 @@ const guardarCliente = async (req, res) => {
 
 const deshboard = async (req, res) => {
   const idUsuario = req.usuario.id;
-  const usuario = await traerInfoUsuario(idUsuario)
-  const direcciones = await solicitarDirecciones(idUsuario)
-  const mascotas = await solicitarMascotas(idUsuario)
-  const turnos = await solicitarTurnos(idUsuario)
-  const pedidos = await solicitarPedidos(idUsuario)
-  
-  res.status(200).json({ usuario, direcciones, mascotas, turnos, pedidos })
+  const usuario = await traerInfoUsuario(idUsuario);
+  const cliente = usuario.cliente;
+  const [direcciones, mascotas, turnos, pedidos, razas] = cliente
+    ? await Promise.all([
+        solicitarDirecciones(cliente.id_cliente),
+        solicitarMascotas(cliente.id_cliente),
+        solicitarTurnos(cliente.id_cliente),
+        solicitarPedidos(cliente.id_cliente),
+        solicitarRazas()
+      ])
+    : [[], [], [], [], await solicitarRazas()];
+
+  res.status(200).json({ usuario, direcciones, mascotas, turnos, pedidos, razas });
 }
+
+const validarDatosMascota = async (datos) => {
+  const { nombre, raza, sexo, fecha_nacimiento, peso } = datos;
+  const idRaza = Number(raza);
+  const fechaValida = /^\d{4}-\d{2}-\d{2}$/.test(fecha_nacimiento || "") &&
+    !Number.isNaN(Date.parse(`${fecha_nacimiento}T00:00:00`)) &&
+    new Date(`${fecha_nacimiento}T00:00:00`) <= new Date();
+  const razas = await solicitarRazas();
+  const pesoValido = peso === "" || peso === null || peso === undefined ||
+    (Number.isFinite(Number(peso)) && Number(peso) > 0 && Number(peso) <= 999.99);
+
+  return Boolean(
+    typeof nombre === "string" &&
+    nombre.trim().length > 0 &&
+    nombre.trim().length <= 50 &&
+    Number.isInteger(idRaza) &&
+    razas.some(item => item.id_raza === idRaza) &&
+    ["MACHO", "HEMBRA"].includes(sexo) &&
+    fechaValida &&
+    pesoValido
+  );
+};
+
+const guardarMascotaUsuario = async (req, res) => {
+  const cliente = await traerInfoCliente(req.usuario.id);
+  if (!cliente) {
+    return res.status(404).json({ message: "Completa tus datos de cliente antes de registrar mascotas" });
+  }
+  if (!await validarDatosMascota(req.body)) {
+    return res.status(400).json({ message: "Revisa los datos obligatorios de la mascota" });
+  }
+
+  try {
+    await guardarMascota(
+      cliente.id_cliente,
+      req.body.nombre.trim(),
+      Number(req.body.raza),
+      req.body.sexo,
+      req.body.fecha_nacimiento,
+      req.body.peso || null,
+      req.body.observaciones?.trim() || null
+    );
+    return res.status(201).json({ message: "Mascota registrada correctamente" });
+  } catch (error) {
+    console.error("Error al registrar la mascota:", error);
+    return res.status(500).json({ message: "No se pudo registrar la mascota" });
+  }
+};
+
+const actualizarMascotaUsuario = async (req, res) => {
+  const cliente = await traerInfoCliente(req.usuario.id);
+  if (!cliente) {
+    return res.status(404).json({ message: "Cliente no encontrado" });
+  }
+  const idMascota = Number(req.params.id);
+  if (!Number.isInteger(idMascota) || idMascota < 1) {
+    return res.status(400).json({ message: "Identificador de mascota inválido" });
+  }
+  const mascota = await traerMascota(idMascota, cliente.id_cliente);
+  if (!mascota) {
+    return res.status(404).json({ message: "Mascota no encontrada" });
+  }
+  if (!await validarDatosMascota(req.body)) {
+    return res.status(400).json({ message: "Revisa los datos obligatorios de la mascota" });
+  }
+
+  try {
+    await actualizarMascota(
+      idMascota,
+      cliente.id_cliente,
+      req.body.nombre.trim(),
+      Number(req.body.raza),
+      req.body.sexo,
+      req.body.fecha_nacimiento,
+      req.body.peso || null,
+      req.body.observaciones?.trim() || null
+    );
+    return res.status(200).json({ message: "Mascota actualizada correctamente" });
+  } catch (error) {
+    console.error("Error al actualizar la mascota:", error);
+    return res.status(500).json({ message: "No se pudo actualizar la mascota" });
+  }
+};
+
+const eliminarMascotaUsuario = async (req, res) => {
+  const cliente = await traerInfoCliente(req.usuario.id);
+  if (!cliente) {
+    return res.status(404).json({ message: "Cliente no encontrado" });
+  }
+  const idMascota = Number(req.params.id);
+  if (!Number.isInteger(idMascota) || idMascota < 1) {
+    return res.status(400).json({ message: "Identificador de mascota inválido" });
+  }
+  try {
+    const eliminado = await eliminarMascota(idMascota, cliente.id_cliente);
+    if (!eliminado) {
+      return res.status(404).json({ message: "Mascota no encontrada" });
+    }
+    return res.status(200).json({ message: "Mascota eliminada correctamente" });
+  } catch (error) {
+    console.error("Error al eliminar la mascota:", error);
+    return res.status(500).json({ message: "No se pudo eliminar la mascota" });
+  }
+};
+
+const fichaMascotaUsuario = async (req, res) => {
+  const cliente = await traerInfoCliente(req.usuario.id);
+  if (!cliente) {
+    return res.status(404).json({ message: "Cliente no encontrado" });
+  }
+  const idMascota = Number(req.params.id);
+  if (!Number.isInteger(idMascota) || idMascota < 1) {
+    return res.status(400).json({ message: "Identificador de mascota inválido" });
+  }
+  const ficha = await traerFichaMascota(idMascota, cliente.id_cliente);
+  if (!ficha) {
+    return res.status(404).json({ message: "Mascota no encontrada" });
+  }
+  return res.status(200).json(ficha);
+};
+
+const cancelarTurnoUsuario = async (req, res) => {
+  const cliente = await traerInfoCliente(req.usuario.id);
+  if (!cliente) {
+    return res.status(404).json({ message: "Cliente no encontrado" });
+  }
+  const idTurno = Number(req.params.id);
+  if (!Number.isInteger(idTurno) || idTurno < 1) {
+    return res.status(400).json({ message: "Identificador de turno inválido" });
+  }
+  const turno = await traerTurno(idTurno, cliente.id_cliente);
+  if (!turno) {
+    return res.status(404).json({ message: "Turno no encontrado" });
+  }
+  if (!["PENDIENTE", "CONFIRMADO"].includes(turno.estado)) {
+    return res.status(409).json({ message: "Este turno no se puede cancelar" });
+  }
+  const cancelado = await cancelarTurno(idTurno, cliente.id_cliente);
+  if (!cancelado) {
+    return res.status(409).json({ message: "No se pudo cancelar el turno" });
+  }
+  return res.status(200).json({ message: "Turno cancelado correctamente" });
+};
+
+const detallePedidoUsuario = async (req, res) => {
+  const cliente = await traerInfoCliente(req.usuario.id);
+  if (!cliente) {
+    return res.status(404).json({ message: "Cliente no encontrado" });
+  }
+  const idPedido = Number(req.params.id);
+  if (!Number.isInteger(idPedido) || idPedido < 1) {
+    return res.status(400).json({ message: "Identificador de compra inválido" });
+  }
+  const detalle = await traerDetallePedido(idPedido, cliente.id_cliente);
+  if (!detalle) {
+    return res.status(404).json({ message: "Compra no encontrada" });
+  }
+  return res.status(200).json(detalle);
+};
 
 const guardarDireccion = async (req, res) => {
   const idUsuario = req.usuario.id;
@@ -361,6 +535,8 @@ const eliminarDireccionUsuario = async (req, res) => {
   res.status(200).json({ message: "Dirección eliminada correctamente" });
 }
 
+
+
 const cambiarFotoPerfil = async (req, res) => {
   const idUsuario = req.usuario.id;
   const archivo = req.file;
@@ -393,5 +569,11 @@ module.exports = {
   traerDireccionEspecifica,
   actualizarDireccion,
   eliminarDireccionUsuario,
+  guardarMascotaUsuario,
+  actualizarMascotaUsuario,
+  eliminarMascotaUsuario,
+  fichaMascotaUsuario,
+  cancelarTurnoUsuario,
+  detallePedidoUsuario,
   cambiarFotoPerfil
 };

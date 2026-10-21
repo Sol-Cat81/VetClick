@@ -16,6 +16,12 @@ const {
     traerDireccionEspecifica,
     actualizarDireccion,
     eliminarDireccionUsuario,
+    guardarMascotaUsuario,
+    actualizarMascotaUsuario,
+    eliminarMascotaUsuario,
+    fichaMascotaUsuario,
+    cancelarTurnoUsuario,
+    detallePedidoUsuario,
     cambiarFotoPerfil
 } = require('./../controllers/usuarios.controller');
 
@@ -61,6 +67,12 @@ router.post('/guardardireccion', authMiddleware, guardarDireccion)
 router.post('/traerdireccion', authMiddleware, traerDireccionEspecifica)
 router.put('/actualizardireccion/:id', authMiddleware, actualizarDireccion)
 router.delete('/eliminardireccion/:id', authMiddleware, eliminarDireccionUsuario)
+router.post('/mascotas', authMiddleware, guardarMascotaUsuario)
+router.get('/mascotas/:id/ficha', authMiddleware, fichaMascotaUsuario)
+router.put('/mascotas/:id', authMiddleware, actualizarMascotaUsuario)
+router.delete('/mascotas/:id', authMiddleware, eliminarMascotaUsuario)
+router.put('/turnos/:id/cancelar', authMiddleware, cancelarTurnoUsuario)
+router.get('/pedidos/:id/detalle', authMiddleware, detallePedidoUsuario)
 router.post('/cambiarfotoperfil', authMiddleware, upload.single('imagen_usuario'), manejarErrorUpload, cambiarFotoPerfil)
 
 module.exports = router;

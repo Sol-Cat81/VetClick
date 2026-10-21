@@ -71,6 +71,38 @@ async function solicitarMascotas(idCliente) {
     return await Usuario.traerMascotas(idCliente)
 }
 
+async function solicitarRazas() {
+    return Usuario.traerRazas()
+}
+
+async function guardarMascota(idCliente, nombre, raza, sexo, fecha_nacimiento, peso, observaciones) {
+    return Usuario.guardarMascota(idCliente, nombre, raza, sexo, fecha_nacimiento, peso, observaciones)
+}
+
+async function traerMascota(idMascota, idCliente) {
+    return Usuario.traerMascota(idMascota, idCliente)
+}
+
+async function actualizarMascota(idMascota, idCliente, nombre, raza, sexo, fecha_nacimiento, peso, observaciones) {
+    return Usuario.actualizarMascota(idMascota, idCliente, nombre, raza, sexo, fecha_nacimiento, peso, observaciones)
+}
+
+async function eliminarMascota(idMascota, idCliente) {
+    return Usuario.eliminarMascota(idMascota, idCliente)
+}
+
+async function traerFichaMascota(idMascota, idCliente) {
+    return Usuario.traerFichaMascota(idMascota, idCliente)
+}
+
+async function cancelarTurno(idTurno, idCliente) {
+    return Usuario.cancelarTurno(idTurno, idCliente)
+}
+
+async function traerTurno(idTurno, idCliente) {
+    return Usuario.traerTurno(idTurno, idCliente)
+}
+
 async function solicitarTurnos(idCliente) {
     return await Usuario.traerTurnosGeneral(idCliente)
 }
@@ -79,8 +111,12 @@ async function solicitarPedidos(idCliente) {
     return await Usuario.traerCompras(idCliente)
 }
 
-async function solicitarHistorialMascota(idMascota){
-    return await Usuario.traerHistorial(idMascota)
+async function solicitarHistorialMascota(idMascota, idCliente){
+    return await Usuario.traerFichaMascota(idMascota, idCliente)
+}
+
+async function traerDetallePedido(idPedido, idCliente) {
+    return Usuario.traerDetallePedido(idPedido, idCliente)
 }
 
 module.exports = {
@@ -96,7 +132,17 @@ module.exports = {
     eliminarDireccion,
 
     solicitarMascotas,
+    solicitarRazas,
+    guardarMascota,
+    traerMascota,
+    actualizarMascota,
+    eliminarMascota,
+    traerFichaMascota,
+
     solicitarTurnos,
+    cancelarTurno,
+    traerTurno,
     solicitarPedidos,
     solicitarHistorialMascota,
+    traerDetallePedido,
 }

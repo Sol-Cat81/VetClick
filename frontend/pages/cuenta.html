@@ -124,13 +124,6 @@
                         <div class="text-end"><button type="submit" class="guardar-cambios">Guardar cambios</button>
                         </div>
                     </form>
-                    <dialog id="modalSimple">
-                        <div class="contenidoModal"></div>
-                        <div class="pieModal"></div>
-                        <button onclick="document.getElementById('modalSimple').close()">Cerrar</button>
-                    </dialog>
-
-                    <button onclick="document.getElementById('modalSimple').showModal()">Abrir Modal</button>
                 </div>
             </section>
             <section id="direcciones" class="seccion">
@@ -143,7 +136,8 @@
                         </div>
                     </div>
                     <div class="col align-content-end text-end">
-                        <button type="button" class="agregar-direccion"><i class="ph ph-plus"></i> Nueva direccion</button>
+                        <button type="button" class="agregar-direccion"><i class="ph ph-plus"></i> Nueva
+                            direccion</button>
                     </div>
                 </div>
                 <div class="row justify-content-center align-items-center g-2 direcciones-contenedor">
@@ -178,9 +172,10 @@
                                 <label for="referencia">Referencia</label><br>
                                 <input type="text" name="referencia" id="referencia"><br>
                                 <div class="pie text-end">
-                                <button type="button" class="cerrar-modal"
+                                    <button type="button" class="cerrar-modal"
                                         onclick="document.querySelector('#modalDireccion').close()">Cancelar</button>
-                                <button type="submit" class="guardar-direccion" id="guardarDireccion">Guardar</button>
+                                    <button type="submit" class="guardar-direccion"
+                                        id="guardarDireccion">Guardar</button>
                                 </div>
                             </div>
                         </div>
@@ -202,6 +197,41 @@
                 </div>
                 <div class="row justify-content-center align-items-center g-2 mascotas-contenedor">
                 </div>
+                <dialog id="modalMascota">
+                    <div class="eyebrow" id="tituloModalMascota">Registrar nueva mascota</div>
+                    <hr>
+                    <form action="" id="formAgregarMascota">
+                        <label for="nombreMascota">Nombre<b class="obligatorio">*</b></label><br>
+                        <input type="text" class="campo" maxlength="40" placeholder="Ej: Firulais" name="nombreMascota" id="nombreMascota" required><br>
+
+                        <label for="raza">Raza<b class="obligatorio">*</b></label><br>
+                        <select name="raza" id="raza" required>
+                            <option selected value="">Seleccioná una raza</option>
+                        </select><br>
+
+                        <label for="sexo">Sexo<b class="obligatorio">*</b></label><br>
+                        <input type="radio" value="HEMBRA" name="sexo" id="hembra" required>
+                        <label for="hembra">Hembra</label>
+                        <input type="radio" value="MACHO" name="sexo" id="macho">
+                        <label for="macho">Macho</label>
+                        <br>
+                        <label for="fechaNac">Fecha de nacimiento<b class="obligatorio">*</b></label><br>
+                        <input type="date" class="campo" name="fechaNac" id="fechaNac" required><br>
+
+                        <label for="peso">Peso</label><br>
+                        <input type="number" class="campo" name="peso" id="peso" step="any" min="0" inputmode="decimal"
+                            placeholder="Ej: 12.5"><br>
+
+                        <label for="observaciones">Observaciones</label><br>
+                        <textarea name="observaciones" id="observaciones" maxlength="150" class="campo"></textarea>
+
+                        <div class="pie text-end">
+                            <button type="button" class="cerrar-modal"
+                                onclick="document.querySelector('#modalMascota').close()">Cancelar</button>
+                            <button type="submit" class="guardar-direccion" id="guardarMascota">Guardar</button>
+                        </div>
+                    </form>
+                </dialog>
             </section>
             <section id="turnos" class="seccion">
                 <div class="row row-cols-1 row-cols-md-2">
@@ -213,7 +243,7 @@
                         </div>
                     </div>
                     <div class="col align-content-end text-end">
-                        <button class="reservar-turno"><i class="ph ph-plus"></i> Reservar turno</button>
+                        <button class="reservar-turno" onclick="window.location.href= 'turnos.html'"><i class="ph ph-plus"></i> Reservar turno</button>
                     </div>
                 </div>
                 <div class="contenedor-turnos">
@@ -223,7 +253,7 @@
                 <div class="eyebrow">Registro</div>
                 <h2>Historial</h2>
                 <div class="desc">
-                    Revisa consultas, turnos, comprar y pedidos en camino
+                    Revisa consultas, compras y pedidos en camino
                 </div>
                 <div class="filtrar-historial">
                     <button class="btn-filtro filtro-activo" data-article="compras">Compras</button>
@@ -233,7 +263,7 @@
                             Mascotas
                         </button>
                         <ul class="dropdown-menu" id="dropdownMascotas">
-                            <li class="dropdown-item">kxncsldcs</li>
+                            <li class="dropdown-item-text">No hay mascotas registradas.</li>
                         </ul>
                     </div>
                 </div>
@@ -244,7 +274,9 @@
                     <div class="contenedorCompras">
                     </div>
                 </article>
-                <article id="mascota" class="seccion-historial"></article>
+                <article id="mascota" class="seccion-historial">
+                    <p class="aviso-seccion">Elegí una mascota del menú para ver su historial de consultas.</p>
+                </article>
             </section>
         </div>
         <input type="file" id="inputFotoUsuario" accept="image/png,image/jpeg,image/webp" hidden>
@@ -272,6 +304,24 @@
                 </div>
             </div>
         </div>
+
+        <!-- Modal compartido: ficha de mascota, informacion del turno y detalle de compra -->
+        <dialog id="modalDetalleCuenta">
+            <div class="cabecera-detalle-cuenta">
+                <div>
+                    <div class="eyebrow">Detalle</div>
+                    <h3 class="titulo-detalle-cuenta"></h3>
+                </div>
+                <button type="button" class="cerrar-detalle-cuenta" data-cerrar-detalle aria-label="Cerrar">
+                    <i class="ph ph-x"></i>
+                </button>
+            </div>
+            <hr>
+            <div class="contenido-detalle-cuenta"></div>
+            <div class="pie text-end">
+                <button type="button" class="cerrar-modal" data-cerrar-detalle>Cerrar</button>
+            </div>
+        </dialog>
 
         <div class="toast-container position-fixed botton-0 end-0 p-3" style="z-index: 1055">
             <div id="miToast" class="toast align-items-center text-bg-success border-0" role="alert"

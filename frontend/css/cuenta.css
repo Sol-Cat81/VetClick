@@ -387,7 +387,8 @@ dialog::-webkit-scrollbar-thumb {
     max-width: 900px;
 }
 
-#formAgregarDireccion input{
+#formAgregarDireccion input,
+#formAgregarMascota .campo{
     padding: 3px 10px;
     border-radius: 10px;
     border: 1px solid #c8cbcc;
@@ -395,14 +396,17 @@ dialog::-webkit-scrollbar-thumb {
     margin-bottom: 10px;
 }
 
-#tipoDireccion, ::picker(select){
+#tipoDireccion, ::picker(select),
+#raza, ::picker(select){
     appearance: base-select;
 }
-::picker(select){
+::picker(select),
+#raza, ::picker(select){
     border: 1px solid #c8cbcc;
     border-radius: 10px;
 }
-#tipoDireccion{
+#tipoDireccion,
+#raza{
     padding: 4px 10px;
     border-radius: 10px;
     border: 1px solid #c8cbcc;
@@ -410,7 +414,8 @@ dialog::-webkit-scrollbar-thumb {
     margin-bottom: 10px;
 }
 
-#formAgregarDireccion select:focus{
+#formAgregarDireccion select:focus,
+#formAgregarMascota select:focus{
     outline: none;
 }
 
@@ -445,6 +450,38 @@ dialog::-webkit-scrollbar-thumb {
 
 #mascotas .ph-pencil-simple-line:hover {
     background-color: #ebf8fc75;
+}
+
+.card-resumen-mascota {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.acciones-mascota {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+#modalMascota{
+    width: auto;
+    max-width: 500px;
+    justify-content: center;
+}
+#formAgregarMascota input[type="radio"]{
+    width: 10px;
+    height: 10px;
+    border: 1px solid var(--elem-importantes);
+    border-radius: 10px;
+    appearance: none;
+}
+#formAgregarMascota input[type="radio"]:checked {
+    background-color: var(--elem-importantes);
+}
+#macho{
+    margin-left: 30px;
 }
 
 /* = = = SECCION TURNOS = = = */
@@ -566,6 +603,164 @@ dialog::-webkit-scrollbar-thumb {
 
 .vermas:hover {
     background-color: #d1d2d237;
+}
+
+/* = = = MODAL DETALLE DE CUENTA (ficha, turno y compra) = = = */
+#modalDetalleCuenta {
+    width: min(700px, calc(100vw - 40px));
+    max-width: 700px;
+}
+
+.cabecera-detalle-cuenta {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.titulo-detalle-cuenta {
+    font-family: "titulo";
+    font-size: 2.2rem;
+    color: var(--elem-importantes);
+    margin-top: 5px;
+}
+
+.cerrar-detalle-cuenta {
+    border: none;
+    background-color: transparent;
+    color: var(--elem-importantes);
+    font-size: 22px;
+    padding: 5px 8px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.cerrar-detalle-cuenta:hover {
+    background-color: #ebf8fc75;
+}
+
+.contenido-detalle-cuenta {
+    margin-top: 12px;
+    color: var(--texto);
+}
+
+.contenido-detalle-cuenta h3 {
+    font-family: "titulo";
+    font-size: 1.9rem;
+    color: var(--elem-importantes);
+    margin-top: 15px;
+}
+
+.contenido-detalle-cuenta h4 {
+    font-family: 'texto';
+    color: var(--elem-importantes);
+    font-size: 1.15rem;
+    margin-bottom: 8px;
+}
+
+.contenido-detalle-cuenta h5 {
+    font-family: 'texto';
+    color: var(--elem-secun);
+    font-size: 1rem;
+    margin-top: 12px;
+    margin-bottom: 6px;
+}
+
+.contenido-detalle-cuenta p {
+    margin: 5px 0;
+    font-size: 15px;
+}
+
+.contenido-detalle-cuenta hr {
+    margin-top: 15px;
+    opacity: 0.5;
+}
+
+.aviso-seccion {
+    text-align: center;
+    margin: 40px 20px;
+    font-family: 'texto';
+    color: var(--elem-importantes);
+}
+
+/* = = = FICHA Y HISTORIAL MEDICO DE LA MASCOTA = = = */
+.datos-ficha-mascota {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 5px 20px;
+    background-color: var(--principal-fondo);
+    border: 1px solid #c8cbcc;
+    border-radius: 15px;
+    padding: 15px 20px;
+}
+
+.datos-ficha-mascota p {
+    margin: 4px 0;
+}
+
+.consulta-mascota {
+    background-color: var(--principal-fondo);
+    border: 1px solid #c8cbcc;
+    border-radius: 15px;
+    padding: 15px 20px;
+    margin: 15px 0;
+}
+
+.lista-tratamientos,
+.lista-vacunas {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.lista-tratamientos li,
+.lista-vacunas li {
+    background-color: #d9fbfb72;
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-size: 15px;
+}
+
+.bloque-ficha {
+    margin-top: 20px;
+}
+
+.contenido-vacunas {
+    padding: 5px 20px 15px;
+}
+
+#historial .seccion-historial .contenido-vacunas p {
+    text-align: center;
+    margin-top: 20px;
+    font-family: 'texto';
+    color: var(--elem-importantes);
+}
+
+/* = = = DETALLE DE LA COMPRA = = = */
+.lineas-compra {
+    border: 1px solid #c8cbcc;
+    border-radius: 15px;
+    overflow: hidden;
+    margin: 12px 0;
+}
+
+.linea-compra {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 10px 15px;
+    border-bottom: 1px solid #c0c0c0c6;
+    font-size: 15px;
+}
+
+.linea-compra:last-child {
+    border-bottom: none;
+}
+
+.total-detalle-compra {
+    color: var(--elem-importantes);
+    font-size: 1.1rem;
 }
 
 /* = = = SECCION CAMBIAR FOTO DE PERFIL = = = */
