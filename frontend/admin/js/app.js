@@ -1098,12 +1098,16 @@ document.addEventListener('submit', async event => {
   }
   const esProducto = nombreEntidad === 'producto';
   const esMarca = nombreEntidad === 'marca'
+  // La sucursal tambien sube una imagen. El input ya se llama img_sucursal,
+  // igual que la columna, asi que FormData lo manda solo: no hace falta el
+  // "datos.set" que necesita el producto (que renombra su campo).
+  const esSucursal = nombreEntidad === 'sucursal'
   const endpoint = esProducto
     ? 'catalogo/productos'
     :esMarca
     ?'catalogo/marcas'
     : `admin/${encodeURIComponent(nombreEntidad)}`;
-  const esArchivo = esProducto || esMarca;
+  const esArchivo = esProducto || esMarca || esSucursal;
   const datos = esArchivo ? new FormData(form) : Object.fromEntries(new FormData(form));
 
   if (esProducto) {

@@ -37,6 +37,16 @@ const entidadMascotaAdopcion = (req, res, next) => {
 router.post('/mascotaAdopcion', entidadMascotaAdopcion, upload.single('img_masc_adop'), controller.crear);
 router.put('/mascotaAdopcion/:id', entidadMascotaAdopcion, upload.single('img_masc_adop'), controller.actualizar);
 
+// Rutas ESPECÍFICAS para sucursal (con subida de imagen). Mismo criterio que
+// arriba: van antes de las genéricas /:entidad y reciben el :entidad inyectado.
+const entidadSucursal = (req, res, next) => {
+  req.params.entidad = 'sucursal';
+  next();
+};
+
+router.post('/sucursal', entidadSucursal, upload.single('img_sucursal'), controller.crear);
+router.put('/sucursal/:id', entidadSucursal, upload.single('img_sucursal'), controller.actualizar);
+
 // Rutas genéricas del panel de administración.
 router.post('/:entidad', controller.crear);
 router.put('/:entidad/:id', controller.actualizar);

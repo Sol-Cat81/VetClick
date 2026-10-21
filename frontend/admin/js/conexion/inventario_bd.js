@@ -3,6 +3,15 @@
 const stockPorId = new Map();
 const sucursalesPorId = new Map();
 
+// La foto de la sucursal en la tarjeta del panel, para que el admin vea si
+// tiene foto antes de editarla. Sin foto, un aviso de que no tiene.
+function miniaturaSucursal(url){
+  const esUrl = typeof url === 'string' && /^https?:\/\//i.test(url);
+  if(!esUrl) return '<p class="sucursal-sin-foto">Sin foto</p>';
+  return `<img class="sucursal-miniatura" src="${escaparHtml(url)}" alt="Foto de la sucursal"
+    onerror="this.outerHTML='<p class=&quot;sucursal-sin-foto&quot;>Sin foto</p>'">`;
+}
+
 async function cargarInventario(){
   try{
     const stock = await obtenerDatos('inventario/stock');
@@ -16,7 +25,7 @@ async function cargarInventario(){
     const sucursales = await obtenerDatos('inventario/sucursales');
     const container = document.querySelector('#sucursales-list');
     guardarEnRegistro(sucursalesPorId, sucursales, 'id_sucursal');
-    if(container) container.innerHTML = sucursales.map(row => `<article class="card info-card" data-id="${escaparHtml(row.id_sucursal)}"><h3>${escaparHtml(row.nombre)}</h3><div class="info-row"><span>Dirección</span><b>${escaparHtml(row.direccion)}</b></div><div class="info-row"><span>Teléfono</span><b>${escaparHtml(row.telefono || '—')}</b></div><div class="info-row"><span>Localidad</span><b>${escaparHtml(row.localidad)}</b></div><div class="info-row"><span>Horario</span><b>${escaparHtml(row.horario)}</b></div><div class="info-row"><span>Estado</span><span class="status ${row.activo ? 'success' : 'warning'}">${row.activo ? 'Activa' : 'Inactiva'}</span></div></article>`).join('');
+    if(container) container.innerHTML = sucursales.map(row => `<article class="card info-card" data-id="${escaparHtml(row.id_sucursal)}">${miniaturaSucursal(row.img_sucursal)}<h3>${escaparHtml(row.nombre)}</h3><div class="info-row"><span>Dirección</span><b>${escaparHtml(row.direccion)}</b></div><div class="info-row"><span>Teléfono</span><b>${escaparHtml(row.telefono || '—')}</b></div><div class="info-row"><span>Localidad</span><b>${escaparHtml(row.localidad)}</b></div><div class="info-row"><span>Horario</span><b>${escaparHtml(row.horario)}</b></div><div class="info-row"><span>Estado</span><span class="status ${row.activo ? 'success' : 'warning'}">${row.activo ? 'Activa' : 'Inactiva'}</span></div></article>`).join('');
   }catch(error){ InformarErrorCarga('inventario/sucursales', error); }
 }
 
