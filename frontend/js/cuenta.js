@@ -45,6 +45,12 @@ contenedorOpcione.querySelectorAll('.opcion').forEach(opcion => {
         const anterior = document.querySelector('.elegido')
         const elegido = evento.target.closest(".opcion")
 
+        // Mientras el usuario no esté registrado como cliente, solo queda Perfil.
+        if (elegido.classList.contains('deshabilitado')) {
+            mostrarToast('Completá tu registro en la sección Perfil para habilitar estas opciones.', 'error')
+            return
+        }
+
         contenido.forEach(seccion => {
             if (seccion.classList.contains('activo')) { seccion.classList.remove('activo') };
         })
@@ -169,6 +175,21 @@ const formatearNumero = (numero) => {
     }).format(numero);
 }
 
+// Habilita o bloquea las secciones del menú según el registro del cliente.
+function aplicarOpcionesRegistro(registrado) {
+    contenedorOpcione.querySelectorAll('.opcion').forEach(opcion => {
+        if (opcion.dataset.seccion === 'perfil') return
+        opcion.classList.toggle('deshabilitado', !registrado)
+        if (registrado) {
+            opcion.removeAttribute('aria-disabled')
+            opcion.removeAttribute('tabindex')
+        } else {
+            opcion.setAttribute('aria-disabled', 'true')
+            opcion.setAttribute('tabindex', '-1')
+        }
+    })
+}
+
 function cargarFormUsuario(info) {
     const alertaUsu = document.querySelector('.alerta')
     if (info.cliente === null) {
@@ -177,6 +198,7 @@ function cargarFormUsuario(info) {
     } else {
         alertaUsu.classList.remove('alertaActiva')
     }
+    aplicarOpcionesRegistro(info.cliente !== null)
     document.querySelector('.usuario-head').innerHTML = `${info.usuario.username}`
     document.getElementById('username').value = info.usuario.username
     document.getElementById('gmail').value = info.usuario.email

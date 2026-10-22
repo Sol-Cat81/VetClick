@@ -282,6 +282,18 @@ const deshboard = async (req, res) => {
   res.status(200).json({ usuario, direcciones, mascotas, turnos, pedidos, razas });
 }
 
+// Devuelve solo lo que necesita el formulario de envio del carrito.
+const datosEnvio = async (req, res) => {
+  try {
+    const cliente = await traerInfoCliente(req.usuario.id);
+    const direcciones = cliente ? await solicitarDirecciones(cliente.id_cliente) : [];
+    return res.status(200).json({ cliente, direcciones });
+  } catch (error) {
+    console.error("Error al traer los datos de envio:", error);
+    return res.status(500).json({ message: "No se pudieron cargar los datos de envio" });
+  }
+}
+
 const validarDatosMascota = async (datos) => {
   const { nombre, raza, sexo, fecha_nacimiento, peso } = datos;
   const idRaza = Number(raza);
@@ -565,6 +577,7 @@ module.exports = {
   refreshToken,
   guardarCliente,
   deshboard,
+  datosEnvio,
   guardarDireccion,
   traerDireccionEspecifica,
   actualizarDireccion,

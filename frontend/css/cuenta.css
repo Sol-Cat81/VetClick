@@ -199,6 +199,16 @@ dialog::-webkit-scrollbar-thumb {
     align-items: center !important;
 }
 
+/* Secciones bloqueadas mientras el usuario no esté registrado como cliente. */
+.opcion.deshabilitado {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.opcion.deshabilitado:hover {
+    background-color: transparent !important;
+}
+
 .nav-titulos {
     display: flex;
     flex-direction: column;

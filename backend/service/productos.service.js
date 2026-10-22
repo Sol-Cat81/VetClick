@@ -32,6 +32,39 @@ async function cantidadCargada(dato) {
     return Carrito.cantidadCargada(dato)
 }
 
+// Valida los datos de envío/pago y delega en el modelo la alta transaccional
+// del pedido (pedidos, detalle_pedidos, pagos, envios, stock y carrito).
+async function crearPedido(idUsuario, datos) {
+    const tipoEntrega = String(datos?.tipo_entrega || '').toUpperCase()
+    const metodoPago = String(datos?.metodo_pago || '').toUpperCase()
+    const opcionesEntrega = ['DOMICILIO', 'SUCURSAL']
+    const opcionesPago = ['EFECTIVO', 'TRANSFERENCIA', 'DEBITO', 'CREDITO']
+
+    if (!opcionesEntrega.includes(tipoEntrega)) throw new Error('El tipo de entrega no es válido')
+    if (!opcionesPago.includes(metodoPago)) throw new Error('La forma de pago no es válida')
+
+    const idDireccion = Number(datos?.id_direccion)
+    const codigoPostal = String(datos?.codigo_postal || '').trim()
+    if (tipoEntrega === 'DOMICILIO') {
+        if (!Number.isInteger(idDireccion) || idDireccion <= 0) {
+            throw new Error('Seleccioná la dirección de entrega')
+        }
+        if (codigoPostal.length < 4 || codigoPostal.length > 10) {
+            throw new Error('El código postal no es válido')
+        }
+    }
+
+    // El costo lo decide el servidor: 1500 en domicilio, sin cargo en retiro.
+    const costoEnvio = tipoEntrega === 'DOMICILIO' ? 1500 : 0
+    return Carrito.checkout(idUsuario, {
+        tipoEntrega,
+        metodoPago,
+        idDireccion: tipoEntrega === 'DOMICILIO' ? idDireccion : null,
+        codigoPostal: tipoEntrega === 'DOMICILIO' ? codigoPostal : null,
+        costoEnvio
+    })
+}
+
 // Agrupa filas planas (producto x variante x categoría) en objetos por producto.
 // Se reutiliza tanto para el listado completo legacy como para la búsqueda paginada.
 function agruparFilas(productos) {
@@ -154,6 +187,7 @@ module.exports = {
   agregarItem, 
   cambiarCantidad, 
   cantidadCargada, 
+  crearPedido, 
   traerTodosProductos, 
   buscarProductosCatalogo, 
   obtenerRangoPrecios, 

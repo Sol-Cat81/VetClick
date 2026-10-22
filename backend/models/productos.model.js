@@ -111,6 +111,102 @@ class Carrito {
         const [ resultado ] = await db.execute(query, [idUsuario])
         return resultado[0].total
     }
+
+    // Registra la compra completa del usuario en una sola transaccion:
+    // pedido, detalle, pago, envio, descuento de stock y vaciado del carrito.
+    static async checkout(idUsuario, opciones) {
+        const { tipoEntrega, metodoPago, idDireccion, codigoPostal, costoEnvio } = opciones
+        const conexion = await db.getConnection()
+        try {
+            await conexion.beginTransaction()
+
+            // Bloquea los items del carrito para que nadie compre lo mismo dos veces.
+            const [items] = await conexion.execute(
+                `SELECT ci.id_variante, ci.cantidad, v.precio, p.descuento, p.nombre
+                 FROM carrito_items AS ci
+                 JOIN variantes AS v ON v.id_variante = ci.id_variante
+                 JOIN productos AS p ON p.id_producto = v.id_producto
+                 WHERE ci.id_usuario = ?
+                 FOR UPDATE`,
+                [idUsuario]
+            )
+            if (items.length === 0) throw new Error('El carrito está vacío')
+
+            // Valida stock y calcula los precios finales con el descuento aplicado.
+            const lineas = []
+            let subtotal = 0
+            for (const item of items) {
+                const [stock] = await conexion.execute(
+                    `SELECT id_inventario, stock_actual
+                     FROM inventario
+                     WHERE id_variante = ? AND stock_actual > 0
+                     ORDER BY id_inventario
+                     FOR UPDATE`,
+                    [item.id_variante]
+                )
+                const disponible = stock.reduce((total, fila) => total + Number(fila.stock_actual || 0), 0)
+                const cantidad = Number(item.cantidad)
+                if (cantidad > disponible) {
+                    throw new Error(`No hay stock suficiente para ${item.nombre}`)
+                }
+                const precioUnitario = Math.round(Number(item.precio) * (1 - (Number(item.descuento) || 0) / 100) * 100) / 100
+                const subtotalLinea = Math.round(precioUnitario * cantidad * 100) / 100
+                lineas.push({ idVariante: item.id_variante, cantidad, precioUnitario, subtotalLinea, stock })
+                subtotal = Math.round((subtotal + subtotalLinea) * 100) / 100
+            }
+
+            const total = Math.round((subtotal + Number(costoEnvio)) * 100) / 100
+
+            const [pedido] = await conexion.execute(
+                `INSERT INTO pedidos (id_cliente, fecha, estado, subtotal, costo_envio, total)
+                 VALUES (?, NOW(), 'PENDIENTE', ?, ?, ?)`,
+                [idUsuario, subtotal, Number(costoEnvio), total]
+            )
+            const idPedido = pedido.insertId
+
+            for (const linea of lineas) {
+                await conexion.execute(
+                    `INSERT INTO detalle_pedidos (id_pedido, id_variante, cantidad, precio_unitario, subtotal)
+                     VALUES (?, ?, ?, ?, ?)`,
+                    [idPedido, linea.idVariante, linea.cantidad, linea.precioUnitario, linea.subtotalLinea]
+                )
+
+                // Descuenta el stock sucursal por sucursal hasta cubrir la cantidad.
+                let restante = linea.cantidad
+                for (const fila of linea.stock) {
+                    if (restante <= 0) break
+                    const tomar = Math.min(restante, Number(fila.stock_actual))
+                    await conexion.execute(
+                        'UPDATE inventario SET stock_actual = stock_actual - ? WHERE id_inventario = ?',
+                        [tomar, fila.id_inventario]
+                    )
+                    restante -= tomar
+                }
+            }
+
+            await conexion.execute(
+                `INSERT INTO pagos (id_pedido, metodo_pago, estado_pago)
+                 VALUES (?, ?, 'PENDIENTE')`,
+                [idPedido, metodoPago]
+            )
+
+            await conexion.execute(
+                `INSERT INTO envios (id_pedido, tipo_entrega, id_direccion, codigo_postal, fecha_estimada, estado)
+                 VALUES (?, ?, ?, ?, IF(? = 'DOMICILIO', DATE_ADD(CURDATE(), INTERVAL 3 DAY), NULL), 'EN_CAMINO')`,
+                [idPedido, tipoEntrega, idDireccion, codigoPostal, tipoEntrega]
+            )
+
+            await conexion.execute('DELETE FROM carrito_items WHERE id_usuario = ?', [idUsuario])
+            await conexion.commit()
+
+            return { id_pedido: idPedido, subtotal, costo_envio: Number(costoEnvio), total }
+        } catch (error) {
+            await conexion.rollback()
+            throw error
+        } finally {
+            conexion.release()
+        }
+    }
 }
 
 class Productos{

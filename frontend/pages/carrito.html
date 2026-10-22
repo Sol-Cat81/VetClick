@@ -53,34 +53,36 @@
                     <fieldset class="grupo-formulario">
                         <legend><i class="ph ph-truck" aria-hidden="true"></i> Datos de envío</legend>
                         <label class="campo">
-                            Nombre y apellido
-                            <input name="nombre" autocomplete="name" required />
+                            Nombre
+                            <input id="nombre" name="nombre" maxlength="30" autocomplete="name" required />
                         </label>
                         <label class="campo">
-                            Correo electrónico
-                            <input type="email" name="correo" autocomplete="email" required />
+                            Apellido
+                            <input type="text" id="apellido" maxlength="30" name="apellido" autocomplete="apellido"
+                                required />
                         </label>
                         <label class="campo">
                             Teléfono
-                            <input type="tel" name="telefono" autocomplete="tel" required />
+                            <input type="tel" id="telefono" maxlength="12" name="telefono" autocomplete="tel"
+                                required />
                         </label>
-                        <label class="campo">
+                        <label class="campo" id="campo-direccion">
                             Dirección
-                            <input name="direccion" autocomplete="street-address" required />
+                            <select name="direccion" id="select-direccion">
+                                <option value="">Seleccioná una dirección</option>
+                            </select>
                         </label>
-                        <div class="campos-pareja">
-                            <label class="campo">
-                                Ciudad
-                                <input name="ciudad" autocomplete="address-level2" required />
-                            </label>
-                            <label class="campo">
-                                Provincia
-                                <input name="provincia" autocomplete="address-level1" required />
-                            </label>
+                        <div class="sin-direcciones" id="sin-direcciones" hidden>
+                            <i class="ph ph-map-pin-line" aria-hidden="true"></i>
+                            <p>No tenés direcciones registradas.</p>
+                            <a class="boton-primario" href="cuenta.html">
+                                <i class="ph ph-plus" aria-hidden="true"></i> Agregar dirección
+                            </a>
                         </div>
-                        <label class="campo">
+                        <label class="campo" id="campo-codigo-postal">
                             Código postal
-                            <input name="codigoPostal" autocomplete="postal-code" required />
+                            <input name="codigoPostal" id="codigo-postal" minlength="4" maxlength="10"
+                                autocomplete="postal-code" />
                         </label>
                         <label class="campo">
                             Entrega
@@ -89,22 +91,26 @@
                                 <option value="retiro">Retiro en sucursal</option>
                             </select>
                         </label>
+                        <p class="aviso-registro" id="aviso-registro" role="status" hidden></p>
                     </fieldset>
 
                     <fieldset class="grupo-formulario pago-forma">
                         <legend><i class="ph ph-credit-card" aria-hidden="true"></i> Forma de pago</legend>
                         <label class="opcion-pago">
-                            <input type="radio" name="pago" value="tarjeta" checked />
-                            <span><i class="ph ph-credit-card" aria-hidden="true"></i> Tarjeta de crédito o
-                                débito</span>
+                            <input type="radio" name="pago" value="credito" checked />
+                            <span><i class="ph ph-credit-card" aria-hidden="true"></i> Tarjeta de crédito</span>
+                        </label>
+                        <label class="opcion-pago">
+                            <input type="radio" name="pago" value="debito" />
+                            <span><i class="ph ph-credit-card" aria-hidden="true"></i> Tarjeta de débito</span>
                         </label>
                         <label class="opcion-pago">
                             <input type="radio" name="pago" value="transferencia" />
-                            <span><i class="ph ph-bank" aria-hidden="true"></i> Transferencia bancaria</span>
+                            <span><i class="ph ph-bank" aria-hidden="true"></i> Transferencia</span>
                         </label>
                         <label class="opcion-pago">
                             <input type="radio" name="pago" value="efectivo" />
-                            <span><i class="ph ph-money" aria-hidden="true"></i> Efectivo al retirar</span>
+                            <span><i class="ph ph-money" aria-hidden="true"></i> Efectivo</span>
                         </label>
                     </fieldset>
 
@@ -133,6 +139,34 @@
             </aside>
         </div>
     </main>
+
+    <dialog id="modal-resumen-compra" class="modal-resumen" aria-labelledby="titulo-modal-compra">
+        <div class="contenedor-modal-resumen">
+            <div class="cabecera-modal-resumen">
+                <span class="icono-modal-resumen" id="icono-modal-resumen">
+                    <i class="ph ph-clipboard-text" aria-hidden="true"></i>
+                </span>
+                <div class="textos-cabecera-resumen">
+                    <h3 id="titulo-modal-resumen">Resumen del pedido</h3>
+                    <p id="subtitulo-modal-resumen">Revisá los datos antes de confirmar la compra.</p>
+                </div>
+                <button type="button" class="cerrar-modal-resumen" data-cerrar-resumen aria-label="Cerrar">
+                    <i class="ph ph-x" aria-hidden="true"></i>
+                </button>
+            </div>
+
+            <div class="cuerpo-modal-resumen" id="detalle-modal-resumen"></div>
+
+            <div class="pie-modal-resumen" id="pie-modal-resumen">
+                <button type="button" class="boton-secundario" data-cerrar-resumen>
+                    Seguir editando
+                </button>
+                <button type="button" class="boton-primario" id="terminar-compra">
+                    Terminar compra <i class="ph ph-check-circle" aria-hidden="true"></i>
+                </button>
+            </div>
+        </div>
+    </dialog>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"

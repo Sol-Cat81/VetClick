@@ -4,7 +4,7 @@ const multer = require ('multer');
 const router = express.Router();
 const UsuarioService = require('../service/personal.service')
 const { authMiddleware } = require('./../middlewares/auth')
-const { 
+const {
     verificarUsuario, 
     registrarUsuario, 
     detectarsession, 
@@ -12,6 +12,7 @@ const {
     refreshToken, 
     guardarCliente,
     deshboard,
+    datosEnvio,
     guardarDireccion,
     traerDireccionEspecifica,
     actualizarDireccion,
@@ -63,6 +64,7 @@ router.post("/refresh", refreshToken);
 
 router.post('/guardarcliente', authMiddleware, guardarCliente)
 router.get('/deshboard', authMiddleware, deshboard)
+router.get('/datosenvio', authMiddleware, datosEnvio)
 router.post('/guardardireccion', authMiddleware, guardarDireccion)
 router.post('/traerdireccion', authMiddleware, traerDireccionEspecifica)
 router.put('/actualizardireccion/:id', authMiddleware, actualizarDireccion)

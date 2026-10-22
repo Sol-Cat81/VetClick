@@ -517,6 +517,318 @@ body {
     }
 }
 
+/* ---------- Formulario de envío: direcciones y avisos ---------- */
+
+/* .campo usa display:flex, así que hay que anular [hidden] explícitamente. */
+.campo[hidden],
+.sin-direcciones[hidden],
+.aviso-registro[hidden] {
+    display: none !important;
+}
+
+.sin-direcciones {
+    display: grid;
+    justify-items: start;
+    gap: 9px;
+    padding: 13px;
+    border: 1px dashed var(--linea);
+    border-radius: 5px;
+    background: var(--principal-fondo);
+}
+
+.sin-direcciones p {
+    margin: 0;
+    color: var(--texto-suave);
+}
+
+.sin-direcciones i {
+    font-size: 1.4rem;
+    color: var(--elem-secun);
+}
+
+.aviso-registro {
+    margin: 4px 0 0;
+    padding: 11px 12px;
+    border: 1px solid #f0c9a3;
+    border-radius: 5px;
+    background: #fdf4e7;
+    color: #8a5a1d;
+    font-size: 0.86rem;
+    font-weight: 400;
+    line-height: 1.4;
+}
+
+.aviso-registro a {
+    color: var(--elem-importantes);
+    font-weight: bold;
+}
+
+.boton-secundario {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    padding: 11px 17px;
+    border: 1px solid var(--linea);
+    border-radius: 5px;
+    background: transparent;
+    color: var(--elem-importantes);
+    font: inherit;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.boton-secundario:hover:not(:disabled) {
+    border-color: var(--elem-importantes);
+    background: var(--principal-fondo);
+    color: var(--elem-importantes);
+}
+
+/* ---------- Modal de resumen y confirmación de la compra ---------- */
+
+.modal-resumen {
+    width: min(580px, calc(100vw - 30px));
+    max-height: min(86vh, 760px);
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: var(--secundario-fondo);
+    color: var(--texto);
+    box-shadow: 0 22px 55px #0b2f3a45;
+    overflow: hidden;
+}
+
+.modal-resumen::backdrop {
+    background: #0f3d4bbf;
+}
+
+.contenedor-modal-resumen {
+    display: flex;
+    flex-direction: column;
+    max-height: inherit;
+}
+
+.cabecera-modal-resumen {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 20px 22px;
+    border-bottom: 1px solid var(--linea);
+}
+
+.icono-modal-resumen {
+    display: grid;
+    place-items: center;
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #effaf8;
+    color: var(--elem-importantes);
+    font-size: 1.5rem;
+}
+
+.icono-modal-resumen.icono-exito {
+    background: #eaf7e0;
+    color: #4d7c0f;
+}
+
+.textos-cabecera-resumen {
+    flex: 1;
+    min-width: 0;
+}
+
+.textos-cabecera-resumen h3 {
+    margin: 0;
+    color: var(--elem-importantes);
+    font-size: 1.3rem;
+    font-weight: bold;
+}
+
+.textos-cabecera-resumen p {
+    margin: 3px 0 0;
+    color: var(--texto-suave);
+    font-size: 0.88rem;
+}
+
+.cerrar-modal-resumen {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 1px solid var(--linea);
+    border-radius: 5px;
+    background: transparent;
+    color: var(--elem-importantes);
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+.cerrar-modal-resumen:hover {
+    background: var(--principal-fondo);
+}
+
+.cuerpo-modal-resumen {
+    padding: 18px 22px;
+    overflow-y: auto;
+}
+
+.bloque-detalle {
+    margin-bottom: 17px;
+}
+
+.bloque-detalle h4 {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin: 0 0 9px;
+    color: var(--elem-importantes);
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.bloque-detalle h4 i {
+    color: var(--elem-secun);
+}
+
+.lineas-detalle {
+    display: grid;
+    gap: 7px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.lineas-detalle li {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    color: var(--texto);
+    font-size: 0.92rem;
+}
+
+.lineas-detalle li > span:first-child {
+    color: var(--texto-suave);
+}
+
+.lineas-detalle .fila-envio > span:last-child {
+    text-align: right;
+    overflow-wrap: anywhere;
+}
+
+.detalle-producto {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.detalle-producto strong {
+    color: var(--elem-importantes);
+    font-size: 0.95rem;
+}
+
+.detalle-producto small {
+    color: var(--texto-suave);
+    font-size: 0.8rem;
+}
+
+.detalle-importe {
+    flex: 0 0 auto;
+    color: var(--elem-importantes);
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.totales-detalle {
+    display: grid;
+    gap: 8px;
+    padding-top: 14px;
+    border-top: 1px solid var(--linea);
+}
+
+.totales-detalle > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.totales-detalle span {
+    color: var(--texto-suave);
+}
+
+.totales-detalle strong {
+    color: var(--elem-importantes);
+}
+
+.totales-detalle .total-detalle {
+    margin-top: 3px;
+    padding-top: 12px;
+    border-top: 1px solid var(--linea);
+    font-size: 1.1rem;
+}
+
+.totales-detalle .total-detalle span,
+.totales-detalle .total-detalle strong {
+    color: var(--elem-importantes);
+    font-weight: bold;
+}
+
+.pie-modal-resumen {
+    display: flex;
+    justify-content: flex-end;
+    gap: 11px;
+    padding: 16px 22px;
+    border-top: 1px solid var(--linea);
+    background: var(--principal-fondo);
+}
+
+.pie-modal-resumen .error-resumen {
+    flex-basis: 100%;
+    margin: 0 0 4px;
+    color: #a45149;
+    font-size: 0.86rem;
+    text-align: right;
+}
+
+.exito-compra {
+    text-align: center;
+}
+
+.exito-compra > p:first-child {
+    margin: 0 0 14px;
+    color: var(--texto);
+    font-size: 1rem;
+}
+
+.exito-compra .lineas-detalle {
+    text-align: left;
+    padding: 13px 15px;
+    border: 1px solid var(--linea);
+    border-radius: 6px;
+    background: var(--principal-fondo);
+}
+
+.nota-exito {
+    margin: 13px 0 0;
+    color: var(--texto-suave);
+    font-size: 0.86rem;
+}
+
+@media (max-width: 540px) {
+    .pie-modal-resumen {
+        flex-direction: column-reverse;
+    }
+
+    .pie-modal-resumen > * {
+        width: 100%;
+    }
+}
+
 @media (max-width: 540px) {
     .carrito-main {
         padding: 25px 13px 48px;

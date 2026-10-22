@@ -1,5 +1,6 @@
 // El controlador recibe HTTP y aplica las reglas de login/registro.
-const { traerCarrito, eliminarItem, agregarItem, cambiarCantidad, cantidadCargada } = require('./../service/productos.service')
+const { traerCarrito, eliminarItem, agregarItem, cambiarCantidad, cantidadCargada, crearPedido } = require('./../service/productos.service')
+const { traerInfoCliente, traerDireccion } = require('./../service/usuarios.service')
 
 // Devuelve los artículos del usuario autenticado, o una lista vacía.
 const solicitarCarrito = async(req, res) =>{
@@ -66,9 +67,43 @@ const actualizarCantidadCarrito = async(req, res) =>{
         return res.status(500).json({mensaje: 'ERROR interno'})
     }
 }
-// Punto de entrada previsto para confirmar una compra; todavía no está implementado.
+// Confirma la compra: exige cliente registrado y dirección propia si el envío
+// es a domicilio; el modelo registra todo en una sola transacción.
 const realizarCompra = async(req, res) =>{
-    
+    try {
+        const cliente = await traerInfoCliente(req.usuario.id)
+        if (!cliente) {
+            return res.status(404).json({mensaje: 'Completá tu registro en Mi cuenta para poder comprar'})
+        }
+
+        const tipoEntrega = String(req.body.tipo_entrega || '').toUpperCase()
+        const idDireccion = Number(req.body.id_direccion)
+        if (tipoEntrega === 'DOMICILIO' && Number.isInteger(idDireccion) && idDireccion > 0) {
+            // Solo se comprueba que la dirección sea del cliente: si el id no
+            // viene, el service devuelve el 400 con el mensaje de validación.
+            const direccion = await traerDireccion(idDireccion, cliente.id_cliente)
+            if (!direccion) {
+                return res.status(404).json({mensaje: 'La dirección de entrega no es válida'})
+            }
+        }
+
+        const pedido = await crearPedido(req.usuario.id, req.body)
+        return res.status(201).json({mensaje: 'Compra registrada con éxito!', pedido})
+    } catch (error) {
+        const mensaje = error.message || 'No se pudo registrar la compra'
+        if (mensaje === 'El carrito está vacío' ||
+            mensaje === 'El tipo de entrega no es válido' ||
+            mensaje === 'La forma de pago no es válida' ||
+            mensaje === 'Seleccioná la dirección de entrega' ||
+            mensaje === 'El código postal no es válido') {
+            return res.status(400).json({mensaje})
+        }
+        if (mensaje.startsWith('No hay stock suficiente')) {
+            return res.status(409).json({mensaje})
+        }
+        console.error('Error al registrar la compra:', error)
+        return res.status(500).json({mensaje: 'No se pudo registrar la compra'})
+    }
 }
 
 const traerCantidad = async(req, res) =>{
