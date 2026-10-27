@@ -14,7 +14,7 @@ const modalFoto = document.getElementById('modalFoto');
 const imagenRecorte = document.getElementById('imagenRecorte');
 const guardarFoto = document.getElementById('guardarFoto');
 const fotoUsuario = document.getElementById('fotoUsuario');
-let recorte = null; 
+let recorte = null;
 
 const navegarHistorial = document.querySelector('.filtrar-historial')
 const contenidoHistorial = document.querySelectorAll('article')
@@ -704,6 +704,33 @@ async function verDetalleCompra(idPedido) {
     }
 }
 
+async function cerrarSession() {
+    try {
+        const cerrarSession = await fetch('http://127.0.0.1:3000/api/usuarios/logout', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include'
+        });
+
+        const cerrado = await cerrarSession.json();
+        if (cerrarSession.ok) {
+            mostrarToast(cerrado.mensaje || 'Sesión cerrada con éxito.', 'exito');
+
+            setTimeout(() => {
+                window.location.href = "./../index.html";
+            }, 1500);
+
+        } else {
+            mostrarToast('No se pudo cerrar sesión.', 'error');
+        }
+    } catch (error) {
+        console.error("Error de conexión:", error);
+        mostrarToast('No se pudo conectar con el servidor.', 'error');
+    }
+}
+
 document.querySelector('.mascotas-contenedor').addEventListener('click', evento => {
     const ficha = evento.target.closest('[data-ficha-mascota]');
     const editar = evento.target.closest('[data-editar-mascota]');
@@ -905,7 +932,7 @@ formMascota.addEventListener('submit', async (evento) => {
     const sexo = document.getElementById('hembra').checked ? 'HEMBRA'
         : document.getElementById('macho').checked ? 'MACHO' : '';
 
-    if(!nombreMascota || !raza || !fechaNacimiento || !sexo){
+    if (!nombreMascota || !raza || !fechaNacimiento || !sexo) {
         mostrarToast('Llena todos los campos obligatorios correctamente!', 'error')
         return;
     }
@@ -953,14 +980,14 @@ formMascota.addEventListener('submit', async (evento) => {
     }
 })
 
-function abrirModalFoto(){
+function abrirModalFoto() {
     modalFoto.classList.add('abierto');
     modalFoto.setAttribute('aria-hidden', 'false');
     guardarFoto.disabled = true;
 }
 
-function cerrarModalFoto(){
-    if(recorte){
+function cerrarModalFoto() {
+    if (recorte) {
         recorte.destroy(); recorte = null;
     }
     modalFoto.classList.remove('abierto');
@@ -975,27 +1002,27 @@ modalFoto.addEventListener('click', (evento) => {
     if (evento.target === modalFoto) cerrarModalFoto();
 });
 
-inputFotoUsuario.addEventListener('change', ()=>{
+inputFotoUsuario.addEventListener('change', () => {
     const archivo = inputFotoUsuario.files[0];
-    if(!archivo)return;
+    if (!archivo) return;
 
     const extensiones = TIPOS_ACEPTADOS.map(tipo => tipo.split('/')[1]);
-    if(!TIPOS_ACEPTADOS.includes(archivo.type)){
+    if (!TIPOS_ACEPTADOS.includes(archivo.type)) {
         mostrarToast(`esa imagen no sirve pe usa ${extensiones.join(', ')}`, 'error');
         inputFotoUsuario.value = '';
         return;
     }
-    if(archivo.size > LIMITE_MEGABYTES * 1024 * 1024){
-        mostrarToast(`la imagen pesa ${(archivo.size / 1024 /1024).toFixed(1)} MB y el macximo es ${LIMITE_MEGABYTES} MB`, 'error');
+    if (archivo.size > LIMITE_MEGABYTES * 1024 * 1024) {
+        mostrarToast(`la imagen pesa ${(archivo.size / 1024 / 1024).toFixed(1)} MB y el macximo es ${LIMITE_MEGABYTES} MB`, 'error');
         inputFotoUsuario.value = '';
         return;
     }
 
     const lector = new FileReader();
-    lector.onload = () =>{
+    lector.onload = () => {
         imagenRecorte.src = lector.result;
         abrirModalFoto();
-        if(recorte) recorte.destroy();
+        if (recorte) recorte.destroy();
         recorte = new Cropper(imagenRecorte, {
             aspectRatio: 1,       // el avatar es un cuadrado de 80px
             viewMode: 1,
@@ -1009,25 +1036,25 @@ inputFotoUsuario.addEventListener('change', ()=>{
     lector.readAsDataURL(archivo);
 });
 
-guardarFoto.addEventListener('click', async()=>{
-    if(!recorte) return;
+guardarFoto.addEventListener('click', async () => {
+    if (!recorte) return;
     guardarFoto.disabled = true;
 
-    recorte.getCroppedCanvas().toBlob(async(blob)=>{
-        if (!blob){guardarFoto.disabled = false; return;}
+    recorte.getCroppedCanvas().toBlob(async (blob) => {
+        if (!blob) { guardarFoto.disabled = false; return; }
 
         const datos = new FormData();
         datos.append('imagen_usuario', blob, 'perfil.jpg');
 
-        try{
-            let enviar = await fetch(`${apiUsuario}/perfil/foto`,{
-                method:'POST',
+        try {
+            let enviar = await fetch(`${apiUsuario}/perfil/foto`, {
+                method: 'POST',
                 credentials: 'include',
                 body: datos
             });
-            if (enviar.status === 401){
-                if (renovarToken()){
-                    enviar = await fetch(`${apiUsuario}/perfil/foto`,{
+            if (enviar.status === 401) {
+                if (renovarToken()) {
+                    enviar = await fetch(`${apiUsuario}/perfil/foto`, {
                         method: 'POST',
                         credentials: 'include',
                         body: datos
@@ -1035,17 +1062,17 @@ guardarFoto.addEventListener('click', async()=>{
                 }
             }
             const confirmacion = await enviar.json();
-            if (enviar.ok){
+            if (enviar.ok) {
                 fotoUsuario.src = `${confirmacion.imagen}?v=${Date.now()}`;
                 cerrarModalFoto();
                 mostrarToast('foto actualizada', 'exito');
-            }else{
+            } else {
                 mostrarToast(confirmacion.mensaje || 'no se pudo guardar la foto', 'error');
                 guardarFoto.disabled = false;
             }
-        }catch (error){
+        } catch (error) {
             mostrarToast('hubo un problema con el servidor', 'error');
             guardarFoto.disabled = false;
         }
-    },'image/jpeg', 0.9);
+    }, 'image/jpeg', 0.9);
 });
