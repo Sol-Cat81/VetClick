@@ -330,7 +330,7 @@ class MiNavbar extends HTMLElement {
         <div class="offcanvas-body">
           <ul class="navegacion">
             <li><a href="${ruta}index.html" class="ofcanvas-nav">Inicio</a></li>
-            <li><a href="${ruta}pages/servicios.html" class="ofcanvas-nav">Servicios</a></li>
+            <li><a href="${ruta}pages/catalogo.html" class="ofcanvas-nav">Catalogo</a></li>
             <li><a href="${ruta}pages/turnos.html" class="ofcanvas-nav">Turnos</a></li>
             <li><a href="${ruta}pages/productos.html" class="ofcanvas-nav">Productos</a></li>
             <li><a href="${ruta}pages/adopciones.html" class="ofcanvas-nav">Adopciones</a></li>

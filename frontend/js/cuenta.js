@@ -199,6 +199,8 @@ function cargarFormUsuario(info) {
         alertaUsu.classList.remove('alertaActiva')
     }
     aplicarOpcionesRegistro(info.cliente !== null)
+    const tituloPerfil = document.querySelector('#header-form')
+    tituloPerfil.textContent = `${info.usuario.username}`
     document.querySelector('.usuario-head').innerHTML = `${info.usuario.username}`
     document.getElementById('username').value = info.usuario.username
     document.getElementById('gmail').value = info.usuario.email
@@ -406,7 +408,7 @@ function cargarMascotas(mascotas) {
                             </div>
                         </div>
                         <div class="col col-2 text-end">
-                            <button type="button" class="accion-icono" data-editar-mascota="${mascota.id_mascota}" aria-label="Editar ${escaparHTML(mascota.nombre)}">
+                            <button type="button" class="accion-icono btn-editar-mascota" data-editar-mascota="${mascota.id_mascota}" aria-label="Editar ${escaparHTML(mascota.nombre)}">
                                 <i class="ph ph-pencil-simple-line"></i>
                             </button>
                         </div>

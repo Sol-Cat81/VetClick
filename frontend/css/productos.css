@@ -181,7 +181,8 @@ body {
 #productos-detacados .card-productos img {
     width: 100%;
     height: 230px;
-    object-fit: cover;
+    object-fit: contain;
+    padding: 10px;
 }
 
 #productos-detacados .card-pie {
@@ -310,7 +311,7 @@ body {
 #marcas .card-marcas img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
 }
 
 /* = = = = PIE DE PAGINA = = = = */

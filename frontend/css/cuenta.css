@@ -450,15 +450,17 @@ dialog::-webkit-scrollbar-thumb {
     padding: 20px 5px;
 }
 
-#mascotas .ph-pencil-simple-line {
+#mascotas .btn-editar-mascota {
     color: var(--elem-importantes);
+    background-color: transparent;
+    border: none;
     font-size: 20px;
     cursor: pointer;
-    padding: 10px;
+    padding: 5px 10px;
     border-radius: 10px;
 }
 
-#mascotas .ph-pencil-simple-line:hover {
+#mascotas .btn-editar-mascota:hover {
     background-color: #ebf8fc75;
 }
 
@@ -609,6 +611,8 @@ dialog::-webkit-scrollbar-thumb {
     margin-left: auto;
     cursor: pointer;
     border-radius: 15px;
+    background-color: transparent;
+    border: none;
 }
 
 .vermas:hover {

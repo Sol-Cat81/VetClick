@@ -18,7 +18,7 @@ async function guardarCrearCliente(idUsuario, nombre, apellido, telefono, userna
     if(!nombre || !apellido || !telefono){
         throw new Error('Todos los campos son obligatorios')
     }
-    const actualizar = await Usuario.actulizarUsuario(idUsuario, username)
+    const actualizar = await Usuario.actualizarUsuario(idUsuario, username)
     const resultado = await Usuario.guardarCliente(idUsuario, nombre, apellido, telefono)
     if(!resultado || !actualizar){
         throw new Error('Error al guardar el cliente')
